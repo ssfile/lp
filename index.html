@@ -1253,7 +1253,19 @@
       </aside>
 
       <!-- Workspace & Admin Main Content -->
-      <div class="lg:col-span-9">
+      <div class="lg:col-span-9 space-y-5">
+
+        <!-- Mobile / Tablet Quick Menu Bar for Admin Dashboard -->
+        <div class="flex lg:hidden items-center gap-2 overflow-x-auto pb-1">
+          <button type="button" onclick="navigateTo('/dashboard')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-black bg-white text-black">Utama</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-customers')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">Pelanggan</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-features')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">Link Fitur</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-pricing')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">Pricing</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-whatsapp')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">WhatsApp</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-landing')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">Landing Page</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-appearance')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">Warna &amp; Tema</button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-firebase')" class="shrink-0 px-3 py-2 text-xs font-semibold rounded-xl border border-neutral-300 bg-white text-black">Firebase</button>
+        </div>
         
         <!-- Sub-view A: Dashboard Overview ("/dashboard") -->
         <div id="dash-subview-overview" class="space-y-6">
@@ -2421,7 +2433,7 @@ service cloud.firestore {
       appState.activeFirebaseConfig = configObj;
 
       // Sync persistent Firebase Email/Password admin session across reloads
-      onAuthStateChanged(auth, async (fbUser) => {
+      onAuthStateChanged(auth, (fbUser) => {
         if (fbUser && fbUser.email) {
           appState.user = {
             name: fbUser.displayName || fbUser.email.split("@")[0] || "Admin Platform",
@@ -2429,8 +2441,11 @@ service cloud.firestore {
             uid: fbUser.uid
           };
           syncAuthNavState();
-          // Ensure initial data exists in Firestore as soon as admin is authenticated
-          await ensureInitialFirestoreSeed();
+          if (appState.currentRoute === "/login" || appState.currentRoute === "/register") {
+            navigateTo("/dashboard");
+          }
+          // Seed initial data in background without blocking UI rendering
+          ensureInitialFirestoreSeed().catch(() => {});
         }
       });
 
@@ -2707,9 +2722,16 @@ service cloud.firestore {
     function applyGlobalThemeAndBrand() {
       const s = appState.siteSettings;
       const root = document.documentElement;
-      root.style.setProperty("--bg-primary", s.themeBgPrimary || "#FFFFFF");
-      root.style.setProperty("--bg-secondary", s.themeBgSecondary || "#FAFAFA");
-      root.style.setProperty("--text-primary", s.themeTextPrimary || "#000000");
+      const bgPrimary = s.themeBgPrimary || "#FFFFFF";
+      const bgSecondary = s.themeBgSecondary || "#FAFAFA";
+      let textPrimary = s.themeTextPrimary || "#000000";
+      if (bgPrimary.toUpperCase() === textPrimary.toUpperCase()) {
+        textPrimary = bgPrimary.toUpperCase() === "#000000" ? "#FFFFFF" : "#000000";
+      }
+
+      root.style.setProperty("--bg-primary", bgPrimary);
+      root.style.setProperty("--bg-secondary", bgSecondary);
+      root.style.setProperty("--text-primary", textPrimary);
       root.style.setProperty("--text-secondary", s.themeTextSecondary || "#525252");
       root.style.setProperty("--accent-primary", s.themeAccentPrimary || "#000000");
       root.style.setProperty("--accent-text", s.themeAccentText || "#FFFFFF");
@@ -2721,9 +2743,9 @@ service cloud.firestore {
       root.style.setProperty("--grid-size", `${Number(s.gridSize) || 36}px`);
 
       const isCustomTheme =
-        (s.themeBgPrimary || "#FFFFFF").toUpperCase() !== "#FFFFFF" ||
-        (s.themeBgSecondary || "#FAFAFA").toUpperCase() !== "#FAFAFA" ||
-        (s.themeTextPrimary || "#000000").toUpperCase() !== "#000000" ||
+        bgPrimary.toUpperCase() !== "#FFFFFF" ||
+        bgSecondary.toUpperCase() !== "#FAFAFA" ||
+        textPrimary.toUpperCase() !== "#000000" ||
         (s.themeAccentPrimary || "#000000").toUpperCase() !== "#000000";
       document.body.classList.toggle("theme-customized", isCustomTheme);
 
@@ -3330,9 +3352,9 @@ service cloud.firestore {
           uid: cred.user.uid
         };
         syncAuthNavState();
-        await ensureInitialFirestoreSeed();
-        showToast("Berhasil masuk ke Dashboard Admin!");
         navigateTo("/dashboard");
+        showToast("Berhasil masuk ke Dashboard Admin!");
+        ensureInitialFirestoreSeed().catch(() => {});
       } catch (error) {
         console.error("Admin Firebase Auth error:", error);
         let hint = "Pastikan email & password sesuai dengan user yang Anda buat di Firebase Console → Authentication → Users.";
@@ -3555,30 +3577,6 @@ service cloud.firestore {
       persistCustomerToFirestore(obj);
     };
 
-    window.saveCustomerForm = async function (event, existingId) {
-      event.preventDefault();
-      const obj = {
-        id: existingId || "cust-" + Date.now(),
-        code: document.getElementById("mc-code").value.trim().toUpperCase(),
-        name: document.getElementById("mc-name").value.trim(),
-        email: document.getElementById("mc-email").value.trim().toLowerCase(),
-        password: document.getElementById("mc-password").value.trim(),
-        subscriptionStart: document.getElementById("mc-start").value,
-        referralCode: document.getElementById("mc-referral").value.trim().toUpperCase(),
-        isActive: document.getElementById("mc-active").checked
-      };
-
-      const idx = appState.customers.findIndex(c => c.id === obj.id);
-      if (idx >= 0) appState.customers[idx] = obj;
-      else appState.customers.unshift(obj);
-
-      saveStateToLocalStorage();
-      await persistCustomerToFirestore(obj);
-      renderAdminCustomersList();
-      closeModal();
-      showToast("Data pelanggan berhasil disimpan.");
-    };
-
     window.deleteCustomerItem = async function (custId) {
       appState.customers = appState.customers.filter(c => c.id !== custId);
       saveStateToLocalStorage();
@@ -3656,24 +3654,6 @@ service cloud.firestore {
       closeModal();
       showToast("Kode referral berhasil ditambahkan!");
       persistReferralToFirestore(obj);
-    };
-
-    window.saveReferralForm = async function (event) {
-      event.preventDefault();
-      const obj = {
-        id: "ref-" + Date.now(),
-        code: document.getElementById("mr-code").value.trim().toUpperCase(),
-        ownerName: document.getElementById("mr-owner").value.trim() || "Mitra AKSA.AI",
-        discountInfo: document.getElementById("mr-info").value.trim() || "Kode Referral Resmi",
-        isActive: true
-      };
-      appState.referrals.unshift(obj);
-      saveStateToLocalStorage();
-      await persistReferralToFirestore(obj);
-      renderAdminReferralsList();
-      renderSinglePricing();
-      closeModal();
-      showToast("Kode referral berhasil ditambahkan.");
     };
 
     window.deleteReferralItem = async function (refId) {
@@ -3834,38 +3814,6 @@ service cloud.firestore {
       closeModal();
       showToast("Fitur AI berhasil disimpan dan diperbarui di landing page!");
       persistFeatureToFirestore(obj);
-    };
-
-    window.saveFeatureForm = async function (event, existingId) {
-      event.preventDefault();
-      const name = document.getElementById("mf-name").value.trim();
-      const benefitsRaw = document.getElementById("mf-benefits").value.split("\n").map(s => s.trim()).filter(Boolean);
-      const existing = existingId ? appState.features.find(f => f.id === existingId) : null;
-
-      const obj = {
-        id: existingId || name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now().toString().slice(-4),
-        name,
-        category: document.getElementById("mf-category").value,
-        icon: document.getElementById("mf-icon").value,
-        description: document.getElementById("mf-desc").value.trim(),
-        longDescription: document.getElementById("mf-long-desc").value.trim(),
-        benefits: benefitsRaw,
-        targetUrl: document.getElementById("mf-url").value.trim(),
-        isActive: document.getElementById("mf-active").checked,
-        isIncludedInPackage: true,
-        displayOrder: existing ? existing.displayOrder : appState.features.length + 1
-      };
-
-      const idx = appState.features.findIndex(f => f.id === obj.id);
-      if (idx >= 0) appState.features[idx] = obj;
-      else appState.features.push(obj);
-
-      appState.activeCategory = "Semua";
-      saveStateToLocalStorage();
-      await persistFeatureToFirestore(obj);
-      refreshAllRenderedViews();
-      closeModal();
-      showToast("Fitur AI berhasil disimpan dan diperbarui di landing page!");
     };
 
     window.deleteFeatureItem = async function (featureId) {
@@ -4138,22 +4086,6 @@ service cloud.firestore {
       persistSiteSettingsToFirestore();
     };
 
-    window.saveFAQForm = async function (event, idx) {
-      event.preventDefault();
-      const obj = {
-        q: document.getElementById("mfaq-q").value.trim(),
-        a: document.getElementById("mfaq-a").value.trim()
-      };
-      if (idx !== null && appState.faqs[idx]) appState.faqs[idx] = obj;
-      else appState.faqs.push(obj);
-      saveStateToLocalStorage();
-      await persistSiteSettingsToFirestore();
-      renderFAQList();
-      renderAdminFAQList();
-      closeModal();
-      showToast("FAQ berhasil disimpan!");
-    };
-
     window.deleteFAQItem = async function (idx) {
       appState.faqs.splice(idx, 1);
       saveStateToLocalStorage();
@@ -4279,49 +4211,61 @@ service cloud.firestore {
         if (el) el.classList.add("hidden");
       });
 
-      if (route === "/" || route === "") {
-        document.getElementById("view-landing")?.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route.startsWith("/fitur/")) {
-        const featureId = route.replace("/fitur/", "");
-        document.getElementById("view-feature-detail")?.classList.remove("hidden");
-        renderFeatureDetailView(featureId);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route === "/member-login") {
-        document.getElementById("view-member-login")?.classList.remove("hidden");
-        const infoBox = document.getElementById("member-login-target-info");
-        const featName = document.getElementById("member-login-feature-name");
-        if (appState.pendingMemberFeatureId && infoBox && featName) {
-          const f = appState.features.find(item => item.id === appState.pendingMemberFeatureId);
-          if (f) {
-            featName.textContent = f.name;
-            infoBox.classList.remove("hidden");
+      try {
+        if (route === "/" || route === "") {
+          document.getElementById("view-landing")?.classList.remove("hidden");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (route.startsWith("/fitur/")) {
+          const featureId = route.replace("/fitur/", "");
+          document.getElementById("view-feature-detail")?.classList.remove("hidden");
+          renderFeatureDetailView(featureId);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (route === "/member-login") {
+          document.getElementById("view-member-login")?.classList.remove("hidden");
+          const infoBox = document.getElementById("member-login-target-info");
+          const featName = document.getElementById("member-login-feature-name");
+          if (appState.pendingMemberFeatureId && infoBox && featName) {
+            const f = appState.features.find(item => item.id === appState.pendingMemberFeatureId);
+            if (f) {
+              featName.textContent = f.name;
+              infoBox.classList.remove("hidden");
+            }
           }
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (route === "/member") {
+          if (!appState.memberUser && !appState.user) {
+            navigateTo("/member-login");
+            return;
+          }
+          document.getElementById("view-member")?.classList.remove("hidden");
+          renderMemberDashboard();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (route === "/login" || route === "/register") {
+          if (appState.user) {
+            navigateTo("/dashboard");
+            return;
+          }
+          document.getElementById("view-auth")?.classList.remove("hidden");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (route.startsWith("/dashboard")) {
+          if (!appState.user) {
+            navigateTo("/login");
+            return;
+          }
+          const dashEl = document.getElementById("view-dashboard");
+          if (dashEl) {
+            dashEl.classList.remove("hidden");
+            dashEl.style.display = "flex";
+          }
+          switchAdminDashboardSubview(route);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          document.getElementById("view-landing")?.classList.remove("hidden");
         }
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route === "/member") {
-        if (!appState.memberUser && !appState.user) {
-          navigateTo("/member-login");
-          return;
-        }
-        document.getElementById("view-member")?.classList.remove("hidden");
-        renderMemberDashboard();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route === "/login" || route === "/register") {
-        if (appState.user) {
-          navigateTo("/dashboard");
-          return;
-        }
-        document.getElementById("view-auth")?.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route.startsWith("/dashboard")) {
-        if (!appState.user) {
-          navigateTo("/login");
-          return;
-        }
+      } catch (err) {
+        console.error("Navigation render error:", err);
         document.getElementById("view-dashboard")?.classList.remove("hidden");
-        switchAdminDashboardSubview(route);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        showToast("Terjadi kendala saat memuat tampilan: " + (err.message || "error"));
       }
     };
 
