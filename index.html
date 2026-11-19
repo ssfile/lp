@@ -2446,6 +2446,15 @@ service cloud.firestore {
       appId: typeof window.__app_id !== "undefined" ? window.__app_id : "default-app-id"
     };
 
+    const EMBEDDED_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyALys9RlMEKT4zbviTLKiOgh41VwO7bN1k",
+      authDomain: "p-c410f.firebaseapp.com",
+      projectId: "p-c410f",
+      storageBucket: "p-c410f.firebasestorage.app",
+      messagingSenderId: "41031214989",
+      appId: "1:41031214989:web:8c02b04f8d65878bafffc4"
+    };
+
     async function connectToFirebaseApp(configObj, appInstanceName = "aksa-main-app") {
       if (!configObj || !configObj.apiKey || !configObj.projectId) return false;
 
@@ -2537,12 +2546,12 @@ service cloud.firestore {
 
     async function initFirebaseIntegration() {
       try {
-        if (typeof window.__firebase_config === "undefined" || !window.__firebase_config) {
-          return;
+        let firebaseConfig = EMBEDDED_FIREBASE_CONFIG;
+        if (typeof window.__firebase_config !== "undefined" && window.__firebase_config) {
+          firebaseConfig = typeof window.__firebase_config === "string"
+            ? JSON.parse(window.__firebase_config)
+            : window.__firebase_config;
         }
-        const firebaseConfig = typeof window.__firebase_config === "string"
-          ? JSON.parse(window.__firebase_config)
-          : window.__firebase_config;
 
         await connectToFirebaseApp(firebaseConfig, "aksa-main-app");
       } catch (err) {
