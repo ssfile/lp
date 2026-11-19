@@ -41,14 +41,18 @@
   </script>
 
   <style>
-    /* Strict Monochrome System & Base Styling */
+    /* Dynamic Theme & Architectural Checkered Grid System */
     :root {
       --bg-primary: #FFFFFF;
       --bg-secondary: #FAFAFA;
       --text-primary: #000000;
       --text-secondary: #525252;
+      --accent-primary: #000000;
+      --accent-text: #FFFFFF;
       --border-subtle: #E5E5E5;
       --border-strong: #000000;
+      --grid-line-color: rgba(163, 163, 163, 0.30);
+      --grid-size: 36px;
     }
 
     * {
@@ -56,24 +60,65 @@
     }
 
     body {
-      background-color: #FFFFFF;
-      color: #000000;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    h1, h2, h3, h4, .font-display {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    /* Subtle architectural grid background (Monochrome only) */
+    /* Subtle gray checkered grid lines ONLY on white background sections */
     .bg-grid-pattern {
-      background-size: 40px 40px;
-      background-image: 
-        linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+      background-image:
+        linear-gradient(to right, var(--grid-line-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
+      background-size: var(--grid-size) var(--grid-size);
+      background-position: top center;
+    }
+
+    /* Dynamic Theme Overrides synced from Admin Settings across all accounts */
+    body.theme-customized .bg-white {
+      background-color: var(--bg-primary) !important;
+    }
+    body.theme-customized .bg-white\/95 {
+      background-color: var(--bg-primary) !important;
+    }
+    body.theme-customized .bg-neutral-50,
+    body.theme-customized .bg-neutral-50\/50,
+    body.theme-customized .bg-neutral-50\/60,
+    body.theme-customized .bg-neutral-50\/70 {
+      background-color: var(--bg-secondary) !important;
+    }
+    body.theme-customized .text-black {
+      color: var(--text-primary) !important;
+    }
+    body.theme-customized .text-neutral-600,
+    body.theme-customized .text-neutral-700,
+    body.theme-customized .text-neutral-800 {
+      color: var(--text-secondary) !important;
+    }
+    body.theme-customized .bg-black {
+      background-color: var(--accent-primary) !important;
+      color: var(--accent-text) !important;
+    }
+    body.theme-customized .border-black {
+      border-color: var(--border-strong) !important;
+    }
+    body.theme-customized .border-neutral-200,
+    body.theme-customized .border-neutral-300 {
+      border-color: var(--border-subtle) !important;
+    }
+    body.theme-customized .hover\:bg-black:hover {
+      background-color: var(--accent-primary) !important;
+      color: var(--accent-text) !important;
+    }
+    body.theme-customized .hover\:border-black:hover {
+      border-color: var(--border-strong) !important;
+    }
+    body.theme-customized .hover\:text-black:hover {
+      color: var(--text-primary) !important;
     }
 
     /* Smooth Scroll Reveal Animation */
@@ -148,7 +193,7 @@
   <!-- =====================================================================
        VIEW 1: LANDING PAGE VIEW ("/")
   ====================================================================== -->
-  <div id="view-landing" class="min-h-screen flex flex-col">
+  <div id="view-landing" class="min-h-screen flex flex-col bg-grid-pattern">
 
     <!-- A. STICKY MINIMALIST NAVBAR -->
     <header id="main-navbar" class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200 transition-all">
@@ -157,7 +202,7 @@
           
           <!-- Brand Logo & Name -->
           <a href="#beranda" onclick="navigateTo('/'); return false;" class="flex items-center gap-3 group focus:outline-none">
-            <div class="w-9 h-9 rounded-lg bg-black text-white flex items-center justify-center border border-black group-hover:bg-white group-hover:text-black transition-colors">
+            <div id="brand-logo-nav" class="w-9 h-9 rounded-lg bg-black text-white flex items-center justify-center border border-black group-hover:bg-white group-hover:text-black transition-colors">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" />
                 <rect x="14" y="3" width="7" height="7" rx="1.5" />
@@ -167,7 +212,7 @@
             </div>
             <div class="flex flex-col">
               <span id="brand-name-nav" class="font-display font-extrabold text-lg tracking-tight leading-none text-black">AKSA.AI</span>
-              <span class="text-[10px] font-medium uppercase tracking-widest text-neutral-500 mt-0.5">Unified AI Platform</span>
+              <span id="brand-tagline-nav" class="text-[10px] font-medium uppercase tracking-widest text-neutral-500 mt-0.5">Unified AI Platform</span>
             </div>
           </a>
 
@@ -358,7 +403,7 @@
       </section>
 
       <!-- 3. KEUNGGULAN PLATFORM (TRUST / VALUE SECTION) -->
-      <section id="keunggulan" class="py-16 sm:py-20 bg-white border-b border-neutral-200">
+      <section id="keunggulan" class="py-16 sm:py-20 bg-white/95 bg-grid-pattern border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           <div class="max-w-2xl mb-12">
             <span id="trust-label-display" class="text-xs font-semibold uppercase tracking-widest text-neutral-500">Keunggulan Platform</span>
@@ -416,7 +461,7 @@
       </section>
 
       <!-- 4. PORTAL KATALOG FITUR DALAM PAKET ("Semua Tools AI dalam Satu Paket") -->
-      <section id="katalog-fitur" class="py-20 sm:py-28 bg-neutral-50 border-b border-neutral-200">
+      <section id="katalog-fitur" class="py-20 sm:py-28 bg-neutral-50/95 border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           
           <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
@@ -451,7 +496,7 @@
       </section>
 
       <!-- 5. PENJELASAN MANFAAT PLATFORM (ALTERNATING LAYOUT) -->
-      <section id="manfaat" class="py-20 sm:py-28 bg-white border-b border-neutral-200">
+      <section id="manfaat" class="py-20 sm:py-28 bg-white/95 bg-grid-pattern border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20 sm:space-y-28">
           
           <div class="max-w-2xl reveal">
@@ -574,7 +619,7 @@
       </section>
 
       <!-- 6. CARA KERJA ("MULAI DALAM 3 LANGKAH") -->
-      <section id="cara-kerja" class="py-20 sm:py-28 bg-neutral-50 border-b border-neutral-200">
+      <section id="cara-kerja" class="py-20 sm:py-28 bg-neutral-50/95 border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           <div class="text-center max-w-2xl mx-auto mb-16">
             <span class="text-xs font-semibold uppercase tracking-widest text-neutral-500">Alur Pemesanan & Akses</span>
@@ -626,7 +671,7 @@
       </section>
 
       <!-- 7. PREVIEW DASHBOARD ATAU PRODUK (INTERACTIVE MOCKUP) -->
-      <section class="py-20 sm:py-28 bg-white border-b border-neutral-200">
+      <section class="py-20 sm:py-28 bg-white/95 bg-grid-pattern border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div class="max-w-2xl">
@@ -774,7 +819,7 @@
       </section>
 
       <!-- 8. PRICING — HANYA SATU PAKET BERBAYAR -->
-      <section id="harga" class="py-20 sm:py-28 bg-neutral-50 border-b border-neutral-200">
+      <section id="harga" class="py-20 sm:py-28 bg-neutral-50/95 border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           <div class="text-center max-w-2xl mx-auto mb-12">
             <span class="text-xs font-semibold uppercase tracking-widest text-neutral-500">Penawaran Berlangganan</span>
@@ -793,7 +838,7 @@
       </section>
 
       <!-- 9. TESTIMONI JIKA TERSEDIA -->
-      <section id="testimoni" class="py-16 sm:py-20 bg-white border-b border-neutral-200">
+      <section id="testimoni" class="py-16 sm:py-20 bg-white/95 bg-grid-pattern border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           <div id="testimonials-container">
             <!-- Rendered dynamically from TESTIMONIALS_DATA -->
@@ -802,7 +847,7 @@
       </section>
 
       <!-- 10. FAQ SECTION (INTERACTIVE ACCORDION) -->
-      <section id="faq" class="py-20 sm:py-28 bg-neutral-50 border-b border-neutral-200">
+      <section id="faq" class="py-20 sm:py-28 bg-neutral-50/95 border-b border-neutral-200">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
           <div class="text-center mb-14">
             <span class="text-xs font-semibold uppercase tracking-widest text-neutral-500">Pertanyaan Umum</span>
@@ -853,7 +898,7 @@
           <!-- Brand & Description -->
           <div class="lg:col-span-4 space-y-4">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center">
+              <div id="brand-logo-footer" class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                   <rect x="3" y="3" width="7" height="7" rx="1.5" />
                   <rect x="14" y="3" width="7" height="7" rx="1.5" />
@@ -918,7 +963,7 @@
        VIEW 1B: FEATURE DETAIL PAGE VIEW ("/fitur/{featureId}")
        Shown when user clicks "Lihat Fitur" — includes button to Dashboard!
   ====================================================================== -->
-  <div id="view-feature-detail" class="hidden min-h-screen bg-white flex flex-col">
+  <div id="view-feature-detail" class="hidden min-h-screen bg-white bg-grid-pattern flex flex-col">
     <!-- Top Header -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-neutral-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
@@ -930,7 +975,7 @@
         </button>
 
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs">A</div>
+          <div id="brand-logo-detail" class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs">A</div>
           <span id="detail-nav-brand" class="font-display font-extrabold text-base tracking-tight text-black">AKSA.AI</span>
         </div>
       </div>
@@ -1011,7 +1056,7 @@
     <header class="sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 sm:px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3 min-w-0">
         <button type="button" onclick="navigateTo('/')" class="flex items-center gap-2.5 shrink-0">
-          <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs">A</div>
+          <div id="brand-logo-member" class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs">A</div>
           <span id="member-dash-brand" class="font-display font-extrabold text-base tracking-tight text-black">AKSA.AI</span>
         </button>
         <span class="text-neutral-300">/</span>
@@ -1139,8 +1184,8 @@
     <header class="sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 sm:px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3 sm:gap-4 min-w-0">
         <button type="button" onclick="navigateTo('/')" class="flex items-center gap-2.5 shrink-0">
-          <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs">A</div>
-          <span class="font-display font-extrabold text-base tracking-tight text-black">AKSA.AI</span>
+          <div id="brand-logo-admin" class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs">A</div>
+          <span id="admin-dash-brand" class="font-display font-extrabold text-base tracking-tight text-black">AKSA.AI</span>
         </button>
         <span class="text-neutral-300">/</span>
         <span id="dash-breadcrumb" class="text-xs sm:text-sm font-semibold text-black truncate">Dashboard</span>
@@ -1169,15 +1214,15 @@
       <!-- Unified Platform Sidebar -->
       <aside class="lg:col-span-3 space-y-4">
         
-        <!-- Group 1: Existing Workspace & AI Features -->
+        <!-- Group 1: Admin Overview -->
         <div class="bg-white border border-neutral-200 rounded-2xl p-4 space-y-1">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-3 py-1">Workspace & Produk</div>
+          <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-3 py-1">Navigasi Admin</div>
           <button type="button" onclick="navigateTo('/dashboard')" id="dash-nav-home" class="dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors">
             <span>Dashboard Utama</span>
           </button>
-          <button type="button" onclick="navigateTo('/dashboard/modul-ajar')" id="dash-nav-modul" class="dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors">
-            <span>AI Generator Modul Ajar</span>
-            <span class="text-[10px] px-1.5 py-0.5 rounded bg-black text-white">Aktif</span>
+          <button type="button" onclick="navigateTo('/member')" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors text-neutral-700 hover:bg-neutral-100">
+            <span>Pratinjau Dashboard Member</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded border border-neutral-300 text-black">Member</span>
           </button>
         </div>
 
@@ -1200,6 +1245,10 @@
           </button>
           <button type="button" onclick="navigateTo('/dashboard/admin-landing')" id="dash-nav-admin-landing" class="dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors">
             <span>Edit Seluruh Landing Page</span>
+          </button>
+          <button type="button" onclick="navigateTo('/dashboard/admin-appearance')" id="dash-nav-admin-appearance" class="dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors">
+            <span>Warna, Ikon &amp; Tema Global</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-black text-white">Baru</span>
           </button>
           <button type="button" onclick="navigateTo('/dashboard/admin-firebase')" id="dash-nav-admin-firebase" class="dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors">
             <span>Pengaturan Firebase</span>
@@ -1226,8 +1275,8 @@
               <button type="button" onclick="navigateTo('/dashboard/admin-customers')" class="px-4 py-2.5 bg-white text-black text-xs font-semibold rounded-xl border border-black hover:bg-neutral-100 transition-colors">
                 Kelola Pelanggan
               </button>
-              <button type="button" onclick="navigateTo('/dashboard/modul-ajar')" class="px-4 py-2.5 bg-white text-black text-xs font-semibold rounded-xl border border-neutral-300 hover:border-black transition-colors">
-                Generator Modul Ajar
+              <button type="button" onclick="navigateTo('/dashboard/admin-landing')" class="px-4 py-2.5 bg-white text-black text-xs font-semibold rounded-xl border border-neutral-300 hover:border-black transition-colors">
+                Edit Landing Page
               </button>
             </div>
           </div>
@@ -1256,106 +1305,26 @@
             </div>
           </div>
 
-          <!-- Existing Generator Modul Ajar Shortcut Card -->
-          <div class="bg-white border border-black rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-black text-white">Fitur AI Berjalan</span>
-              <h2 class="font-display text-lg font-bold text-black mt-2">AI Generator Modul Ajar</h2>
-              <p class="text-xs text-neutral-600 mt-1">Sistem generator modul ajar tetap tersedia dan dapat langsung digunakan oleh admin maupun pelanggan.</p>
-            </div>
-            <button type="button" onclick="navigateTo('/dashboard/modul-ajar')" class="shrink-0 px-5 py-3 bg-black text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition-colors">
-              Jalankan Tool →
-            </button>
-          </div>
-
-          <!-- Session Activity History -->
-          <div class="bg-white border border-neutral-200 rounded-2xl p-6">
-            <h2 class="font-display text-base font-bold text-black mb-4">Riwayat Generasi Modul Ajar Sesi Ini</h2>
-            <div id="dash-history-list" class="space-y-2.5 text-sm">
-              <!-- Populated dynamically -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Sub-view B: Functional AI Generator Modul Ajar ("/dashboard/modul-ajar") -->
-        <div id="dash-subview-modul-ajar" class="hidden space-y-6">
-          <div class="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 pb-5 mb-6">
+          <!-- Quick Settings Shortcuts -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white border border-neutral-200 rounded-2xl p-5 flex items-center justify-between gap-3">
               <div>
-                <div class="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded bg-black text-white mb-2">
-                  Fitur Tersedia
-                </div>
-                <h1 class="font-display text-2xl font-bold text-black">AI Generator Modul Ajar</h1>
-                <p class="text-xs sm:text-sm text-neutral-600 mt-1">
-                  Lengkapi parameter pembelajaran di bawah ini untuk menghasilkan draf Modul Ajar yang sistematis dan siap disesuaikan.
-                </p>
+                <div class="text-xs font-bold text-black">Pengaturan WhatsApp Penjualan</div>
+                <div id="dash-quick-wa-number" class="text-xs text-neutral-500 mt-0.5 font-mono">6281234567890</div>
               </div>
-              <button type="button" onclick="navigateTo('/dashboard')" class="text-xs font-semibold px-3 py-2 border border-neutral-300 rounded-lg hover:border-black">
-                ← Kembali ke Dashboard
+              <button type="button" onclick="navigateTo('/dashboard/admin-whatsapp')" class="px-3.5 py-2 text-xs font-semibold border border-black rounded-lg hover:bg-black hover:text-white transition-colors">
+                Atur WA
               </button>
             </div>
-
-            <form id="modul-ajar-form" onsubmit="handleGenerateModulAjar(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white border border-neutral-200 rounded-2xl p-5 flex items-center justify-between gap-3">
               <div>
-                <label for="ma-mapel" class="block text-xs font-semibold text-black mb-1.5">Mata Pelajaran *</label>
-                <input id="ma-mapel" type="text" required placeholder="Contoh: Ilmu Pengetahuan Alam (IPA)" class="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                <div class="text-xs font-bold text-black">Konten &amp; Teks Landing Page</div>
+                <div class="text-xs text-neutral-500 mt-0.5">Ubah seluruh headline, keunggulan &amp; FAQ</div>
               </div>
-
-              <div>
-                <label for="ma-fase" class="block text-xs font-semibold text-black mb-1.5">Jenjang / Fase / Kelas *</label>
-                <select id="ma-fase" class="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl bg-white focus:outline-none focus:border-black">
-                  <option value="Fase A (SD Kelas 1-2)">Fase A (SD Kelas 1–2)</option>
-                  <option value="Fase B (SD Kelas 3-4)">Fase B (SD Kelas 3–4)</option>
-                  <option value="Fase C (SD Kelas 5-6)">Fase C (SD Kelas 5–6)</option>
-                  <option value="Fase D (SMP Kelas 7-9)" selected>Fase D (SMP Kelas 7–9)</option>
-                  <option value="Fase E (SMA/SMK Kelas 10)">Fase E (SMA/SMK Kelas 10)</option>
-                  <option value="Fase F (SMA/SMK Kelas 11-12)">Fase F (SMA/SMK Kelas 11–12)</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="ma-topik" class="block text-xs font-semibold text-black mb-1.5">Topik / Materi Pokok *</label>
-                <input id="ma-topik" type="text" required placeholder="Contoh: Ekosistem dan Interaksi Makhluk Hidup" class="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
-              </div>
-
-              <div>
-                <label for="ma-waktu" class="block text-xs font-semibold text-black mb-1.5">Alokasi Waktu</label>
-                <input id="ma-waktu" type="text" placeholder="Contoh: 2 x 40 Menit (1 Pertemuan)" class="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
-              </div>
-
-              <div class="sm:col-span-2">
-                <label for="ma-tujuan" class="block text-xs font-semibold text-black mb-1.5">Tujuan Pembelajaran (Opsional)</label>
-                <textarea id="ma-tujuan" rows="2" placeholder="Tuliskan capaian atau tujuan pembelajaran spesifik jika ada..." class="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black"></textarea>
-              </div>
-
-              <div class="sm:col-span-2 flex flex-wrap items-center gap-3 pt-2">
-                <button id="ma-generate-btn" type="submit" class="px-6 py-3 bg-black text-white text-xs sm:text-sm font-semibold rounded-xl border border-black hover:bg-white hover:text-black transition-colors">
-                  <span>Generate Modul Ajar</span>
-                </button>
-                <button type="button" onclick="fillExampleModulAjar()" class="px-4 py-3 bg-white text-black text-xs sm:text-sm font-semibold rounded-xl border border-neutral-300 hover:border-black transition-colors">
-                  Isi Contoh Parameter
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Generated Output Result Card -->
-          <div id="ma-result-card" class="hidden bg-white border border-black rounded-2xl p-6 sm:p-8 space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 pb-4">
-              <div>
-                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-neutral-100 text-black">Siap Diedit</span>
-                <h2 id="ma-result-title" class="font-display text-lg font-bold text-black mt-1">Modul Ajar</h2>
-              </div>
-              <div class="flex items-center gap-2">
-                <button type="button" onclick="copyModulAjarResult()" class="px-3.5 py-2 text-xs font-semibold border border-neutral-300 rounded-lg hover:border-black">
-                  Salin Teks
-                </button>
-                <button type="button" onclick="downloadModulAjarResult()" class="px-3.5 py-2 text-xs font-semibold bg-black text-white rounded-lg hover:bg-neutral-800">
-                  Unduh (.txt)
-                </button>
-              </div>
+              <button type="button" onclick="navigateTo('/dashboard/admin-landing')" class="px-3.5 py-2 text-xs font-semibold border border-black rounded-lg hover:bg-black hover:text-white transition-colors">
+                Edit Konten
+              </button>
             </div>
-            <textarea id="ma-result-editor" rows="18" class="w-full p-4 text-xs sm:text-sm font-mono bg-neutral-50 border border-neutral-200 rounded-xl leading-relaxed focus:outline-none focus:border-black"></textarea>
           </div>
         </div>
 
@@ -1610,115 +1579,107 @@
                   <label for="cfg-platform-desc" class="block text-xs font-semibold text-black mb-1">Deskripsi Keunggulan Platform</label>
                   <textarea id="cfg-platform-desc" rows="2" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl"></textarea>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div class="p-3 bg-white rounded-xl border border-neutral-200 space-y-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
                     <div class="text-[11px] font-bold text-black">Pilar 1</div>
-                    <input id="cfg-p1-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
-                    <textarea id="cfg-p1-desc" rows="3" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
+                    <input id="cfg-p1-title" type="text" placeholder="Judul Pilar 1" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-p1-desc" rows="2" placeholder="Deskripsi Pilar 1" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
-                  <div class="p-3 bg-white rounded-xl border border-neutral-200 space-y-2">
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
                     <div class="text-[11px] font-bold text-black">Pilar 2</div>
-                    <input id="cfg-p2-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
-                    <textarea id="cfg-p2-desc" rows="3" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
+                    <input id="cfg-p2-title" type="text" placeholder="Judul Pilar 2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-p2-desc" rows="2" placeholder="Deskripsi Pilar 2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
-                  <div class="p-3 bg-white rounded-xl border border-neutral-200 space-y-2">
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
                     <div class="text-[11px] font-bold text-black">Pilar 3</div>
-                    <input id="cfg-p3-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
-                    <textarea id="cfg-p3-desc" rows="3" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
+                    <input id="cfg-p3-title" type="text" placeholder="Judul Pilar 3" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-p3-desc" rows="2" placeholder="Deskripsi Pilar 3" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
                 </div>
               </div>
 
-              <!-- Group 3: Katalog, Manfaat, Cara Kerja & Preview -->
+              <!-- Group 3: Katalog, Manfaat & Cara Kerja -->
               <div class="p-4 sm:p-5 rounded-2xl border border-neutral-200 bg-neutral-50/60 space-y-4">
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-black">3. Judul Katalog, Manfaat, Cara Kerja &amp; Preview</h2>
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-black">3. Katalog Fitur, Manfaat &amp; Cara Kerja</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Judul Katalog Fitur</label>
+                    <label class="block text-xs font-semibold text-black mb-1">Judul Section Katalog Fitur</label>
                     <input id="cfg-catalog-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Deskripsi Katalog Fitur</label>
-                    <input id="cfg-catalog-desc" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Judul Section Manfaat</label>
+                    <label class="block text-xs font-semibold text-black mb-1">Judul Utama Manfaat Ekosistem</label>
                     <input id="cfg-benefits-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
                   </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Judul Baris Manfaat 1</label>
-                    <input id="cfg-benefit1-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-black mb-1">Deskripsi Section Katalog Fitur</label>
+                  <textarea id="cfg-catalog-desc" rows="2" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl"></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
+                    <div class="text-[11px] font-bold text-black">Blok Manfaat 01</div>
+                    <input id="cfg-benefit1-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-benefit1-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
-                  <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-black mb-1">Deskripsi Baris Manfaat 1</label>
-                    <textarea id="cfg-benefit1-desc" rows="2" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl"></textarea>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Judul Baris Manfaat 2</label>
-                    <input id="cfg-benefit2-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Deskripsi Baris Manfaat 2</label>
-                    <input id="cfg-benefit2-desc" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
+                    <div class="text-[11px] font-bold text-black">Blok Manfaat 02</div>
+                    <input id="cfg-benefit2-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-benefit2-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
                 </div>
 
-                <!-- Cara Kerja 3 Langkah -->
-                <div class="pt-2 border-t border-neutral-200 space-y-3">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="block text-xs font-semibold text-black mb-1">Judul Cara Kerja</label>
-                      <input id="cfg-steps-title" type="text" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl" />
-                    </div>
-                    <div>
-                      <label class="block text-xs font-semibold text-black mb-1">Subjudul Cara Kerja</label>
-                      <input id="cfg-steps-desc" type="text" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl" />
-                    </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-neutral-200">
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1">Judul Cara Kerja</label>
+                    <input id="cfg-steps-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
                   </div>
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="p-3 bg-white rounded-xl border border-neutral-200 space-y-1.5">
-                      <div class="text-[11px] font-bold text-black">Langkah 1</div>
-                      <input id="cfg-s1-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
-                      <textarea id="cfg-s1-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
-                    </div>
-                    <div class="p-3 bg-white rounded-xl border border-neutral-200 space-y-1.5">
-                      <div class="text-[11px] font-bold text-black">Langkah 2</div>
-                      <input id="cfg-s2-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
-                      <textarea id="cfg-s2-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
-                    </div>
-                    <div class="p-3 bg-white rounded-xl border border-neutral-200 space-y-1.5">
-                      <div class="text-[11px] font-bold text-black">Langkah 3</div>
-                      <input id="cfg-s3-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
-                      <textarea id="cfg-s3-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
-                    </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1">Subjudul Cara Kerja</label>
+                    <input id="cfg-steps-desc" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
                   </div>
                 </div>
-
-                <!-- Preview & Pricing Header -->
-                <div class="pt-2 border-t border-neutral-200 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Judul Section Preview Dashboard</label>
-                    <input id="cfg-preview-title" type="text" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl" />
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
+                    <div class="text-[11px] font-bold text-black">Langkah 1</div>
+                    <input id="cfg-s1-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-s1-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Deskripsi Section Preview</label>
-                    <input id="cfg-preview-desc" type="text" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl" />
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
+                    <div class="text-[11px] font-bold text-black">Langkah 2</div>
+                    <input id="cfg-s2-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-s2-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Judul Section Harga</label>
-                    <input id="cfg-pricing-title" type="text" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl" />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-black mb-1">Subjudul Section Harga</label>
-                    <input id="cfg-pricing-desc" type="text" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl" />
+                  <div class="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
+                    <div class="text-[11px] font-bold text-black">Langkah 3</div>
+                    <input id="cfg-s3-title" type="text" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg" />
+                    <textarea id="cfg-s3-desc" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-neutral-300 rounded-lg"></textarea>
                   </div>
                 </div>
               </div>
 
-              <!-- Group 4: Final CTA & Footer -->
+              <!-- Group 4: Preview Dashboard, Pricing, Final CTA & Footer -->
               <div class="p-4 sm:p-5 rounded-2xl border border-neutral-200 bg-neutral-50/60 space-y-4">
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-black">4. Final CTA &amp; Footer</h2>
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-black">4. Preview Dashboard, Pricing, Final CTA &amp; Footer</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1">Judul Preview Dashboard</label>
+                    <input id="cfg-preview-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1">Deskripsi Preview Dashboard</label>
+                    <input id="cfg-preview-desc" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1">Judul Section Pricing</label>
+                    <input id="cfg-pricing-title" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1">Deskripsi Section Pricing</label>
+                    <input id="cfg-pricing-desc" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-neutral-200">
                   <div>
                     <label class="block text-xs font-semibold text-black mb-1">Badge Final CTA</label>
                     <input id="cfg-final-badge" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
@@ -1732,34 +1693,38 @@
                   <label class="block text-xs font-semibold text-black mb-1">Deskripsi Final CTA</label>
                   <textarea id="cfg-final-desc" rows="2" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl"></textarea>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-neutral-200">
                   <div>
-                    <label for="cfg-contact-email" class="block text-xs font-semibold text-black mb-1">Email Kontak Footer</label>
-                    <input id="cfg-contact-email" type="email" required class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
+                    <label class="block text-xs font-semibold text-black mb-1">Email Kontak Footer</label>
+                    <input id="cfg-contact-email" type="email" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
                   </div>
                   <div>
-                    <label for="cfg-footer-tagline" class="block text-xs font-semibold text-black mb-1">Tagline Bawah Footer</label>
+                    <label class="block text-xs font-semibold text-black mb-1">Tagline Bawah Footer</label>
                     <input id="cfg-footer-tagline" type="text" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl" />
                   </div>
                 </div>
                 <div>
-                  <label for="cfg-footer-desc" class="block text-xs font-semibold text-black mb-1">Deskripsi Singkat Footer</label>
+                  <label class="block text-xs font-semibold text-black mb-1">Deskripsi Platform di Footer</label>
                   <textarea id="cfg-footer-desc" rows="2" class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-neutral-300 rounded-xl"></textarea>
                 </div>
               </div>
 
               <div class="pt-2">
                 <button type="submit" class="px-6 py-3.5 bg-black text-white text-xs sm:text-sm font-semibold rounded-xl border border-black hover:bg-white hover:text-black transition-colors">
-                  Simpan Seluruh Perubahan Landing Page
+                  Simpan Seluruh Konten Landing Page
                 </button>
               </div>
             </form>
 
-            <!-- FAQ Management -->
+            <!-- FAQ Editor inside Admin Landing Page Settings -->
             <div class="pt-6 border-t border-neutral-200 space-y-4">
-              <div class="flex items-center justify-between">
-                <h2 class="font-display text-base font-bold text-black">Kelola Daftar FAQ</h2>
-                <button type="button" onclick="openFAQEditorModal()" class="px-3.5 py-2 bg-black text-white text-xs font-semibold rounded-lg">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 class="font-display text-base font-bold text-black">5. Kelola Daftar Pertanyaan Umum (FAQ)</h2>
+                  <p class="text-xs text-neutral-500">Tambah, ubah, atau hapus pertanyaan yang muncul di section FAQ landing page.</p>
+                </div>
+                <button type="button" onclick="openFAQEditorModal()" class="px-4 py-2 bg-black text-white text-xs font-semibold rounded-xl hover:bg-neutral-800">
                   + Tambah FAQ
                 </button>
               </div>
@@ -1770,7 +1735,167 @@
           </div>
         </div>
 
-        <!-- Sub-view G: ADMIN — PENGATURAN FIREBASE ("/dashboard/admin-firebase") -->
+        <!-- Sub-view G: ADMIN — PENGATURAN WARNA, IKON & TEMA GLOBAL ("/dashboard/admin-appearance") -->
+        <div id="dash-subview-admin-appearance" class="hidden space-y-6">
+          <div class="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 pb-5">
+              <div>
+                <span class="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded bg-black text-white">Tampilan Global Semua Akun</span>
+                <h1 class="font-display text-2xl font-bold text-black mt-2">Pengaturan Warna, Ikon, Teks &amp; Background</h1>
+                <p class="text-xs sm:text-sm text-neutral-600 mt-1">
+                  Seluruh pengaturan warna utama, teks, kartu, tombol, ikon logo brand, maupun garis kotak-kotak background akan langsung diterapkan ke seluruh halaman dan akun (Landing Page, Detail Fitur, Member, &amp; Admin).
+                </p>
+              </div>
+              <button type="button" onclick="resetAppearanceToDefault()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-xl hover:border-black transition-colors">
+                Reset Default Hitam-Putih
+              </button>
+            </div>
+
+            <!-- Preset Color Palettes -->
+            <div class="p-4 rounded-2xl border border-neutral-200 bg-neutral-50 space-y-3">
+              <div class="text-xs font-bold uppercase tracking-wider text-black">Preset Tema Cepat (1-Klik)</div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <button type="button" onclick="applyAppearancePreset('monochrome')" class="p-3 rounded-xl border border-black bg-white text-left hover:opacity-90 transition-all">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    <span class="w-4 h-4 rounded-full bg-black border border-neutral-300"></span>
+                    <span class="w-4 h-4 rounded-full bg-white border border-neutral-300"></span>
+                  </div>
+                  <div class="text-xs font-bold text-black">Monokrom Klasik</div>
+                  <div class="text-[10px] text-neutral-500">Hitam &amp; Putih Bersih</div>
+                </button>
+                <button type="button" onclick="applyAppearancePreset('dark')" class="p-3 rounded-xl border border-neutral-300 bg-white text-left hover:border-black transition-all">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    <span class="w-4 h-4 rounded-full bg-neutral-950 border border-neutral-400"></span>
+                    <span class="w-4 h-4 rounded-full bg-neutral-100 border border-neutral-400"></span>
+                  </div>
+                  <div class="text-xs font-bold text-black">Dark Obsidian</div>
+                  <div class="text-[10px] text-neutral-500">Gelap Futuristik</div>
+                </button>
+                <button type="button" onclick="applyAppearancePreset('emerald')" class="p-3 rounded-xl border border-neutral-300 bg-white text-left hover:border-black transition-all">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    <span class="w-4 h-4 rounded-full" style="background:#064E3B"></span>
+                    <span class="w-4 h-4 rounded-full" style="background:#ECFDF5"></span>
+                  </div>
+                  <div class="text-xs font-bold text-black">Emerald Executive</div>
+                  <div class="text-[10px] text-neutral-500">Hijau Tua Profesional</div>
+                </button>
+                <button type="button" onclick="applyAppearancePreset('navy')" class="p-3 rounded-xl border border-neutral-300 bg-white text-left hover:border-black transition-all">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    <span class="w-4 h-4 rounded-full" style="background:#0F172A"></span>
+                    <span class="w-4 h-4 rounded-full" style="background:#F8FAFC"></span>
+                  </div>
+                  <div class="text-xs font-bold text-black">Slate Navy</div>
+                  <div class="text-[10px] text-neutral-500">Biru Gelap SaaS</div>
+                </button>
+              </div>
+            </div>
+
+            <form id="admin-appearance-form" onsubmit="handleSaveAppearanceSettings(event)" class="space-y-6">
+              
+              <!-- Color Pickers -->
+              <div class="p-4 sm:p-5 rounded-2xl border border-neutral-200 bg-neutral-50/60 space-y-4">
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-black">1. Palet Warna Global Website</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Background Utama</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-bg-primary" type="color" oninput="syncColorHexInput('app-bg-primary', 'app-bg-primary-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-bg-primary-hex" type="text" oninput="syncColorPickerInput('app-bg-primary-hex', 'app-bg-primary'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Background Sekunder / Section</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-bg-secondary" type="color" oninput="syncColorHexInput('app-bg-secondary', 'app-bg-secondary-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-bg-secondary-hex" type="text" oninput="syncColorPickerInput('app-bg-secondary-hex', 'app-bg-secondary'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Teks Utama &amp; Judul</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-text-primary" type="color" oninput="syncColorHexInput('app-text-primary', 'app-text-primary-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-text-primary-hex" type="text" oninput="syncColorPickerInput('app-text-primary-hex', 'app-text-primary'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Teks Sekunder / Deskripsi</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-text-secondary" type="color" oninput="syncColorHexInput('app-text-secondary', 'app-text-secondary-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-text-secondary-hex" type="text" oninput="syncColorPickerInput('app-text-secondary-hex', 'app-text-secondary'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Aksen &amp; Tombol Utama</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-accent-primary" type="color" oninput="syncColorHexInput('app-accent-primary', 'app-accent-primary-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-accent-primary-hex" type="text" oninput="syncColorPickerInput('app-accent-primary-hex', 'app-accent-primary'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Teks di Atas Tombol Aksen</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-accent-text" type="color" oninput="syncColorHexInput('app-accent-text', 'app-accent-text-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-accent-text-hex" type="text" oninput="syncColorPickerInput('app-accent-text-hex', 'app-accent-text'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grid Background & Brand Icon Settings -->
+              <div class="p-4 sm:p-5 rounded-2xl border border-neutral-200 bg-neutral-50/60 space-y-4">
+                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-black">2. Ikon Brand, Tagline &amp; Garis Kotak-Kotak Background</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="app-brand-icon" class="block text-xs font-semibold text-black mb-1.5">Pilih Ikon Utama Brand (Navbar, Footer &amp; Dashboard)</label>
+                    <select id="app-brand-icon" onchange="previewLiveAppearance()" class="w-full px-3.5 py-2.5 text-sm bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-black">
+                      <option value="grid-node">Grid Node AI (Default)</option>
+                      <option value="spark-cube">Kubus AI Futuristik</option>
+                      <option value="hexagon-core">Hexagon Core AI</option>
+                      <option value="orbit-atom">Orbit Ekosistem AI</option>
+                      <option value="layers-stack">Lapisan Modul Terpadu</option>
+                      <option value="terminal-ai">Terminal &amp; Prompt AI</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="app-brand-tagline" class="block text-xs font-semibold text-black mb-1.5">Teks Tagline Kecil di Bawah Nama Brand</label>
+                    <input id="app-brand-tagline" type="text" oninput="previewLiveAppearance()" placeholder="Unified AI Platform" class="w-full px-3.5 py-2.5 text-sm bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-neutral-200">
+                  <div>
+                    <label class="block text-xs font-semibold text-black mb-1.5">Warna Garis Kotak-Kotak</label>
+                    <div class="flex items-center gap-2">
+                      <input id="app-grid-color" type="color" oninput="syncColorHexInput('app-grid-color', 'app-grid-color-hex'); previewLiveAppearance()" class="w-11 h-10 p-1 rounded-lg border border-neutral-300 bg-white cursor-pointer" />
+                      <input id="app-grid-color-hex" type="text" oninput="syncColorPickerInput('app-grid-color-hex', 'app-grid-color'); previewLiveAppearance()" class="flex-1 px-3 py-2 text-xs font-mono uppercase bg-white border border-neutral-300 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="app-grid-opacity" class="block text-xs font-semibold text-black mb-1.5">Ketebalan / Opasitas Garis (%)</label>
+                    <input id="app-grid-opacity" type="number" min="0" max="100" oninput="previewLiveAppearance()" class="w-full px-3.5 py-2.5 text-sm bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                  </div>
+                  <div>
+                    <label for="app-grid-size" class="block text-xs font-semibold text-black mb-1.5">Ukuran Kotak Grid (px)</label>
+                    <input id="app-grid-size" type="number" min="16" max="96" oninput="previewLiveAppearance()" class="w-full px-3.5 py-2.5 text-sm bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                  </div>
+                </div>
+
+                <label class="inline-flex items-center gap-2 text-xs font-semibold text-black cursor-pointer pt-1">
+                  <input id="app-grid-enabled" type="checkbox" onchange="previewLiveAppearance()" class="w-4 h-4 accent-black" />
+                  <span>Tampilkan garis kotak-kotak di background seluruh halaman</span>
+                </label>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button type="submit" class="px-6 py-3.5 bg-black text-white text-xs sm:text-sm font-semibold rounded-xl border border-black hover:bg-white hover:text-black transition-colors">
+                  Simpan &amp; Terapkan ke Semua Akun
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Sub-view H: ADMIN — PENGATURAN FIREBASE ("/dashboard/admin-firebase") -->
         <div id="dash-subview-admin-firebase" class="hidden space-y-6">
           <div class="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 space-y-6">
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 pb-5">
@@ -2076,17 +2201,30 @@ service cloud.firestore {
         "AI Generator Soal HOTS",
         "AI Generator Studi Kasus",
         "AI Generator Materi Ajar",
-        "AI Generator Media Pembelajaran, Presentasi & Refleksi",
-        "Akses ke fitur-fitur baru yang termasuk dalam paket",
-        "Pengembangan fitur secara berkala"
+        "Akses ke seluruh fitur baru dalam paket",
+        "Pembaruan dan pengembangan fitur berkala"
       ],
       buttonText: "BERLANGGANAN SEKARANG",
       isActive: true
     };
 
-    // Site & WhatsApp Settings (Admin Editable — Covers ALL Landing Page Sections)
+    // Site & WhatsApp Settings (Admin Editable — Covers ALL Landing Page Sections & Global Theme)
     const DEFAULT_SITE_SETTINGS = {
       brandName: "AKSA.AI",
+      brandTagline: "Unified AI Platform",
+      brandIcon: "grid-node",
+      themeBgPrimary: "#FFFFFF",
+      themeBgSecondary: "#FAFAFA",
+      themeTextPrimary: "#000000",
+      themeTextSecondary: "#525252",
+      themeAccentPrimary: "#000000",
+      themeAccentText: "#FFFFFF",
+      themeBorderSubtle: "#E5E5E5",
+      themeBorderStrong: "#000000",
+      gridEnabled: true,
+      gridColor: "#A3A3A3",
+      gridOpacity: 30,
+      gridSize: 36,
       whatsappNumber: "6281234567890",
       whatsappMessage: "Halo, saya tertarik untuk berlangganan ALL IN ONE AI PACKAGE.\n\nSaya ingin mengetahui informasi lebih lanjut mengenai harga, fasilitas, dan proses berlangganan.\n\nTerima kasih.",
       whatsappEnabled: true,
@@ -2536,8 +2674,81 @@ service cloud.firestore {
     };
 
     /* =======================================================================
-       MONOCHROME SVG ICONS
+       MONOCHROME & BRAND SVG ICONS
     ======================================================================== */
+    function getBrandLogoSVG(iconKey, sizeClass = "w-5 h-5") {
+      const logos = {
+        "grid-node": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5" fill="currentColor"/></svg>`,
+        "spark-cube": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>`,
+        "hexagon-core": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`,
+        "orbit-atom": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" fill="currentColor"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/></svg>`,
+        "layers-stack": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+        "terminal-ai": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="2"/><polyline points="7 9 10 12 7 15"/><line x1="12" y1="15" x2="17" y2="15"/></svg>`
+      };
+      return logos[iconKey] || logos["grid-node"];
+    }
+
+    function hexToRgba(hex, alpha = 0.06) {
+      const clean = String(hex || "#000000").replace("#", "");
+      if (clean.length !== 6) return `rgba(0, 0, 0, ${alpha})`;
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function applyGlobalAppearanceTheme() {
+      const s = appState.siteSettings;
+      const root = document.documentElement;
+
+      const bgPrimary = s.themeBgPrimary || "#FFFFFF";
+      const bgSecondary = s.themeBgSecondary || "#FAFAFA";
+      const textPrimary = s.themeTextPrimary || "#000000";
+      const textSecondary = s.themeTextSecondary || "#525252";
+      const accentPrimary = s.themeAccentPrimary || "#000000";
+      const accentText = s.themeAccentText || "#FFFFFF";
+      const borderSubtle = s.themeBorderSubtle || "#E5E5E5";
+      const borderStrong = s.themeBorderStrong || accentPrimary;
+
+      const gridEnabled = s.gridEnabled !== false;
+      const gridColor = s.gridColor || "#A3A3A3";
+      const gridOpacity = Math.max(0, Math.min(100, Number(s.gridOpacity ?? 30))) / 100;
+      const gridSize = Math.max(16, Math.min(96, Number(s.gridSize || 36)));
+
+      root.style.setProperty("--bg-primary", bgPrimary);
+      root.style.setProperty("--bg-secondary", bgSecondary);
+      root.style.setProperty("--text-primary", textPrimary);
+      root.style.setProperty("--text-secondary", textSecondary);
+      root.style.setProperty("--accent-primary", accentPrimary);
+      root.style.setProperty("--accent-text", accentText);
+      root.style.setProperty("--border-subtle", borderSubtle);
+      root.style.setProperty("--border-strong", borderStrong);
+      root.style.setProperty("--grid-size", `${gridSize}px`);
+      root.style.setProperty("--grid-line-color", gridEnabled ? hexToRgba(gridColor, gridOpacity) : "transparent");
+
+      const isDefaultMonochrome =
+        bgPrimary.toUpperCase() === "#FFFFFF" &&
+        bgSecondary.toUpperCase() === "#FAFAFA" &&
+        textPrimary.toUpperCase() === "#000000" &&
+        accentPrimary.toUpperCase() === "#000000" &&
+        accentText.toUpperCase() === "#FFFFFF";
+
+      document.body.classList.toggle("theme-customized", !isDefaultMonochrome);
+
+      const iconKey = s.brandIcon || "grid-node";
+      const navLogo = document.getElementById("brand-logo-nav");
+      const footerLogo = document.getElementById("brand-logo-footer");
+      const detailLogo = document.getElementById("brand-logo-detail");
+      const memberLogo = document.getElementById("brand-logo-member");
+      const adminLogo = document.getElementById("brand-logo-admin");
+
+      if (navLogo) navLogo.innerHTML = getBrandLogoSVG(iconKey, "w-5 h-5");
+      if (footerLogo) footerLogo.innerHTML = getBrandLogoSVG(iconKey, "w-4 h-4");
+      if (detailLogo) detailLogo.innerHTML = getBrandLogoSVG(iconKey, "w-4 h-4");
+      if (memberLogo) memberLogo.innerHTML = getBrandLogoSVG(iconKey, "w-4 h-4");
+      if (adminLogo) adminLogo.innerHTML = getBrandLogoSVG(iconKey, "w-4 h-4");
+    }
+
     function getFeatureIconSVG(iconName, sizeClass = "w-5 h-5") {
       const icons = {
         "document": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
@@ -2567,11 +2778,15 @@ service cloud.firestore {
         if (el && val !== undefined) el.textContent = val;
       };
 
+      applyGlobalAppearanceTheme();
+
       setTxt("brand-name-nav", brandName);
+      setTxt("brand-tagline-nav", s.brandTagline || PLATFORM_CONFIG.tagline);
       setTxt("brand-name-footer", brandName);
       setTxt("brand-name-copy", brandName);
       setTxt("member-login-brand", brandName);
       setTxt("member-dash-brand", brandName);
+      setTxt("admin-dash-brand", brandName);
       setTxt("detail-nav-brand", brandName);
       setTxt("detail-footer-brand", brandName);
 
@@ -3198,9 +3413,12 @@ service cloud.firestore {
 
       if (countBadge) countBadge.textContent = `${activeFeatures.length} Fitur Tersedia`;
 
-      gridContainer.innerHTML = activeFeatures.map(feature => `
-        <div onclick="openMemberFeatureTool('${feature.id}')" role="button" tabindex="0"
-          class="cursor-pointer group bg-white border border-neutral-200 rounded-2xl p-6 flex flex-col justify-between hover:border-black transition-all">
+      gridContainer.innerHTML = activeFeatures.map(feature => {
+        const rawUrl = (feature.targetUrl || "").trim();
+        const hasExternalUrl = isValidTargetUrl(rawUrl) && rawUrl !== "#";
+
+        return `
+        <div class="group bg-white border border-neutral-200 rounded-2xl p-6 flex flex-col justify-between hover:border-black transition-all">
           <div>
             <div class="flex items-center justify-between mb-4">
               <div class="w-11 h-11 rounded-xl bg-neutral-100 text-black flex items-center justify-center border border-neutral-200 group-hover:bg-black group-hover:text-white transition-colors">
@@ -3213,13 +3431,40 @@ service cloud.firestore {
             <h3 class="font-display text-lg font-bold text-black mb-2">${escapeHTML(feature.name)}</h3>
             <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-5">${escapeHTML(feature.description)}</p>
           </div>
-          <div class="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs font-bold text-black">
-            <span>Buka &amp; Gunakan Fitur</span>
-            <span>→</span>
+          <div class="pt-3 border-t border-neutral-100">
+            <a href="${hasExternalUrl ? escapeHTML(rawUrl) : "#"}"
+              ${hasExternalUrl ? 'target="_blank" rel="noopener noreferrer"' : ""}
+              onclick="return handleMemberFeatureLinkClick(event, '${feature.id}')"
+              class="w-full py-2.5 px-4 rounded-xl bg-black text-white text-xs font-semibold border border-black hover:bg-white hover:text-black transition-colors flex items-center justify-between">
+              <span>Buka &amp; Gunakan Fitur</span>
+              <span>→</span>
+            </a>
           </div>
         </div>
-      `).join("");
+      `;
+      }).join("");
     }
+
+    window.handleMemberFeatureLinkClick = function (e, featureId) {
+      const feature = appState.features.find(f => f.id === featureId);
+      if (!feature) {
+        e.preventDefault();
+        return false;
+      }
+
+      const trimmedUrl = (feature.targetUrl || "").trim();
+      // Jika admin sudah mengisi URL tujuan yang valid, buka link eksternal tersebut
+      if (trimmedUrl && trimmedUrl !== "#" && isValidTargetUrl(trimmedUrl)) {
+        e.preventDefault();
+        window.open(trimmedUrl, "_blank", "noopener,noreferrer");
+        return false;
+      }
+
+      // Sementara URL eksternal masih kosong hingga diisi di Dashboard Admin
+      e.preventDefault();
+      showToast(`Link eksternal untuk "${feature.name}" belum diisi. Silakan atur URL tujuan melalui Dashboard Admin.`);
+      return false;
+    };
 
     window.copyMemberReferralCode = function (code) {
       const tempInput = document.createElement("input");
@@ -3791,6 +4036,299 @@ service cloud.firestore {
       }
     };
 
+    window.moveFeatureOrder = async function (featureId, direction) {
+      const sorted = [...appState.features].sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999));
+      const idx = sorted.findIndex(f => f.id === featureId);
+      const targetIdx = idx + direction;
+      if (idx < 0 || targetIdx < 0 || targetIdx >= sorted.length) return;
+
+      const temp = sorted[idx];
+      sorted[idx] = sorted[targetIdx];
+      sorted[targetIdx] = temp;
+
+      sorted.forEach((item, i) => {
+        item.displayOrder = i + 1;
+      });
+      appState.features = sorted;
+
+      for (const item of sorted) {
+        try {
+          await persistFeatureToFirestore(item);
+        } catch (_) {}
+      }
+      refreshAllRenderedViews();
+      showToast("Urutan fitur berhasil diperbarui.");
+    };
+
+    window.toggleFeatureActive = async function (featureId) {
+      const feature = appState.features.find(f => f.id === featureId);
+      if (!feature) return;
+      feature.isActive = feature.isActive === false ? true : false;
+      try {
+        await persistFeatureToFirestore(feature);
+      } catch (_) {}
+      refreshAllRenderedViews();
+      showToast(`Fitur "${feature.name}" ${feature.isActive ? "diaktifkan" : "dinonaktifkan"}.`);
+    };
+
+    window.confirmDeleteFeature = function (featureId) {
+      const feature = appState.features.find(f => f.id === featureId);
+      if (!feature) return;
+      openModal({
+        badge: "Hapus Fitur",
+        title: `Hapus "${feature.name}"?`,
+        bodyHTML: `<p>Fitur ini akan dihapus dari katalog landing page dan dashboard member.</p>`,
+        actionsHTML: `
+          <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
+          <button type="button" onclick="executeDeleteFeature('${featureId}')" class="px-4 py-2 bg-black text-white text-xs font-semibold rounded-lg">Ya, Hapus</button>
+        `
+      });
+    };
+
+    window.executeDeleteFeature = async function (featureId) {
+      appState.features = appState.features.filter(f => f.id !== featureId);
+      try {
+        await deleteFeatureFromFirestore(featureId);
+      } catch (_) {}
+      closeModal();
+      refreshAllRenderedViews();
+      showToast("Fitur berhasil dihapus dari katalog.");
+    };
+
+    /* =======================================================================
+       ADMIN — PENGATURAN PRICING, WHATSAPP & FAQ CONTROLLERS
+    ======================================================================== */
+    window.handleSavePricingSettings = async function (e) {
+      e.preventDefault();
+      const packageName = document.getElementById("cfg-pkg-name").value.trim();
+      const price = document.getElementById("cfg-pkg-price").value.trim();
+      const billingPeriod = document.getElementById("cfg-pkg-period").value.trim();
+      const buttonText = document.getElementById("cfg-pkg-btn").value.trim();
+      const description = document.getElementById("cfg-pkg-desc").value.trim();
+      const rawFeatures = document.getElementById("cfg-pkg-features").value;
+      const includedFeatures = rawFeatures.split("\n").map(line => line.trim()).filter(Boolean);
+      const isActive = document.getElementById("cfg-pkg-active").checked;
+
+      Object.assign(appState.pricing, {
+        packageName,
+        price,
+        billingPeriod,
+        buttonText,
+        description,
+        includedFeatures,
+        isActive
+      });
+
+      try {
+        await persistPricingToFirestore(appState.pricing);
+      } catch (_) {}
+      refreshAllRenderedViews();
+      showToast("Pengaturan Pricing Paket berhasil disimpan.");
+    };
+
+    window.updateWhatsAppPreviewBox = function () {
+      const previewEl = document.getElementById("wa-preview-url");
+      if (!previewEl) return;
+      const rawNum = document.getElementById("cfg-wa-number")?.value || appState.siteSettings.whatsappNumber;
+      const rawMsg = document.getElementById("cfg-wa-message")?.value || appState.siteSettings.whatsappMessage;
+      const cleanNumber = sanitizeWhatsAppNumber(rawNum);
+      if (!cleanNumber) {
+        previewEl.textContent = "Masukkan nomor WhatsApp internasional (contoh: 6281234567890)";
+        return;
+      }
+      const encodedText = encodeURIComponent(rawMsg.trim());
+      previewEl.textContent = `https://wa.me/${cleanNumber}${encodedText ? `?text=${encodedText}` : ""}`;
+    };
+
+    window.handleSaveWhatsAppSettings = async function (e) {
+      e.preventDefault();
+      const rawNumber = document.getElementById("cfg-wa-number").value.trim();
+      const cleanNumber = sanitizeWhatsAppNumber(rawNumber);
+      const message = document.getElementById("cfg-wa-message").value.trim();
+      const enabled = document.getElementById("cfg-wa-active").checked;
+
+      if (!cleanNumber || cleanNumber.length < 8) {
+        showToast("Nomor WhatsApp tidak valid. Gunakan format internasional seperti 6281234567890.");
+        return;
+      }
+
+      appState.siteSettings.whatsappNumber = cleanNumber;
+      appState.siteSettings.whatsappMessage = message;
+      appState.siteSettings.whatsappEnabled = enabled;
+
+      try {
+        await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      } catch (_) {}
+      updateWhatsAppPreviewBox();
+      refreshAllRenderedViews();
+      showToast("Pengaturan WhatsApp Admin berhasil disimpan.");
+    };
+
+    window.handleSaveLandingSettings = async function (e) {
+      e.preventDefault();
+      const getVal = (id) => document.getElementById(id)?.value.trim() || "";
+
+      Object.assign(appState.siteSettings, {
+        brandName: getVal("cfg-brand-name") || "AKSA.AI",
+        heroBadge: getVal("cfg-hero-badge"),
+        heroTitle: getVal("cfg-hero-title"),
+        heroDescription: getVal("cfg-hero-desc"),
+        ctaText: getVal("cfg-cta-text"),
+        secondaryCtaText: getVal("cfg-sec-cta-text"),
+        stat1Value: getVal("cfg-stat1-val"),
+        stat1Label: getVal("cfg-stat1-lbl"),
+        stat2Label: getVal("cfg-stat2-lbl"),
+        stat3Value: getVal("cfg-stat3-val"),
+        stat3Label: getVal("cfg-stat3-lbl"),
+        trustLabel: getVal("cfg-trust-label"),
+        trustTitle: getVal("cfg-trust-title"),
+        platformDescription: getVal("cfg-platform-desc"),
+        pillar1Title: getVal("cfg-p1-title"),
+        pillar1Desc: getVal("cfg-p1-desc"),
+        pillar2Title: getVal("cfg-p2-title"),
+        pillar2Desc: getVal("cfg-p2-desc"),
+        pillar3Title: getVal("cfg-p3-title"),
+        pillar3Desc: getVal("cfg-p3-desc"),
+        catalogTitle: getVal("cfg-catalog-title"),
+        catalogDesc: getVal("cfg-catalog-desc"),
+        benefitsTitle: getVal("cfg-benefits-title"),
+        benefit1Title: getVal("cfg-benefit1-title"),
+        benefit1Desc: getVal("cfg-benefit1-desc"),
+        benefit2Title: getVal("cfg-benefit2-title"),
+        benefit2Desc: getVal("cfg-benefit2-desc"),
+        stepsTitle: getVal("cfg-steps-title"),
+        stepsDesc: getVal("cfg-steps-desc"),
+        step1Title: getVal("cfg-s1-title"),
+        step1Desc: getVal("cfg-s1-desc"),
+        step2Title: getVal("cfg-s2-title"),
+        step2Desc: getVal("cfg-s2-desc"),
+        step3Title: getVal("cfg-s3-title"),
+        step3Desc: getVal("cfg-s3-desc"),
+        previewTitle: getVal("cfg-preview-title"),
+        previewDesc: getVal("cfg-preview-desc"),
+        pricingTitle: getVal("cfg-pricing-title"),
+        pricingDesc: getVal("cfg-pricing-desc"),
+        finalCtaBadge: getVal("cfg-final-badge"),
+        finalCtaTitle: getVal("cfg-final-title"),
+        finalCtaDesc: getVal("cfg-final-desc"),
+        contactEmail: getVal("cfg-contact-email"),
+        footerTagline: getVal("cfg-footer-tagline"),
+        footerDescription: getVal("cfg-footer-desc")
+      });
+
+      try {
+        await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      } catch (_) {}
+      refreshAllRenderedViews();
+      showToast("Seluruh perubahan konten landing page berhasil disimpan!");
+    };
+
+    function renderAdminFAQList() {
+      const container = document.getElementById("admin-faq-list");
+      if (!container) return;
+
+      if (!appState.faqs || appState.faqs.length === 0) {
+        container.innerHTML = `<div class="p-4 rounded-xl border border-dashed border-neutral-300 text-xs text-neutral-500 text-center">Belum ada daftar FAQ. Klik "+ Tambah FAQ" untuk menambahkan.</div>`;
+        return;
+      }
+
+      container.innerHTML = appState.faqs.map((faq, idx) => `
+        <div class="p-4 rounded-xl border border-neutral-200 bg-neutral-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="text-xs sm:text-sm font-bold text-black">${idx + 1}. ${escapeHTML(faq.question)}</div>
+            <div class="text-xs text-neutral-600">${escapeHTML(faq.answer)}</div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="openFAQEditorModal(${idx})" class="px-3 py-1.5 text-xs font-semibold border border-neutral-300 bg-white rounded-lg hover:border-black">Edit</button>
+            <button type="button" onclick="deleteFAQItem(${idx})" class="px-3 py-1.5 text-xs font-semibold border border-neutral-200 bg-white text-neutral-600 rounded-lg hover:border-black hover:text-black">Hapus</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.openFAQEditorModal = function (index = null) {
+      const isEdit = index !== null && appState.faqs[index];
+      const existing = isEdit ? appState.faqs[index] : { question: "", answer: "" };
+
+      openModal({
+        badge: isEdit ? "Edit FAQ" : "Tambah FAQ Baru",
+        title: isEdit ? `Edit Pertanyaan #${index + 1}` : "Tambah Pertanyaan Umum (FAQ)",
+        bodyHTML: `
+          <form onsubmit="handleSaveFAQForm(event, ${isEdit ? index : -1})" class="space-y-3 text-left">
+            <div>
+              <label class="block text-xs font-semibold text-black mb-1">Pertanyaan *</label>
+              <input id="faq-q-input" type="text" required value="${escapeHTML(existing.question)}" placeholder="Contoh: Bagaimana cara mengakses dashboard?" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-black" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-black mb-1">Jawaban *</label>
+              <textarea id="faq-a-input" rows="4" required placeholder="Tuliskan jawaban lengkap..." class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-black">${escapeHTML(existing.answer)}</textarea>
+            </div>
+            <div class="pt-2 flex justify-end gap-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
+              <button type="submit" class="px-4 py-2 bg-black text-white text-xs font-semibold rounded-lg">Simpan FAQ</button>
+            </div>
+          </form>
+        `,
+        actionsHTML: ``
+      });
+    };
+
+    window.handleSaveFAQForm = async function (e, index) {
+      e.preventDefault();
+      const question = document.getElementById("faq-q-input").value.trim();
+      const answer = document.getElementById("faq-a-input").value.trim();
+
+      if (index >= 0 && appState.faqs[index]) {
+        appState.faqs[index] = { question, answer };
+      } else {
+        appState.faqs.push({ question, answer });
+      }
+
+      try {
+        await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      } catch (_) {}
+      closeModal();
+      renderAdminFAQList();
+      refreshAllRenderedViews();
+      showToast("Daftar FAQ berhasil diperbarui.");
+    };
+
+    window.deleteFAQItem = async function (index) {
+      appState.faqs.splice(index, 1);
+      try {
+        await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      } catch (_) {}
+      renderAdminFAQList();
+      refreshAllRenderedViews();
+      showToast("Item FAQ berhasil dihapus.");
+    };
+
+    window.parseRawFirebaseJson = function () {
+      const rawText = (document.getElementById("fb-raw-json")?.value || "").trim();
+      if (!rawText) {
+        showToast("Tempelkan objek JSON firebaseConfig terlebih dahulu.");
+        return;
+      }
+      try {
+        // Support both valid JSON and JS object literal copied from Firebase Console
+        const normalized = rawText
+          .replace(/^[^{]*\{/, "{")
+          .replace(/\}[^}]*$/, "}")
+          .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+          .replace(/'/g, '"');
+        const parsed = JSON.parse(normalized);
+        if (parsed.apiKey) document.getElementById("fb-apiKey").value = parsed.apiKey;
+        if (parsed.authDomain) document.getElementById("fb-authDomain").value = parsed.authDomain;
+        if (parsed.projectId) document.getElementById("fb-projectId").value = parsed.projectId;
+        if (parsed.storageBucket) document.getElementById("fb-storageBucket").value = parsed.storageBucket;
+        if (parsed.messagingSenderId) document.getElementById("fb-messagingSenderId").value = parsed.messagingSenderId;
+        if (parsed.appId) document.getElementById("fb-appId").value = parsed.appId;
+        showToast("Konfigurasi Firebase berhasil diekstrak ke kolom form.");
+      } catch (err) {
+        showToast("Format JSON tidak dapat dibaca. Pastikan kurung kurawal { ... } lengkap.");
+      }
+    };
+
     window.handleSaveFirebaseConfig = async function (e) {
       e.preventDefault();
       const configObj = {
@@ -3928,64 +4466,155 @@ service cloud.firestore {
         setVal("fb-appId", appState.firebaseConfigObj.appId);
       }
 
+      // Populate Global Appearance & Theme Form
+      if (document.getElementById("app-bg-primary")) {
+        setVal("app-bg-primary", s.themeBgPrimary || "#FFFFFF");
+        setVal("app-bg-primary-hex", (s.themeBgPrimary || "#FFFFFF").toUpperCase());
+        setVal("app-bg-secondary", s.themeBgSecondary || "#FAFAFA");
+        setVal("app-bg-secondary-hex", (s.themeBgSecondary || "#FAFAFA").toUpperCase());
+        setVal("app-text-primary", s.themeTextPrimary || "#000000");
+        setVal("app-text-primary-hex", (s.themeTextPrimary || "#000000").toUpperCase());
+        setVal("app-text-secondary", s.themeTextSecondary || "#525252");
+        setVal("app-text-secondary-hex", (s.themeTextSecondary || "#525252").toUpperCase());
+        setVal("app-accent-primary", s.themeAccentPrimary || "#000000");
+        setVal("app-accent-primary-hex", (s.themeAccentPrimary || "#000000").toUpperCase());
+        setVal("app-accent-text", s.themeAccentText || "#FFFFFF");
+        setVal("app-accent-text-hex", (s.themeAccentText || "#FFFFFF").toUpperCase());
+        setVal("app-brand-icon", s.brandIcon || "grid-node");
+        setVal("app-brand-tagline", s.brandTagline || "Unified AI Platform");
+        setVal("app-grid-color", s.gridColor || "#A3A3A3");
+        setVal("app-grid-color-hex", (s.gridColor || "#A3A3A3").toUpperCase());
+        setVal("app-grid-opacity", s.gridOpacity ?? 30);
+        setVal("app-grid-size", s.gridSize || 36);
+        document.getElementById("app-grid-enabled").checked = s.gridEnabled !== false;
+      }
+
       renderAdminFAQList();
     }
 
-    window.handleSaveLandingSettings = async function (e) {
-      e.preventDefault();
-      const getVal = (id) => (document.getElementById(id)?.value || "").trim();
+    window.syncColorHexInput = function (pickerId, hexId) {
+      const picker = document.getElementById(pickerId);
+      const hex = document.getElementById(hexId);
+      if (picker && hex) hex.value = picker.value.toUpperCase();
+    };
 
+    window.syncColorPickerInput = function (hexId, pickerId) {
+      const hex = document.getElementById(hexId);
+      const picker = document.getElementById(pickerId);
+      if (!hex || !picker) return;
+      const val = hex.value.trim();
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+        picker.value = val;
+      }
+    };
+
+    window.previewLiveAppearance = function () {
+      const getVal = (id) => document.getElementById(id)?.value || "";
       Object.assign(appState.siteSettings, {
-        brandName: getVal("cfg-brand-name") || "AKSA.AI",
-        heroBadge: getVal("cfg-hero-badge"),
-        heroTitle: getVal("cfg-hero-title"),
-        heroDescription: getVal("cfg-hero-desc"),
-        ctaText: getVal("cfg-cta-text"),
-        secondaryCtaText: getVal("cfg-sec-cta-text"),
-        stat1Value: getVal("cfg-stat1-val"),
-        stat1Label: getVal("cfg-stat1-lbl"),
-        stat2Label: getVal("cfg-stat2-lbl"),
-        stat3Value: getVal("cfg-stat3-val"),
-        stat3Label: getVal("cfg-stat3-lbl"),
-        trustLabel: getVal("cfg-trust-label"),
-        trustTitle: getVal("cfg-trust-title"),
-        platformDescription: getVal("cfg-platform-desc"),
-        pillar1Title: getVal("cfg-p1-title"),
-        pillar1Desc: getVal("cfg-p1-desc"),
-        pillar2Title: getVal("cfg-p2-title"),
-        pillar2Desc: getVal("cfg-p2-desc"),
-        pillar3Title: getVal("cfg-p3-title"),
-        pillar3Desc: getVal("cfg-p3-desc"),
-        catalogTitle: getVal("cfg-catalog-title"),
-        catalogDesc: getVal("cfg-catalog-desc"),
-        benefitsTitle: getVal("cfg-benefits-title"),
-        benefit1Title: getVal("cfg-benefit1-title"),
-        benefit1Desc: getVal("cfg-benefit1-desc"),
-        benefit2Title: getVal("cfg-benefit2-title"),
-        benefit2Desc: getVal("cfg-benefit2-desc"),
-        stepsTitle: getVal("cfg-steps-title"),
-        stepsDesc: getVal("cfg-steps-desc"),
-        step1Title: getVal("cfg-s1-title"),
-        step1Desc: getVal("cfg-s1-desc"),
-        step2Title: getVal("cfg-s2-title"),
-        step2Desc: getVal("cfg-s2-desc"),
-        step3Title: getVal("cfg-s3-title"),
-        step3Desc: getVal("cfg-s3-desc"),
-        previewTitle: getVal("cfg-preview-title"),
-        previewDesc: getVal("cfg-preview-desc"),
-        pricingTitle: getVal("cfg-pricing-title"),
-        pricingDesc: getVal("cfg-pricing-desc"),
-        finalCtaBadge: getVal("cfg-final-badge"),
-        finalCtaTitle: getVal("cfg-final-title"),
-        finalCtaDesc: getVal("cfg-final-desc"),
-        contactEmail: getVal("cfg-contact-email"),
-        footerTagline: getVal("cfg-footer-tagline"),
-        footerDescription: getVal("cfg-footer-desc")
+        themeBgPrimary: getVal("app-bg-primary") || "#FFFFFF",
+        themeBgSecondary: getVal("app-bg-secondary") || "#FAFAFA",
+        themeTextPrimary: getVal("app-text-primary") || "#000000",
+        themeTextSecondary: getVal("app-text-secondary") || "#525252",
+        themeAccentPrimary: getVal("app-accent-primary") || "#000000",
+        themeAccentText: getVal("app-accent-text") || "#FFFFFF",
+        themeBorderStrong: getVal("app-accent-primary") || "#000000",
+        brandIcon: getVal("app-brand-icon") || "grid-node",
+        brandTagline: getVal("app-brand-tagline") || "Unified AI Platform",
+        gridColor: getVal("app-grid-color") || "#A3A3A3",
+        gridOpacity: Number(getVal("app-grid-opacity") ?? 30),
+        gridSize: Number(getVal("app-grid-size") || 36),
+        gridEnabled: document.getElementById("app-grid-enabled")?.checked !== false
       });
+      renderLandingCopySettings();
+    };
 
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+    window.applyAppearancePreset = function (presetKey) {
+      const presets = {
+        monochrome: {
+          themeBgPrimary: "#FFFFFF",
+          themeBgSecondary: "#FAFAFA",
+          themeTextPrimary: "#000000",
+          themeTextSecondary: "#525252",
+          themeAccentPrimary: "#000000",
+          themeAccentText: "#FFFFFF",
+          themeBorderSubtle: "#E5E5E5",
+          themeBorderStrong: "#000000",
+          gridColor: "#A3A3A3",
+          gridOpacity: 30,
+          gridSize: 36,
+          gridEnabled: true
+        },
+        dark: {
+          themeBgPrimary: "#09090B",
+          themeBgSecondary: "#18181B",
+          themeTextPrimary: "#FAFAFA",
+          themeTextSecondary: "#A1A1AA",
+          themeAccentPrimary: "#FFFFFF",
+          themeAccentText: "#09090B",
+          themeBorderSubtle: "#27272A",
+          themeBorderStrong: "#FAFAFA",
+          gridColor: "#52525B",
+          gridOpacity: 30,
+          gridSize: 36,
+          gridEnabled: true
+        },
+        emerald: {
+          themeBgPrimary: "#FFFFFF",
+          themeBgSecondary: "#F0FDF4",
+          themeTextPrimary: "#064E3B",
+          themeTextSecondary: "#374151",
+          themeAccentPrimary: "#065F46",
+          themeAccentText: "#FFFFFF",
+          themeBorderSubtle: "#D1FAE5",
+          themeBorderStrong: "#065F46",
+          gridColor: "#A3A3A3",
+          gridOpacity: 30,
+          gridSize: 36,
+          gridEnabled: true
+        },
+        navy: {
+          themeBgPrimary: "#FFFFFF",
+          themeBgSecondary: "#F8FAFC",
+          themeTextPrimary: "#0F172A",
+          themeTextSecondary: "#475569",
+          themeAccentPrimary: "#1E293B",
+          themeAccentText: "#FFFFFF",
+          themeBorderSubtle: "#E2E8F0",
+          themeBorderStrong: "#0F172A",
+          gridColor: "#A3A3A3",
+          gridOpacity: 30,
+          gridSize: 36,
+          gridEnabled: true
+        }
+      };
+
+      const selected = presets[presetKey] || presets.monochrome;
+      Object.assign(appState.siteSettings, selected);
+      populateAdminForms();
       refreshAllRenderedViews();
-      showToast("Seluruh pengaturan Landing Page berhasil disimpan.");
+      showToast("Preset warna diterapkan. Klik 'Simpan & Terapkan ke Semua Akun' untuk menyimpan permanen.");
+    };
+
+    window.resetAppearanceToDefault = async function () {
+      applyAppearancePreset("monochrome");
+      appState.siteSettings.brandIcon = "grid-node";
+      appState.siteSettings.brandTagline = "Unified AI Platform";
+      populateAdminForms();
+      try {
+        await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      } catch (_) {}
+      refreshAllRenderedViews();
+      showToast("Tampilan dikembalikan ke tema default hitam-putih.");
+    };
+
+    window.handleSaveAppearanceSettings = async function (e) {
+      e.preventDefault();
+      previewLiveAppearance();
+      try {
+        await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      } catch (_) {}
+      refreshAllRenderedViews();
+      showToast("Pengaturan warna, ikon, teks & background berhasil disimpan untuk semua akun!");
     };
 
     /* =======================================================================
@@ -4180,12 +4809,12 @@ service cloud.firestore {
     function renderDashboardView(route) {
       const subviews = {
         "/dashboard": { el: "dash-subview-overview", nav: "dash-nav-home", title: "Dashboard Utama" },
-        "/dashboard/modul-ajar": { el: "dash-subview-modul-ajar", nav: "dash-nav-modul", title: "AI Generator Modul Ajar" },
         "/dashboard/admin-customers": { el: "dash-subview-admin-customers", nav: "dash-nav-admin-customers", title: "Admin / Pelanggan & Referral" },
         "/dashboard/admin-features": { el: "dash-subview-admin-features", nav: "dash-nav-admin-features", title: "Admin / Pengaturan Link & Detail Fitur" },
         "/dashboard/admin-pricing": { el: "dash-subview-admin-pricing", nav: "dash-nav-admin-pricing", title: "Admin / Pengaturan Pricing" },
         "/dashboard/admin-whatsapp": { el: "dash-subview-admin-whatsapp", nav: "dash-nav-admin-whatsapp", title: "Admin / Pengaturan WhatsApp" },
         "/dashboard/admin-landing": { el: "dash-subview-admin-landing", nav: "dash-nav-admin-landing", title: "Admin / Edit Seluruh Landing Page" },
+        "/dashboard/admin-appearance": { el: "dash-subview-admin-appearance", nav: "dash-nav-admin-appearance", title: "Admin / Warna, Ikon & Tema Global" },
         "/dashboard/admin-firebase": { el: "dash-subview-admin-firebase", nav: "dash-nav-admin-firebase", title: "Admin / Pengaturan Firebase" }
       };
 
@@ -4216,166 +4845,22 @@ service cloud.firestore {
       const statFeatures = document.getElementById("dash-stat-features");
       const statPrice = document.getElementById("dash-stat-price");
       const statFirebase = document.getElementById("dash-stat-firebase");
+      const quickWaEl = document.getElementById("dash-quick-wa-number");
       if (statCustomers) statCustomers.textContent = `${appState.customers.length} Akun`;
       if (statFeatures) statFeatures.textContent = `${appState.features.length} Fitur`;
       if (statPrice) statPrice.textContent = `${appState.pricing.price} ${appState.pricing.billingPeriod}`.trim();
       if (statFirebase) statFirebase.textContent = appState.firebaseReady ? (appState.firebaseConfigObj?.projectId || "Terhubung") : "Mode Lokal";
+      if (quickWaEl) quickWaEl.textContent = appState.siteSettings.whatsappNumber || "-";
 
       if (route === "/dashboard/admin-customers") {
         renderAdminCustomersList();
         renderAdminReferralsList();
       } else if (route === "/dashboard/admin-features") {
         renderAdminFeaturesList();
-      } else if (["/dashboard/admin-pricing", "/dashboard/admin-whatsapp", "/dashboard/admin-landing", "/dashboard/admin-firebase"].includes(route)) {
+      } else if (["/dashboard/admin-pricing", "/dashboard/admin-whatsapp", "/dashboard/admin-landing", "/dashboard/admin-appearance", "/dashboard/admin-firebase"].includes(route)) {
         populateAdminForms();
       }
-
-      const historyList = document.getElementById("dash-history-list");
-      if (historyList) {
-        if (appState.sessionHistory.length === 0) {
-          historyList.innerHTML = `
-            <div class="p-4 rounded-xl border border-dashed border-neutral-300 text-xs text-neutral-500 text-center">
-              Belum ada dokumen Modul Ajar yang dibuat pada sesi ini.
-            </div>
-          `;
-        } else {
-          historyList.innerHTML = appState.sessionHistory.map((item, index) => `
-            <div class="p-3.5 rounded-xl border border-neutral-200 flex items-center justify-between gap-3">
-              <div>
-                <div class="font-semibold text-black text-xs sm:text-sm">${escapeHTML(item.title)}</div>
-                <div class="text-[11px] text-neutral-500">${escapeHTML(item.meta)} • ${escapeHTML(item.timestamp)}</div>
-              </div>
-              <button type="button" onclick="loadHistoryItem(${index})" class="px-3 py-1.5 text-xs font-semibold border border-black rounded-lg hover:bg-black hover:text-white transition-colors">
-                Buka
-              </button>
-            </div>
-          `).join("");
-        }
-      }
     }
-
-    // AI Generator Modul Ajar Functions
-    window.fillExampleModulAjar = function () {
-      document.getElementById("ma-mapel").value = "Ilmu Pengetahuan Alam (IPA)";
-      document.getElementById("ma-fase").value = "Fase D (SMP Kelas 7-9)";
-      document.getElementById("ma-topik").value = "Ekosistem dan Interaksi Makhluk Hidup";
-      document.getElementById("ma-waktu").value = "2 x 40 Menit (1 Pertemuan)";
-      document.getElementById("ma-tujuan").value = "Peserta didik mampu mengidentifikasi komponen biotik dan abiotik serta menganalisis aliran energi dalam rantai makanan.";
-    };
-
-    window.handleGenerateModulAjar = function (e) {
-      e.preventDefault();
-      const mapel = document.getElementById("ma-mapel").value.trim();
-      const fase = document.getElementById("ma-fase").value;
-      const topik = document.getElementById("ma-topik").value.trim();
-      const waktu = document.getElementById("ma-waktu").value.trim() || "2 x 40 Menit";
-      const tujuan = document.getElementById("ma-tujuan").value.trim() || `Peserta didik mampu memahami, menganalisis, dan menerapkan konsep ${topik} secara kontekstual.`;
-
-      const btn = document.getElementById("ma-generate-btn");
-      btn.disabled = true;
-      btn.innerHTML = `<span>Menyusun Modul Ajar...</span>`;
-
-      setTimeout(() => {
-        const generatedDoc = `====================================================================
-MODUL AJAR KURIKULUM MERDEKA
-Dihasilkan melalui ${appState.siteSettings.brandName || PLATFORM_CONFIG.name} — Unified AI Platform
-====================================================================
-
-I. INFORMASI UMUM
-- Mata Pelajaran       : ${mapel}
-- Jenjang / Fase       : ${fase}
-- Topik / Materi Pokok : ${topik}
-- Alokasi Waktu        : ${waktu}
-- Model Pembelajaran   : Problem-Based Learning (PBL) / Diskusi Terbimbing
-
-II. KOMPETENSI & PROFIL PELAJAR PANCASILA
-1. Bernalar Kritis: Menganalisis permasalahan kontekstual terkait ${topik}.
-2. Gotong Royong: Berkolaborasi dalam kelompok kecil saat eksplorasi materi.
-3. Mandiri: Menyusun refleksi pemahaman individu di akhir pembelajaran.
-
-III. TUJUAN PEMBELAJARAN
-${tujuan}
-
-IV. PEMAHAMAN BERMAKNA & PERTANYAAN PEMANTIK
-- Pemahaman Bermakna:
-  Memahami konsep ${topik} membantu peserta didik memecahkan persoalan nyata di lingkungan sekitar secara sistematis.
-- Pertanyaan Pemantik:
-  1. Mengapa pemahaman tentang ${topik} penting dalam kehidupan sehari-hari?
-  2. Apa dampak yang terjadi apabila salah satu unsur dalam ${topik} mengalami perubahan?
-
-V. KEGIATAN PEMBELAJARAN
-A. Kegiatan Pendahuluan (15 Menit)
-   1. Guru membuka pembelajaran dengan salam, doa, dan mengecek kesiapan peserta didik.
-   2. Apersepsi: Guru mengaitkan pengalaman awal peserta didik dengan topik ${topik}.
-   3. Penyampaian tujuan pembelajaran dan garis besar aktivitas hari ini.
-
-B. Kegiatan Inti (50 Menit)
-   1. Orientasi Masalah: Peserta didik mengamati studi kasus singkat mengenai ${topik}.
-   2. Organisasi Belajar: Peserta didik dibagi ke dalam kelompok beranggotakan 3–4 orang.
-   3. Penyelidikan Kelompok: Kelompok mengumpulkan informasi, berdiskusi, dan mencatat temuan utama.
-   4. Pengembangan & Penyajian Hasil: Perwakilan kelompok mempresentasikan hasil analisis di depan kelas.
-   5. Analisis & Evaluasi: Guru memberikan penguatan konsep dan meluruskan miskonsepsi.
-
-C. Kegiatan Penutup (15 Menit)
-   1. Peserta didik bersama guru menyimpulkan poin-poin inti materi ${topik}.
-   2. Refleksi singkat mengenai bagian materi yang sudah dipahami dan yang perlu pendalaman.
-   3. Informasi agenda pertemuan berikutnya dan penutup.
-
-VI. ASESMEN PEMBELAJARAN
-1. Asesmen Diagnostik: Pertanyaan pemantik lisan di awal sesi.
-2. Asesmen Formatif: Observasi keaktifan diskusi kelompok & ketepatan analisis konsep.
-3. Asesmen Sumatif: Uji pemahaman tertulis (uraian analitis) dan rubrik penilaian presentasi.
-====================================================================`;
-
-        const resultTitle = `Modul Ajar: ${topik}`;
-        document.getElementById("ma-result-title").textContent = resultTitle;
-        document.getElementById("ma-result-editor").value = generatedDoc;
-        document.getElementById("ma-result-card").classList.remove("hidden");
-
-        appState.sessionHistory.unshift({
-          title: resultTitle,
-          meta: `${mapel} • ${fase}`,
-          timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
-          content: generatedDoc
-        });
-
-        btn.disabled = false;
-        btn.innerHTML = `<span>Generate Modul Ajar</span>`;
-        showToast("Modul Ajar berhasil disusun dan siap diedit!");
-        document.getElementById("ma-result-card").scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }, 400);
-    };
-
-    window.loadHistoryItem = function (index) {
-      const item = appState.sessionHistory[index];
-      if (!item) return;
-      navigateTo("/dashboard/modul-ajar");
-      document.getElementById("ma-result-title").textContent = item.title;
-      document.getElementById("ma-result-editor").value = item.content;
-      document.getElementById("ma-result-card").classList.remove("hidden");
-    };
-
-    window.copyModulAjarResult = function () {
-      const editor = document.getElementById("ma-result-editor");
-      editor.select();
-      document.execCommand("copy");
-      showToast("Teks Modul Ajar berhasil disalin ke clipboard.");
-    };
-
-    window.downloadModulAjarResult = function () {
-      const text = document.getElementById("ma-result-editor").value;
-      const title = document.getElementById("ma-result-title").textContent.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${title || "modul-ajar"}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast("File Modul Ajar mulai diunduh.");
-    };
 
     /* =======================================================================
        MOBILE MENU & SCROLL REVEAL INITIALIZATION
@@ -4449,6 +4934,7 @@ VI. ASESMEN PEMBELAJARAN
         "/dashboard/admin-pricing",
         "/dashboard/admin-whatsapp",
         "/dashboard/admin-landing",
+        "/dashboard/admin-appearance",
         "/dashboard/admin-firebase"
       ];
       if (initialHash.startsWith("/fitur/") || validRoutes.includes(initialHash)) {
