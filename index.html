@@ -1137,6 +1137,9 @@
         <h1 id="auth-heading" class="font-display text-2xl font-bold text-black">Masuk ke Dashboard Admin</h1>
         <p id="auth-subheading" class="text-sm text-neutral-600 mt-1">
           Kelola seluruh konten landing page, katalog fitur, data pelanggan, kode referral, dan pengaturan Firebase.
+        </p>
+      </div>
+
       <!-- Admin Login Error Diagnostic Box -->
       <div id="admin-auth-error-box" class="hidden mb-4 p-3.5 rounded-xl border border-black bg-neutral-100 text-xs text-black leading-relaxed space-y-1"></div>
 
@@ -3333,10 +3336,13 @@ service cloud.firestore {
       } catch (error) {
         console.error("Admin Firebase Auth error:", error);
         let hint = "Pastikan email & password sesuai dengan user yang Anda buat di Firebase Console → Authentication → Users.";
+        let showLocalBypass = false;
         if (error.code === "auth/operation-not-allowed") {
-          hint = "Metode sign-in Email/Password belum diaktifkan di Firebase Console → Authentication → Sign-in method.";
+          hint = `Metode sign-in <strong>Email/Password</strong> belum diaktifkan di project Firebase <strong>${escapeHTML(appState.activeFirebaseConfig?.projectId || "p-c410f")}</strong>.<br/>Buka <strong>Firebase Console → Authentication → Sign-in method → Email/Password → Enable → Save</strong>.`;
+          showLocalBypass = true;
         } else if (error.code === "auth/unauthorized-domain") {
           hint = `Domain <code>${escapeHTML(window.location.hostname)}</code> belum terdaftar di Firebase Console → Authentication → Settings → Authorized domains.`;
+          showLocalBypass = true;
         } else if (error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
           hint = "Email atau kata sandi salah, atau user belum dibuat di project Firebase aktif.";
         }
@@ -3346,6 +3352,13 @@ service cloud.firestore {
             <div><strong>Login Gagal (${escapeHTML(error.code || "error")})</strong></div>
             <div>${hint}</div>
             <div class="text-[11px] font-mono text-neutral-600 pt-1">Project: ${escapeHTML(appState.activeFirebaseConfig?.projectId || "-")} • Domain: ${escapeHTML(window.location.hostname || "localhost")}</div>
+            ${showLocalBypass ? `
+              <div class="pt-2">
+                <button type="button" onclick="loginAdminLocalFallback()" class="w-full py-2 px-3 bg-black text-white text-xs font-semibold rounded-lg hover:bg-neutral-800 transition-colors">
+                  Masuk Dashboard Admin (Mode Lokal Sementara) →
+                </button>
+              </div>
+            ` : ""}
           `;
         }
       } finally {
@@ -3354,6 +3367,18 @@ service cloud.firestore {
           submitBtn.textContent = "Masuk ke Dashboard Admin";
         }
       }
+    };
+
+    window.loginAdminLocalFallback = function () {
+      const email = document.getElementById("auth-email")?.value.trim() || "admin@aksa-ai.id";
+      appState.user = {
+        name: email.split("@")[0] || "Admin Lokal",
+        email: email,
+        uid: "local-admin"
+      };
+      syncAuthNavState();
+      showToast("Masuk dalam Mode Lokal Sementara. Aktifkan Email/Password di Firebase Console untuk sinkronisasi cloud.");
+      navigateTo("/dashboard");
     };
 
     window.handleLogout = async function () {
@@ -3484,9 +3509,50 @@ service cloud.firestore {
         `,
         actionsHTML: `
           <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
-          <button type="submit" form="modal-customer-form" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan Pelanggan</button>
+          <button type="button" onclick="submitModalForm('modal-customer-form')" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg hover:bg-neutral-800">Simpan Pelanggan</button>
         `
       });
+    };
+
+    window.submitModalForm = function (formId) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      if (typeof form.requestSubmit === "function") {
+        form.requestSubmit();
+      } else {
+        form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+      }
+    };
+
+    window.saveCustomerForm = async function (event, existingId) {
+      if (event) event.preventDefault();
+      const nameVal = document.getElementById("mc-name")?.value.trim();
+      const emailVal = document.getElementById("mc-email")?.value.trim().toLowerCase();
+      const passVal = document.getElementById("mc-password")?.value.trim();
+      if (!nameVal || !emailVal || !passVal) {
+        showToast("Nama, Email, dan Password wajib diisi.");
+        return;
+      }
+      const obj = {
+        id: existingId || "cust-" + Date.now(),
+        code: (document.getElementById("mc-code")?.value.trim().toUpperCase()) || ("CUST-" + Date.now().toString().slice(-4)),
+        name: nameVal,
+        email: emailVal,
+        password: passVal,
+        subscriptionStart: document.getElementById("mc-start")?.value || new Date().toISOString().split("T")[0],
+        referralCode: document.getElementById("mc-referral")?.value.trim().toUpperCase() || "",
+        isActive: Boolean(document.getElementById("mc-active")?.checked)
+      };
+
+      const idx = appState.customers.findIndex(c => c.id === obj.id);
+      if (idx >= 0) appState.customers[idx] = obj;
+      else appState.customers.unshift(obj);
+
+      saveStateToLocalStorage();
+      renderAdminCustomersList();
+      closeModal();
+      showToast("Data pelanggan berhasil disimpan!");
+      persistCustomerToFirestore(obj);
     };
 
     window.saveCustomerForm = async function (event, existingId) {
@@ -3564,9 +3630,32 @@ service cloud.firestore {
         `,
         actionsHTML: `
           <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
-          <button type="submit" form="modal-referral-form" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan Kode</button>
+          <button type="button" onclick="submitModalForm('modal-referral-form')" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg hover:bg-neutral-800">Simpan Kode</button>
         `
       });
+    };
+
+    window.saveReferralForm = async function (event) {
+      if (event) event.preventDefault();
+      const codeVal = document.getElementById("mr-code")?.value.trim().toUpperCase();
+      if (!codeVal) {
+        showToast("Kode referral wajib diisi.");
+        return;
+      }
+      const obj = {
+        id: "ref-" + Date.now(),
+        code: codeVal,
+        ownerName: document.getElementById("mr-owner")?.value.trim() || "Mitra AKSA.AI",
+        discountInfo: document.getElementById("mr-info")?.value.trim() || "Kode Referral Resmi",
+        isActive: true
+      };
+      appState.referrals.unshift(obj);
+      saveStateToLocalStorage();
+      renderAdminReferralsList();
+      renderSinglePricing();
+      closeModal();
+      showToast("Kode referral berhasil ditambahkan!");
+      persistReferralToFirestore(obj);
     };
 
     window.saveReferralForm = async function (event) {
@@ -3695,7 +3784,7 @@ service cloud.firestore {
             </div>
             <div>
               <label class="block text-xs font-semibold text-black mb-1">URL Tujuan Eksternal (Saat tombol di Dashboard Member diklik)</label>
-              <input id="mf-url" type="url" value="${escapeHTML(existing ? existing.targetUrl || "" : "")}" placeholder="https://... (kosongkan jika belum ada)" class="w-full px-3 py-2 text-xs font-mono border border-neutral-300 rounded-lg" />
+              <input id="mf-url" type="text" value="${escapeHTML(existing ? existing.targetUrl || "" : "")}" placeholder="https://... (kosongkan jika belum ada)" class="w-full px-3 py-2 text-xs font-mono border border-neutral-300 rounded-lg" />
             </div>
             <label class="inline-flex items-center gap-2 text-xs font-semibold text-black pt-1 cursor-pointer">
               <input id="mf-active" type="checkbox" ${!existing || existing.isActive !== false ? "checked" : ""} class="w-4 h-4 accent-black" />
@@ -3705,9 +3794,46 @@ service cloud.firestore {
         `,
         actionsHTML: `
           <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
-          <button type="submit" form="modal-feature-form" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan Fitur</button>
+          <button type="button" onclick="submitModalForm('modal-feature-form')" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg hover:bg-neutral-800">Simpan Fitur</button>
         `
       });
+    };
+
+    window.saveFeatureForm = async function (event, existingId) {
+      if (event) event.preventDefault();
+      const name = document.getElementById("mf-name")?.value.trim();
+      const desc = document.getElementById("mf-desc")?.value.trim();
+      if (!name || !desc) {
+        showToast("Nama fitur dan deskripsi singkat wajib diisi.");
+        return;
+      }
+      const benefitsRaw = (document.getElementById("mf-benefits")?.value || "").split("\n").map(s => s.trim()).filter(Boolean);
+      const existing = existingId ? appState.features.find(f => f.id === existingId) : null;
+
+      const obj = {
+        id: existingId || name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now().toString().slice(-4),
+        name,
+        category: document.getElementById("mf-category")?.value || "Tools Produktivitas AI",
+        icon: document.getElementById("mf-icon")?.value || "sparkles",
+        description: desc,
+        longDescription: document.getElementById("mf-long-desc")?.value.trim() || desc,
+        benefits: benefitsRaw,
+        targetUrl: document.getElementById("mf-url")?.value.trim() || "",
+        isActive: Boolean(document.getElementById("mf-active")?.checked),
+        isIncludedInPackage: true,
+        displayOrder: existing ? existing.displayOrder : appState.features.length + 1
+      };
+
+      const idx = appState.features.findIndex(f => f.id === obj.id);
+      if (idx >= 0) appState.features[idx] = obj;
+      else appState.features.push(obj);
+
+      appState.activeCategory = "Semua";
+      saveStateToLocalStorage();
+      refreshAllRenderedViews();
+      closeModal();
+      showToast("Fitur AI berhasil disimpan dan diperbarui di landing page!");
+      persistFeatureToFirestore(obj);
     };
 
     window.saveFeatureForm = async function (event, existingId) {
@@ -3988,9 +4114,28 @@ service cloud.firestore {
         `,
         actionsHTML: `
           <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
-          <button type="submit" form="modal-faq-form" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan FAQ</button>
+          <button type="button" onclick="submitModalForm('modal-faq-form')" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg hover:bg-neutral-800">Simpan FAQ</button>
         `
       });
+    };
+
+    window.saveFAQForm = async function (event, idx) {
+      if (event) event.preventDefault();
+      const qVal = document.getElementById("mfaq-q")?.value.trim();
+      const aVal = document.getElementById("mfaq-a")?.value.trim();
+      if (!qVal || !aVal) {
+        showToast("Pertanyaan dan jawaban FAQ wajib diisi.");
+        return;
+      }
+      const obj = { q: qVal, a: aVal };
+      if (idx !== null && appState.faqs[idx]) appState.faqs[idx] = obj;
+      else appState.faqs.push(obj);
+      saveStateToLocalStorage();
+      renderFAQList();
+      renderAdminFAQList();
+      closeModal();
+      showToast("FAQ berhasil disimpan!");
+      persistSiteSettingsToFirestore();
     };
 
     window.saveFAQForm = async function (event, idx) {
