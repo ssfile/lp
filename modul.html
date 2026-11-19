@@ -448,7 +448,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signInAnonymously, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -714,12 +714,12 @@
             },
             questionBank: [],
             lastAssessmentMeta: {
-                mapel: 'Ilmu Pengetahuan Alam (IPA)',
+                mapel: 'Pendidikan Pancasila',
                 kelas: 'Kelas VII / Fase D',
-                materi: 'Ekosistem dan Interaksi Makhluk Hidup',
+                materi: 'Macam-Macam Norma',
                 jenis: 'Sumatif',
                 bentuk: 'Pilihan Ganda (A-D)',
-                kesulitan: 'Sedang - HOTS'
+                kesulitan: 'Soal HOTS (C4-C6)'
             },
             lastLkpdState: {
                 template: 'Modern',
@@ -767,6 +767,24 @@
                     docId: null,
                     html: '<h1>MEDIA PEMBELAJARAN</h1><p>Hasil dari <strong>Generator Media Ajar</strong> (Presentasi, Ringkasan, Infografis, Ilustrasi, atau Naskah Video) akan tampil di editor khusus ini.</p>'
                 },
+                presentasi: {
+                    title: 'Kerangka & Materi Slide Presentasi',
+                    category: 'Presentasi',
+                    mapel: 'Umum',
+                    kelas: 'Fase D',
+                    orientation: 'landscape',
+                    docId: null,
+                    html: '<h1>KERANGKA &amp; MATERI SLIDE PRESENTASI</h1><p>Hasil dari <strong>AI Generator Presentasi</strong> akan tampil otomatis di editor khusus ini.</p>'
+                },
+                materiAjar: {
+                    title: 'Bahan Ajar & Ringkasan Materi',
+                    category: 'Materi Ajar',
+                    mapel: 'Umum',
+                    kelas: 'Fase D',
+                    orientation: 'portrait',
+                    docId: null,
+                    html: '<h1>BAHAN AJAR &amp; RINGKASAN MATERI</h1><p>Hasil dari <strong>AI Generator Materi Ajar</strong> akan tampil otomatis di editor khusus ini.</p>'
+                },
                 ringkasan: {
                     title: 'Ringkasan Materi Pembelajaran',
                     category: 'Ringkasan Materi',
@@ -795,15 +813,15 @@
                     <li>Isi identitas satuan pendidikan, semester, mata pelajaran, fase/kelas, materi pokok, alokasi waktu, model pembelajaran (PBL, PjBL, Discovery Learning, Inquiry Learning, Cooperative Learning, Direct Instruction), serta CP resmi jika sudah tersedia.</li>
                     <li>Modul tersusun sistematis dalam <strong>A. Informasi Umum</strong>, <strong>B. Komponen Inti</strong> (termasuk Pendahuluan, Inti, Penutup, Asesmen Diagnostik/Formatif/Sumatif, Pengayaan &amp; Remedial, Refleksi Guru &amp; Peserta Didik), dan <strong>C. Lampiran</strong> (LKPD, Bahan Bacaan Guru &amp; Peserta Didik, Media Pembelajaran, Instrumen Penilaian, Rubrik Penilaian, Kunci Jawaban, Glosarium, dan Daftar Pustaka) dalam format tabel siap unduh <strong>.DOCX</strong>.</li>
                 </ul>
-                <h3>2. Generator Soal &amp; Asesmen</h3>
+                <h3>2. Generator Soal &amp; Asesmen (LOTS, MOTS, HOTS &amp; Campuran)</h3>
                 <ul>
-                    <li>Pilih jenis asesmen (Diagnostik, Formatif, Sumatif, HOTS, Remedial) dan bentuk soal (termasuk <strong>Pilihan Ganda A–C, A–D, A–E</strong>, Pilihan Ganda Kompleks, Benar/Salah, Menjodohkan, Isian, Uraian, dan Studi Kasus).</li>
-                    <li>Setiap butir soal dilengkapi stimulus kasus yang bervariasi, kunci jawaban, pembahasan, level kognitif C1–C6, dan rubrik penilaian.</li>
+                    <li>Pilih tingkat kemampuan berpikir sesuai Taksonomi Bloom revisi: <strong>Soal LOTS (C1–C2)</strong>, <strong>Soal MOTS (C3)</strong>, <strong>Soal HOTS (C4–C6)</strong>, atau <strong>Soal Campuran (C1–C6)</strong>.</li>
+                    <li>Setiap butir soal dilengkapi konteks kasus yang bervariasi, indikator, kunci jawaban, pembahasan, dan pedoman penskoran.</li>
                 </ul>
-                <h3>3. Generator LKPD, Media Ajar, Ringkasan Materi &amp; Refleksi</h3>
+                <h3>3. Generator LKPD, Presentasi, Materi Ajar, Ringkasan &amp; Refleksi</h3>
                 <ul>
-                    <li>Setiap generator memiliki <strong>halaman editor mandiri</strong> sehingga naskah Modul Ajar, Soal, LKPD, Media, Ringkasan, maupun Refleksi tidak saling menimpa.</li>
-                    <li>Gunakan tombol <strong>Simpan ke Dokumen Saya</strong>, <strong>Unduh Word (.doc/.docx)</strong>, atau <strong>Cetak / PDF</strong> pada bilah atas setiap editor.</li>
+                    <li>Setiap generator memiliki <strong>halaman editor mandiri</strong> sehingga naskah tidak saling menimpa.</li>
+                    <li>Gunakan tombol <strong>Simpan</strong>, <strong>Unduh .DOCX / Word</strong>, atau <strong>Cetak / PDF</strong> pada bilah atas setiap editor.</li>
                 </ul>
             `
         };
@@ -1065,7 +1083,7 @@
                 return true;
             } catch (e) {
                 console.error(`Firestore write failed (${label}):`, e);
-                showToast(`Firestore (${label}) belum tersimpan ke cloud: ${e.code || e.message}. Periksa Firestore Rules di Firebase Console.`, 'warning');
+                showToast(`Firestore (${label}) belum tersimpan ke cloud: ${e.code || e.message}.`, 'warning');
                 return false;
             }
         }
@@ -1110,6 +1128,487 @@
                 await writeFirestoreSafe(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', newId), record, 'Dokumen');
                 updateHeaderDocCount();
                 return record;
+            }
+        }
+
+        async function saveCurrentDocument(editorKey) {
+            const ed = appState.editors[editorKey];
+            if (!ed) return;
+            const titleInput = document.getElementById('editor-doc-title');
+            const canvas = document.getElementById('document-editor-canvas');
+            const title = (titleInput?.value || ed.title || 'Dokumen Perangkat Ajar').trim();
+            const html = canvas ? canvas.innerHTML : ed.html;
+
+            ed.title = title;
+            ed.html = html;
+
+            const saved = await persistDocumentRecord({
+                id: ed.docId,
+                title,
+                category: ed.category,
+                mapel: ed.mapel,
+                kelas: ed.kelas,
+                html
+            });
+            if (saved) ed.docId = saved.id;
+            showToast(`"${title}" berhasil disimpan ke Dokumen Saya.`, 'success');
+        }
+
+        async function saveThemeToFirestore() {
+            const t = { ...DEFAULT_THEME, ...appState.theme };
+            applyThemeVariables(t);
+            await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'theme_config'),
+                { ...t, updatedAt: Date.now() },
+                'Identitas, Warna & Tampilan'
+            );
+            showToast('Identitas web, warna, tampilan & teks footer berhasil disimpan dan diterapkan!', 'success');
+        }
+
+        // =====================================================================
+        // VALID & COMPATIBLE OFFICE OPEN XML (.DOCX) GENERATOR + VALIDATOR
+        // =====================================================================
+        function crc32Table() {
+            const table = new Uint32Array(256);
+            for (let n = 0; n < 256; n++) {
+                let c = n;
+                for (let k = 0; k < 8; k++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[n] = c >>> 0;
+            }
+            return table;
+        }
+        const CRC32_TABLE = crc32Table();
+
+        function computeCrc32(bytes) {
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < bytes.length; i++) {
+                crc = CRC32_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+            }
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+
+        function buildStoredZipArchive(entries) {
+            const encoder = new TextEncoder();
+            const localParts = [];
+            const centralParts = [];
+            let offset = 0;
+
+            for (const entry of entries) {
+                const nameBytes = encoder.encode(entry.name);
+                const dataBytes = typeof entry.data === 'string' ? encoder.encode(entry.data) : entry.data;
+                const crc = computeCrc32(dataBytes);
+                const size = dataBytes.length;
+
+                // Local file header (30 bytes + filename)
+                const localHeader = new Uint8Array(30 + nameBytes.length);
+                const lv = new DataView(localHeader.buffer);
+                lv.setUint32(0, 0x04034b50, true);
+                lv.setUint16(4, 20, true); // version needed to extract (2.0)
+                lv.setUint16(6, 0x0800, true); // UTF-8 flag
+                lv.setUint16(8, 0, true); // method 0 = store
+                lv.setUint16(10, 0, true);
+                lv.setUint16(12, 0x0021, true);
+                lv.setUint32(14, crc, true);
+                lv.setUint32(18, size, true);
+                lv.setUint32(22, size, true);
+                lv.setUint16(26, nameBytes.length, true);
+                lv.setUint16(28, 0, true);
+                localHeader.set(nameBytes, 30);
+
+                localParts.push(localHeader, dataBytes);
+
+                // Central directory header (46 bytes + filename)
+                const centralHeader = new Uint8Array(46 + nameBytes.length);
+                const cv = new DataView(centralHeader.buffer);
+                cv.setUint32(0, 0x02014b50, true);
+                cv.setUint16(4, 20, true);
+                cv.setUint16(6, 20, true);
+                cv.setUint16(8, 0x0800, true);
+                cv.setUint16(10, 0, true);
+                cv.setUint16(12, 0, true);
+                cv.setUint16(14, 0x0021, true);
+                cv.setUint32(16, crc, true);
+                cv.setUint32(20, size, true);
+                cv.setUint32(24, size, true);
+                cv.setUint16(28, nameBytes.length, true);
+                cv.setUint16(30, 0, true);
+                cv.setUint16(32, 0, true);
+                cv.setUint16(34, 0, true);
+                cv.setUint16(36, 0, true);
+                cv.setUint32(38, 0, true);
+                cv.setUint32(42, offset, true);
+                centralHeader.set(nameBytes, 46);
+
+                centralParts.push(centralHeader);
+                offset += localHeader.length + dataBytes.length;
+            }
+
+            const centralSize = centralParts.reduce((acc, arr) => acc + arr.length, 0);
+            const eocd = new Uint8Array(22);
+            const ev = new DataView(eocd.buffer);
+            ev.setUint32(0, 0x06054b50, true);
+            ev.setUint16(4, 0, true);
+            ev.setUint16(6, 0, true);
+            ev.setUint16(8, entries.length, true);
+            ev.setUint16(10, entries.length, true);
+            ev.setUint32(12, centralSize, true);
+            ev.setUint32(16, offset, true);
+            ev.setUint16(20, 0, true);
+
+            const totalBytes = offset + centralSize + eocd.length;
+            const out = new Uint8Array(totalBytes);
+            let pos = 0;
+            for (const p of localParts) {
+                out.set(p, pos);
+                pos += p.length;
+            }
+            for (const c of centralParts) {
+                out.set(c, pos);
+                pos += c.length;
+            }
+            out.set(eocd, pos);
+            return out;
+        }
+
+        function xmlEscape(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+        }
+
+        function inlineNodesToRunsXml(node, bold = false, italic = false) {
+            if (!node) return '';
+            if (node.nodeType === Node.TEXT_NODE) {
+                const raw = (node.nodeValue || '').replace(/\s+/g, ' ');
+                if (!raw || raw === ' ') return '';
+                const rPr = (bold || italic)
+                    ? `<w:rPr>${bold ? '<w:b/>' : ''}${italic ? '<w:i/>' : ''}</w:rPr>`
+                    : '';
+                return `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(raw)}</w:t></w:r>`;
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+            const tag = node.tagName.toLowerCase();
+            if (tag === 'br') {
+                return `<w:r><w:br/></w:r>`;
+            }
+            const nextBold = bold || tag === 'strong' || tag === 'b';
+            const nextItalic = italic || tag === 'em' || tag === 'i';
+            let out = '';
+            for (const child of Array.from(node.childNodes)) {
+                out += inlineNodesToRunsXml(child, nextBold, nextItalic);
+            }
+            return out;
+        }
+
+        function cellChildrenToXml(cellEl) {
+            let xml = '';
+            let buf = '';
+            const flushBuf = () => {
+                if (buf.trim().length > 0) {
+                    xml += `<w:p><w:pPr><w:spacing w:before="30" w:after="40" w:line="260" w:lineRule="auto"/></w:pPr>${buf}</w:p>`;
+                }
+                buf = '';
+            };
+
+            for (const child of Array.from(cellEl.childNodes)) {
+                if (child.nodeType === Node.ELEMENT_NODE) {
+                    const t = child.tagName.toLowerCase();
+                    if (t === 'p' || t === 'div') {
+                        flushBuf();
+                        const runs = inlineNodesToRunsXml(child);
+                        xml += `<w:p><w:pPr><w:spacing w:before="30" w:after="40" w:line="260" w:lineRule="auto"/></w:pPr>${runs || '<w:r><w:t></w:t></w:r>'}</w:p>`;
+                    } else if (t === 'ul' || t === 'ol') {
+                        flushBuf();
+                        const items = Array.from(child.children).filter(el => el.tagName.toLowerCase() === 'li');
+                        items.forEach((li, i) => {
+                            const bullet = t === 'ol' ? `${i + 1}. ` : '• ';
+                            xml += `<w:p><w:pPr><w:ind w:left="260" w:hanging="180"/><w:spacing w:before="20" w:after="30" w:line="250" w:lineRule="auto"/></w:pPr><w:r><w:t xml:space="preserve">${xmlEscape(bullet)}</w:t></w:r>${inlineNodesToRunsXml(li)}</w:p>`;
+                        });
+                    } else if (t === 'br') {
+                        flushBuf();
+                        xml += `<w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr></w:p>`;
+                    } else {
+                        buf += inlineNodesToRunsXml(child);
+                    }
+                } else {
+                    buf += inlineNodesToRunsXml(child);
+                }
+            }
+            flushBuf();
+            if (!xml) {
+                xml = `<w:p><w:pPr><w:spacing w:before="30" w:after="40"/></w:pPr></w:p>`;
+            }
+            return xml;
+        }
+
+        function convertHtmlTableToWordXml(tableEl, isLandscape) {
+            const rows = Array.from(tableEl.querySelectorAll('tr'));
+            if (rows.length === 0) return '';
+
+            let maxCols = 1;
+            rows.forEach(tr => {
+                const cells = Array.from(tr.children).filter(el => ['th', 'td'].includes(el.tagName.toLowerCase()));
+                let count = 0;
+                cells.forEach(c => {
+                    count += Math.max(1, parseInt(c.getAttribute('colspan') || '1', 10));
+                });
+                if (count > maxCols) maxCols = count;
+            });
+
+            const totalWidthDxa = isLandscape ? 14200 : 9640;
+            const colWidth = Math.floor(totalWidthDxa / maxCols);
+
+            const gridColsXml = Array.from({ length: maxCols }, () => `<w:gridCol w:w="${colWidth}"/>`).join('');
+
+            const trXmlList = rows.map((tr, rIdx) => {
+                const cells = Array.from(tr.children).filter(el => ['th', 'td'].includes(el.tagName.toLowerCase()));
+                const isHeaderRow = rIdx === 0 || cells.every(c => c.tagName.toLowerCase() === 'th');
+
+                const tcXmlList = cells.map(cell => {
+                    const isTh = cell.tagName.toLowerCase() === 'th';
+                    const span = Math.max(1, parseInt(cell.getAttribute('colspan') || '1', 10));
+                    const wDxa = colWidth * span;
+                    const shd = isTh ? `<w:shd w:val="clear" w:color="auto" w:fill="F4F4F5"/>` : '';
+                    const spanXml = span > 1 ? `<w:gridSpan w:val="${span}"/>` : '';
+                    return `
+                        <w:tc>
+                            <w:tcPr>
+                                <w:tcW w:w="${wDxa}" w:type="dxa"/>
+                                ${spanXml}
+                                ${shd}
+                                <w:tcMar>
+                                    <w:top w:w="90" w:type="dxa"/>
+                                    <w:bottom w:w="90" w:type="dxa"/>
+                                    <w:left w:w="120" w:type="dxa"/>
+                                    <w:right w:w="120" w:type="dxa"/>
+                                </w:tcMar>
+                            </w:tcPr>
+                            ${cellChildrenToXml(cell)}
+                        </w:tc>
+                    `;
+                }).join('');
+
+                return `
+                    <w:tr>
+                        <w:trPr>
+                            <w:cantSplit/>
+                            ${isHeaderRow ? '<w:tblHeader/>' : ''}
+                        </w:trPr>
+                        ${tcXmlList}
+                    </w:tr>
+                `;
+            }).join('');
+
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblW w:w="${totalWidthDxa}" w:type="dxa"/>
+                        <w:tblBorders>
+                            <w:top w:val="single" w:sz="6" w:space="0" w:color="262626"/>
+                            <w:bottom w:val="single" w:sz="6" w:space="0" w:color="262626"/>
+                            <w:left w:val="single" w:sz="6" w:space="0" w:color="262626"/>
+                            <w:right w:val="single" w:sz="6" w:space="0" w:color="262626"/>
+                            <w:insideH w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                            <w:insideV w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                        </w:tblBorders>
+                        <w:tblLook w:val="04A0"/>
+                    </w:tblPr>
+                    <w:tblGrid>${gridColsXml}</w:tblGrid>
+                    ${trXmlList}
+                </w:tbl>
+                <w:p><w:pPr><w:spacing w:before="0" w:after="80"/></w:pPr></w:p>
+            `;
+        }
+
+        function htmlNodesToDocxBodyXml(containerEl, isLandscape) {
+            let bodyXml = '';
+            let inlineBuf = '';
+            const flushInline = () => {
+                if (inlineBuf.trim().length > 0) {
+                    bodyXml += `<w:p><w:pPr><w:spacing w:before="40" w:after="80" w:line="276" w:lineRule="auto"/></w:pPr>${inlineBuf}</w:p>`;
+                }
+                inlineBuf = '';
+            };
+
+            const walk = (el) => {
+                if (el.nodeType === Node.TEXT_NODE) {
+                    inlineBuf += inlineNodesToRunsXml(el);
+                    return;
+                }
+                if (el.nodeType !== Node.ELEMENT_NODE) return;
+                const tag = el.tagName.toLowerCase();
+
+                if (tag === 'table') {
+                    flushInline();
+                    bodyXml += convertHtmlTableToWordXml(el, isLandscape);
+                } else if (tag === 'h1') {
+                    flushInline();
+                    bodyXml += `<w:p><w:pPr><w:pStyle w:val="Heading1"/><w:keepNext/><w:spacing w:before="120" w:after="80"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="30"/><w:szCs w:val="30"/></w:rPr>${inlineNodesToRunsXml(el, true, false)}</w:r></w:p>`;
+                } else if (tag === 'h2') {
+                    flushInline();
+                    bodyXml += `<w:p><w:pPr><w:pStyle w:val="Heading2"/><w:keepNext/><w:spacing w:before="80" w:after="120"/></w:pPr>${inlineNodesToRunsXml(el, true, false)}</w:p>`;
+                } else if (tag === 'h3') {
+                    flushInline();
+                    bodyXml += `<w:p><w:pPr><w:pStyle w:val="Heading3"/><w:keepNext/><w:spacing w:before="200" w:after="80"/><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="2" w:color="111111"/></w:pBdr></w:pPr>${inlineNodesToRunsXml(el, true, false)}</w:p>`;
+                } else if (tag === 'h4') {
+                    flushInline();
+                    bodyXml += `<w:p><w:pPr><w:pStyle w:val="Heading4"/><w:keepNext/><w:spacing w:before="140" w:after="60"/></w:pPr>${inlineNodesToRunsXml(el, true, false)}</w:p>`;
+                } else if (tag === 'p') {
+                    flushInline();
+                    bodyXml += `<w:p><w:pPr><w:spacing w:before="40" w:after="80" w:line="276" w:lineRule="auto"/></w:pPr>${inlineNodesToRunsXml(el)}</w:p>`;
+                } else if (tag === 'ul' || tag === 'ol') {
+                    flushInline();
+                    const items = Array.from(el.children).filter(c => c.tagName.toLowerCase() === 'li');
+                    items.forEach((li, idx) => {
+                        const prefix = tag === 'ol' ? `${idx + 1}. ` : '• ';
+                        bodyXml += `<w:p><w:pPr><w:ind w:left="360" w:hanging="220"/><w:spacing w:before="20" w:after="40" w:line="264" w:lineRule="auto"/></w:pPr><w:r><w:t xml:space="preserve">${xmlEscape(prefix)}</w:t></w:r>${inlineNodesToRunsXml(li)}</w:p>`;
+                    });
+                } else if (tag === 'div' || tag === 'section' || tag === 'article') {
+                    flushInline();
+                    Array.from(el.childNodes).forEach(walk);
+                    flushInline();
+                } else {
+                    inlineBuf += inlineNodesToRunsXml(el);
+                }
+            };
+
+            Array.from(containerEl.childNodes).forEach(walk);
+            flushInline();
+            return bodyXml;
+        }
+
+        function buildDocxPackageBytes(docTitle, htmlContent, isLandscape) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent || '<p></p>';
+            const bodyInnerXml = htmlNodesToDocxBodyXml(tempDiv, isLandscape);
+
+            // A4 dimensions in twips (1 inch = 1440 twips; A4 = 8.27in x 11.69in -> 11906 x 16838 twips)
+            const pgW = isLandscape ? 16838 : 11906;
+            const pgH = isLandscape ? 11906 : 16838;
+            const marginTop = 1134; // ~2cm
+            const marginBottom = 1134;
+            const marginLeft = 1247; // ~2.2cm
+            const marginRight = 1247;
+
+            const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`;
+
+            const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+            const docRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+
+            const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault>
+      <w:rPr>
+        <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>
+        <w:sz w:val="23"/>
+        <w:szCs w:val="23"/>
+        <w:color w:val="111111"/>
+      </w:rPr>
+    </w:rPrDefault>
+  </w:docDefaults>
+  <w:style w:type="paragraph" w:styleId="Heading1">
+    <w:name w:val="heading 1"/>
+    <w:rPr><w:b/><w:sz w:val="30"/><w:color w:val="000000"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading2">
+    <w:name w:val="heading 2"/>
+    <w:rPr><w:b/><w:sz w:val="26"/><w:color w:val="111111"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading3">
+    <w:name w:val="heading 3"/>
+    <w:rPr><w:b/><w:sz w:val="24"/><w:color w:val="000000"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading4">
+    <w:name w:val="heading 4"/>
+    <w:rPr><w:b/><w:sz w:val="23"/><w:color w:val="1F1F1F"/></w:rPr>
+  </w:style>
+</w:styles>`;
+
+            const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    ${bodyInnerXml}
+    <w:sectPr>
+      <w:pgSz w:w="${pgW}" w:h="${pgH}"${isLandscape ? ' w:orient="landscape"' : ''}/>
+      <w:pgMar w:top="${marginTop}" w:right="${marginRight}" w:bottom="${marginBottom}" w:left="${marginLeft}" w:header="708" w:footer="708" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+            const zipBytes = buildStoredZipArchive([
+                { name: '[Content_Types].xml', data: contentTypesXml },
+                { name: '_rels/.rels', data: rootRelsXml },
+                { name: 'word/_rels/document.xml.rels', data: docRelsXml },
+                { name: 'word/styles.xml', data: stylesXml },
+                { name: 'word/document.xml', data: documentXml }
+            ]);
+
+            // Automatic validation of generated OOXML & ZIP structure
+            const view = new DataView(zipBytes.buffer);
+            if (view.getUint32(0, true) !== 0x04034b50) {
+                throw new Error('Header ZIP DOCX tidak valid.');
+            }
+            const parser = new DOMParser();
+            for (const [xmlName, xmlStr] of [
+                ['[Content_Types].xml', contentTypesXml],
+                ['word/styles.xml', stylesXml],
+                ['word/document.xml', documentXml]
+            ]) {
+                const parsed = parser.parseFromString(xmlStr, 'application/xml');
+                if (parsed.getElementsByTagName('parsererror').length > 0) {
+                    throw new Error(`Kesalahan struktur XML pada ${xmlName}.`);
+                }
+            }
+
+            return zipBytes;
+        }
+
+        async function exportEditorToWord(editorKey) {
+            const actualKey = editorKey || 'modul';
+            const ed = appState.editors[actualKey] || { title: 'Dokumen_Perangkat_Ajar', html: '<p></p>', orientation: 'portrait' };
+            const canvas = document.getElementById('document-editor-canvas');
+            const titleInput = document.getElementById('editor-doc-title');
+            const title = (titleInput?.value || ed.title || 'Dokumen_Perangkat_Ajar').trim();
+            const html = canvas ? canvas.innerHTML : ed.html;
+            const isLandscape = ed.orientation === 'landscape';
+
+            try {
+                const docxBytes = buildDocxPackageBytes(title, html, isLandscape);
+                const blob = new Blob([docxBytes], {
+                    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                });
+                const safeName = title.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_') || 'Modul_Ajar';
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${safeName}.docx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showToast(`File "${safeName}.docx" tervalidasi & berhasil diunduh.`, 'success');
+            } catch (err) {
+                showToast(`Gagal membuat file .docx: ${err.message}`, 'error');
             }
         }
 
@@ -1238,7 +1737,7 @@
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<span>Masuk ke Dashboard</span><span>→</span>';
+                    submitBtn.innerHTML = '<span>Masuk</span><span>→</span>';
                 }
             }
         }
@@ -4248,597 +4747,531 @@
             renderDedicatedEditorView(document.getElementById('main-content'), editorKey);
         }
 
-        async function saveCurrentDocument(editorKey) {
-            const ed = appState.editors[editorKey];
-            if (!ed) return;
-            const canvas = document.getElementById('document-editor-canvas');
-            const titleInput = document.getElementById('editor-doc-title');
-            if (canvas) ed.html = canvas.innerHTML;
-            if (titleInput && titleInput.value.trim()) ed.title = titleInput.value.trim();
-
-            const saved = await persistDocumentRecord({
-                id: ed.docId,
-                title: ed.title,
-                category: ed.category,
-                mapel: ed.mapel,
-                kelas: ed.kelas,
-                html: ed.html
-            });
-            if (saved) ed.docId = saved.id;
-            showToast(`"${ed.title}" berhasil disimpan ke Dokumen Saya.`, 'success');
+        function exportEditorToPDF() {
+            window.print();
         }
 
-        function exportEditorToWord(editorKey) {
-            const ed = appState.editors[editorKey] || {};
-            const canvas = document.getElementById('document-editor-canvas');
-            const contentHtml = canvas ? canvas.innerHTML : (ed.html || '');
-            const docTitle = (document.getElementById('editor-doc-title')?.value || ed.title || 'Dokumen_Perangkat_Ajar').trim();
+        function renderDedicatedEditorView(container, editorKey) {
+            const keyMap = {
+                modul: 'modul',
+                soal: 'soal',
+                lkpd: 'lkpd',
+                media: 'media',
+                presentasi: 'presentasi',
+                materiAjar: 'materiAjar',
+                ringkasan: 'ringkasan',
+                refleksi: 'refleksi'
+            };
+            const actualKey = keyMap[editorKey] || 'modul';
+            const ed = appState.editors[actualKey] || {
+                title: 'Dokumen A4',
+                category: 'Modul Ajar',
+                orientation: 'portrait',
+                html: '<p>Dokumen kosong.</p>'
+            };
             const isLandscape = ed.orientation === 'landscape';
-            const isDocxFormat = editorKey === 'modul' || (ed.category || '').toLowerCase().includes('modul');
 
-            if (isDocxFormat) {
-                try {
-                    const docxResult = generateValidatedOfficeOpenXmlDocx({
-                        title: docTitle,
-                        html: contentHtml,
-                        isLandscape
-                    });
-                    if (docxResult && docxResult.valid && docxResult.blob) {
-                        const url = URL.createObjectURL(docxResult.blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.docx`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                        showToast(`File .DOCX valid terstruktur (${docxResult.summary}) berhasil diunduh.`, 'success');
-                        return;
-                    }
-                    throw new Error((docxResult && docxResult.issues && docxResult.issues.join('; ')) || 'Validasi DOCX gagal.');
-                } catch (err) {
-                    console.warn('DOCX generator fallback:', err);
-                    showToast(`Validasi DOCX menemukan kendala (${err.message}), menggunakan ekspor dokumen alternatif.`, 'warning');
-                }
-            }
+            const extraBarHtml = actualKey === 'ringkasan'
+                ? `
+                    <div class="flex flex-wrap items-center gap-2 p-3 rounded-xl border border-borderCustom" style="background-color: var(--bg-custom);">
+                        <span class="text-[11px] font-bold">Penyempurnaan Cepat Ringkasan:</span>
+                        <button type="button" onclick="generateRingkasanMateri('expand')" class="px-3 py-1.5 rounded-lg theme-btn-primary text-[11px] font-bold">Perluas Ringkasan</button>
+                    </div>
+                `
+                : actualKey === 'soal'
+                    ? `
+                        <div class="flex flex-wrap items-center gap-2 p-3 rounded-xl border border-borderCustom" style="background-color: var(--bg-custom);">
+                            <span class="text-[11px] font-bold">Alat Bank Soal (${(appState.questionBank || []).length} Butir):</span>
+                            <button type="button" onclick="addManualQuestionItem()" class="px-3 py-1.5 rounded-lg theme-btn-primary text-[11px] font-bold">+ Tambah Soal</button>
+                            <button type="button" onclick="shuffleQuestionBank()" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Acak Urutan</button>
+                            <button type="button" onclick="exportQuestionsToExcel()" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Ekspor CSV/Excel</button>
+                        </div>
+                    `
+                    : '';
 
-            const wordHtml = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="utf-8"><title>${escapeHtml(docTitle)}</title></head>
-                <body style="font-family:'Times New Roman',serif;font-size:11.5pt;line-height:1.5;">${contentHtml}</body>
-                </html>
+            const refleksiPanelsHtml = actualKey === 'refleksi' && Array.isArray(appState.lastRefleksiSections) && appState.lastRefleksiSections.length > 0
+                ? `
+                    <div class="space-y-3 p-4 rounded-2xl border border-borderCustom" style="background-color: var(--bg-custom);">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-xs font-extrabold theme-heading">Penyuntingan Per Bagian Refleksi</h3>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="generateRefleksiDocument('expand')" class="px-2.5 py-1 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Perluas</button>
+                                <button type="button" onclick="generateRefleksiDocument('shorten')" class="px-2.5 py-1 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Ringkas</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${appState.lastRefleksiSections.map((sec, idx) => `
+                                <div class="p-3 rounded-xl border border-borderCustom theme-card space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[11px] font-bold theme-heading">${escapeHtml(sec.title)}</span>
+                                        <button type="button" onclick="regenerateSingleRefleksiSection(${idx})" class="px-2 py-0.5 rounded border border-borderCustom text-[10px] font-bold">Generate Ulang Bagian</button>
+                                    </div>
+                                    <textarea rows="3" oninput="updateSingleRefleksiSectionText(${idx}, this.value)" class="w-full p-2 text-xs border border-borderCustom rounded-lg theme-card">${escapeHtml(sec.content)}</textarea>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `
+                : '';
+
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto space-y-5">
+                    <div class="theme-card p-4 sm:p-5 rounded-2xl border border-borderCustom shadow-sm space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex-1 min-w-[220px]">
+                                <label class="block text-[10px] font-bold uppercase opacity-60 mb-1">Judul Dokumen</label>
+                                <input type="text" id="editor-doc-title" value="${escapeHtml(ed.title)}" oninput="if (appState.editors['${actualKey}']) appState.editors['${actualKey}'].title = this.value;" class="w-full px-3.5 py-2 text-xs font-bold border border-borderCustom rounded-xl theme-card">
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <div class="inline-flex rounded-xl border border-borderCustom p-1" style="background-color: var(--bg-custom);">
+                                    <button type="button" onclick="changeEditorPaperOrientation('${actualKey}', 'portrait')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${!isLandscape ? 'theme-btn-primary' : ''}">A4 Portrait</button>
+                                    <button type="button" onclick="changeEditorPaperOrientation('${actualKey}', 'landscape')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${isLandscape ? 'theme-btn-primary' : ''}">A4 Landscape</button>
+                                </div>
+                                <button type="button" onclick="copyEditorPlainText()" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">Salin Teks</button>
+                                <button type="button" onclick="saveCurrentDocument('${actualKey}')" class="px-3.5 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">Simpan</button>
+                                <button type="button" onclick="exportEditorToWord('${actualKey}')" class="px-3.5 py-2 rounded-xl theme-btn-primary text-xs font-extrabold">Unduh .DOCX</button>
+                                <button type="button" onclick="exportEditorToPDF()" class="px-3.5 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">Cetak / PDF</button>
+                            </div>
+                        </div>
+                        ${extraBarHtml}
+                        ${refleksiPanelsHtml}
+                    </div>
+
+                    <div id="editor-progress-panel" class="hidden"></div>
+
+                    <div class="paper-workspace">
+                        <div id="document-editor-canvas" contenteditable="true" oninput="if (appState.editors['${actualKey}']) appState.editors['${actualKey}'].html = this.innerHTML;" class="${isLandscape ? 'paper-landscape' : 'paper-portrait'}">${ed.html || ''}</div>
+                    </div>
+                </div>
             `;
-            const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.doc`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Dokumen berhasil diunduh dalam format .DOC.', 'success');
         }
 
-        // =====================================================================
-        // ECMA-376 OFFICE OPEN XML (.DOCX) BUILDER + AUTO-VALIDATION & REPAIR
-        // =====================================================================
-        function escapeXmlText(str) {
-            if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&apos;');
-        }
-
-        const CRC32_TABLE = (() => {
-            const tbl = new Uint32Array(256);
-            for (let n = 0; n < 256; n++) {
-                let c = n;
-                for (let k = 0; k < 8; k++) {
-                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-                }
-                tbl[n] = c >>> 0;
+        function openDocumentInEditor(docId) {
+            const found = appState.documents.find(d => d.id === docId);
+            if (!found) {
+                showToast('Dokumen tidak ditemukan.', 'error');
+                return;
             }
-            return tbl;
-        })();
-
-        function computeCrc32(uint8Arr) {
-            let crc = 0xFFFFFFFF;
-            for (let i = 0; i < uint8Arr.length; i++) {
-                crc = CRC32_TABLE[(crc ^ uint8Arr[i]) & 0xFF] ^ (crc >>> 8);
-            }
-            return (crc ^ 0xFFFFFFFF) >>> 0;
-        }
-
-        function buildStoredZipArchive(entries) {
-            const encoder = new TextEncoder();
-            const localParts = [];
-            const centralParts = [];
-            let offset = 0;
-
-            for (const entry of entries) {
-                const nameBytes = encoder.encode(entry.name);
-                const dataBytes = entry.data instanceof Uint8Array ? entry.data : encoder.encode(String(entry.data || ''));
-                const crc = computeCrc32(dataBytes);
-                const size = dataBytes.length;
-
-                // Local file header (30 bytes + name + data)
-                const localHeader = new Uint8Array(30 + nameBytes.length);
-                const lv = new DataView(localHeader.buffer);
-                lv.setUint32(0, 0x04034b50, true); // Local file header signature
-                lv.setUint16(4, 20, true);         // Version needed to extract (2.0)
-                lv.setUint16(6, 0x0800, true);     // UTF-8 filename flag
-                lv.setUint16(8, 0, true);          // Compression method: 0 (STORE)
-                lv.setUint16(10, 0, true);         // Mod time
-                lv.setUint16(12, 0x0021, true);    // Mod date (1980-01-01)
-                lv.setUint32(14, crc, true);
-                lv.setUint32(18, size, true);
-                lv.setUint32(22, size, true);
-                lv.setUint16(26, nameBytes.length, true);
-                lv.setUint16(28, 0, true);         // Extra field length
-                localHeader.set(nameBytes, 30);
-
-                localParts.push(localHeader, dataBytes);
-
-                // Central directory header (46 bytes + name)
-                const centralHeader = new Uint8Array(46 + nameBytes.length);
-                const cv = new DataView(centralHeader.buffer);
-                cv.setUint32(0, 0x02014b50, true); // Central file header signature
-                cv.setUint16(4, 20, true);         // Version made by
-                cv.setUint16(6, 20, true);         // Version needed
-                cv.setUint16(8, 0x0800, true);     // UTF-8 flag
-                cv.setUint16(10, 0, true);         // Store
-                cv.setUint16(12, 0, true);
-                cv.setUint16(14, 0x0021, true);
-                cv.setUint32(16, crc, true);
-                cv.setUint32(20, size, true);
-                cv.setUint32(24, size, true);
-                cv.setUint16(28, nameBytes.length, true);
-                cv.setUint16(30, 0, true);         // Extra len
-                cv.setUint16(32, 0, true);         // Comment len
-                cv.setUint16(34, 0, true);         // Disk number start
-                cv.setUint16(36, 0, true);         // Internal file attrs
-                cv.setUint32(38, 0, true);         // External file attrs
-                cv.setUint32(42, offset, true);    // Relative offset of local header
-                centralHeader.set(nameBytes, 46);
-
-                centralParts.push(centralHeader);
-                offset += localHeader.length + dataBytes.length;
+            const cat = (found.category || '').toLowerCase();
+            let targetKey = 'modul';
+            let targetRoute = 'editor-modul';
+            if (cat.includes('soal') || cat.includes('asesmen')) {
+                targetKey = 'soal';
+                targetRoute = 'editor-soal';
+            } else if (cat.includes('lkpd')) {
+                targetKey = 'lkpd';
+                targetRoute = 'editor-lkpd';
+            } else if (cat.includes('presentasi')) {
+                targetKey = 'presentasi';
+                targetRoute = 'editor-presentasi';
+            } else if (cat.includes('materi ajar')) {
+                targetKey = 'materiAjar';
+                targetRoute = 'editor-materi-ajar';
+            } else if (cat.includes('ringkasan')) {
+                targetKey = 'ringkasan';
+                targetRoute = 'editor-ringkasan';
+            } else if (cat.includes('refleksi')) {
+                targetKey = 'refleksi';
+                targetRoute = 'editor-refleksi';
+            } else if (cat.includes('infografis') || cat.includes('ilustrasi') || cat.includes('video') || cat.includes('media')) {
+                targetKey = 'media';
+                targetRoute = 'editor-media';
             }
 
-            let centralSize = 0;
-            for (const part of centralParts) centralSize += part.length;
-
-            // End of central directory record (22 bytes)
-            const eocd = new Uint8Array(22);
-            const ev = new DataView(eocd.buffer);
-            ev.setUint32(0, 0x06054b50, true);      // EOCD signature
-            ev.setUint16(4, 0, true);
-            ev.setUint16(6, 0, true);
-            ev.setUint16(8, entries.length, true);
-            ev.setUint16(10, entries.length, true);
-            ev.setUint32(12, centralSize, true);
-            ev.setUint32(16, offset, true);
-            ev.setUint16(20, 0, true);
-
-            return new Uint8Array([...localParts.flatMap(p => Array.from(p)), ...centralParts.flatMap(p => Array.from(p)), ...Array.from(eocd)]);
-        }
-
-        function extractInlineRunsXml(node, baseStyle = {}) {
-            if (!node) return '';
-            if (node.nodeType === Node.TEXT_NODE) {
-                const rawText = (node.nodeValue || '').replace(/\s+/g, ' ');
-                if (!rawText) return '';
-                const rPrParts = [];
-                if (baseStyle.bold) rPrParts.push('<w:b/>');
-                if (baseStyle.italic) rPrParts.push('<w:i/>');
-                const rPr = rPrParts.length ? `<w:rPr>${rPrParts.join('')}</w:rPr>` : '';
-                return `<w:r>${rPr}<w:t xml:space="preserve">${escapeXmlText(rawText)}</w:t></w:r>`;
-            }
-            if (node.nodeType !== Node.ELEMENT_NODE) return '';
-
-            const tag = node.tagName.toLowerCase();
-            if (tag === 'br') {
-                return '<w:r><w:br/></w:r>';
-            }
-
-            const nextStyle = {
-                bold: baseStyle.bold || tag === 'strong' || tag === 'b',
-                italic: baseStyle.italic || tag === 'em' || tag === 'i'
+            appState.editors[targetKey] = {
+                title: found.title,
+                category: found.category,
+                mapel: found.mapel || 'Umum',
+                kelas: found.kelas || 'Fase D',
+                orientation: targetKey === 'presentasi' || targetKey === 'media' ? 'landscape' : 'portrait',
+                docId: found.id,
+                html: found.html
             };
-
-            let out = '';
-            for (const child of Array.from(node.childNodes)) {
-                out += extractInlineRunsXml(child, nextStyle);
-            }
-            return out;
+            navigate(targetRoute);
         }
 
-        function buildWordParagraphXml(runsXml, { align = 'left', keepNext = false, spaceBefore = 60, spaceAfter = 100, lineRule = 276, shadingFill = null, borderBottom = false } = {}) {
-            const safeRuns = runsXml && runsXml.trim() ? runsXml : '<w:r><w:t xml:space="preserve"></w:t></w:r>';
-            const pPr = [
-                `<w:spacing w:before="${spaceBefore}" w:after="${spaceAfter}" w:line="${lineRule}" w:lineRule="auto"/>`,
-                align !== 'left' ? `<w:jc w:val="${align}"/>` : '',
-                keepNext ? '<w:keepNext/>' : '',
-                shadingFill ? `<w:shd w:val="clear" w:color="auto" w:fill="${shadingFill}"/>` : '',
-                borderBottom ? '<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="2" w:color="111111"/></w:pBdr>' : ''
-            ].filter(Boolean).join('');
-            return `<w:p><w:pPr>${pPr}</w:pPr>${safeRuns}</w:p>`;
-        }
-
-        function convertTableElementToWordXml(tableEl, availableWidthTwips) {
-            const allRows = Array.from(tableEl.querySelectorAll('tr'));
-            if (allRows.length === 0) return '';
-
-            let maxCols = 1;
-            const parsedRows = allRows.map(tr => {
-                const cells = Array.from(tr.children).filter(el => {
-                    const t = el.tagName.toLowerCase();
-                    return t === 'th' || t === 'td';
-                });
-                if (cells.length > maxCols) maxCols = cells.length;
-                const isHeaderRow = cells.length > 0 && cells.every(c => c.tagName.toLowerCase() === 'th');
-                return { cells, isHeaderRow };
+        async function duplicateDocumentRecord(docId) {
+            const found = appState.documents.find(d => d.id === docId);
+            if (!found) return;
+            await persistDocumentRecord({
+                title: `${found.title} (Salinan)`,
+                category: found.category,
+                mapel: found.mapel,
+                kelas: found.kelas,
+                folder: found.folder || 'Umum',
+                html: found.html
             });
-
-            maxCols = Math.max(1, maxCols);
-            const colWidthTwips = Math.floor(availableWidthTwips / maxCols);
-            const gridColsXml = Array.from({ length: maxCols }, () => `<w:gridCol w:w="${colWidthTwips}"/>`).join('');
-
-            const rowsXml = parsedRows.map(({ cells, isHeaderRow }) => {
-                const trPrParts = ['<w:cantSplit/>'];
-                if (isHeaderRow) {
-                    trPrParts.push('<w:tblHeader/>');
-                }
-                const trPr = `<w:trPr>${trPrParts.join('')}</w:trPr>`;
-
-                const cellsXml = Array.from({ length: maxCols }, (_, colIdx) => {
-                    const cellEl = cells[colIdx];
-                    const cellRuns = cellEl ? extractInlineRunsXml(cellEl, { bold: isHeaderRow }) : '';
-                    const cellPara = buildWordParagraphXml(cellRuns, {
-                        align: 'left',
-                        keepNext: false,
-                        spaceBefore: 40,
-                        spaceAfter: 40,
-                        lineRule: 252
-                    });
-                    const shdXml = isHeaderRow ? '<w:shd w:val="clear" w:color="auto" w:fill="F4F4F5"/>' : '';
-                    return `
-                        <w:tc>
-                            <w:tcPr>
-                                <w:tcW w:w="${colWidthTwips}" w:type="dxa"/>
-                                <w:vAlign w:val="top"/>
-                                ${shdXml}
-                            </w:tcPr>
-                            ${cellPara}
-                        </w:tc>
-                    `;
-                }).join('');
-
-                return `<w:tr>${trPr}${cellsXml}</w:tr>`;
-            }).join('');
-
-            return `
-                <w:tbl>
-                    <w:tblPr>
-                        <w:tblW w:w="${availableWidthTwips}" w:type="dxa"/>
-                        <w:tblLayout w:type="fixed"/>
-                        <w:tblBorders>
-                            <w:top w:val="single" w:sz="4" w:space="0" w:color="262626"/>
-                            <w:bottom w:val="single" w:sz="4" w:space="0" w:color="262626"/>
-                            <w:left w:val="single" w:sz="4" w:space="0" w:color="262626"/>
-                            <w:right w:val="single" w:sz="4" w:space="0" w:color="262626"/>
-                            <w:insideH w:val="single" w:sz="4" w:space="0" w:color="262626"/>
-                            <w:insideV w:val="single" w:sz="4" w:space="0" w:color="262626"/>
-                        </w:tblBorders>
-                        <w:tblCellMar>
-                            <w:top w:w="80" w:type="dxa"/>
-                            <w:bottom w:w="80" w:type="dxa"/>
-                            <w:left w:w="120" w:type="dxa"/>
-                            <w:right w:w="120" w:type="dxa"/>
-                        </w:tblCellMar>
-                    </w:tblPr>
-                    <w:tblGrid>${gridColsXml}</w:tblGrid>
-                    ${rowsXml}
-                </w:tbl>
-                ${buildWordParagraphXml('', { spaceBefore: 0, spaceAfter: 80 })}
-            `;
+            showToast('Dokumen berhasil digandakan.', 'success');
+            renderDocumentsArchiveView(document.getElementById('main-content'));
         }
 
-        function convertHtmlNodesToWordBodyXml(containerEl, availableWidthTwips) {
-            let bodyXml = '';
-            const children = Array.from(containerEl.childNodes);
-
-            for (const node of children) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const txt = (node.nodeValue || '').trim();
-                    if (txt) {
-                        bodyXml += buildWordParagraphXml(`<w:r><w:t xml:space="preserve">${escapeXmlText(txt)}</w:t></w:r>`);
-                    }
-                    continue;
-                }
-                if (node.nodeType !== Node.ELEMENT_NODE) continue;
-
-                const tag = node.tagName.toLowerCase();
-                if (tag === 'table') {
-                    bodyXml += convertTableElementToWordXml(node, availableWidthTwips);
-                } else if (tag === 'h1') {
-                    const runs = extractInlineRunsXml(node, { bold: true });
-                    bodyXml += buildWordParagraphXml(
-                        `<w:r><w:rPr><w:b/><w:sz w:val="30"/><w:szCs w:val="30"/><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
-                        { align: 'center', keepNext: true, spaceBefore: 60, spaceAfter: 80 }
-                    );
-                } else if (tag === 'h2') {
-                    bodyXml += buildWordParagraphXml(
-                        `<w:r><w:rPr><w:b/><w:sz w:val="26"/><w:szCs w:val="26"/><w:color w:val="111111"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
-                        { align: 'center', keepNext: true, spaceBefore: 40, spaceAfter: 140, borderBottom: true }
-                    );
-                } else if (tag === 'h3') {
-                    bodyXml += buildWordParagraphXml(
-                        `<w:r><w:rPr><w:b/><w:sz w:val="24"/><w:szCs w:val="24"/><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
-                        { align: 'left', keepNext: true, spaceBefore: 200, spaceAfter: 80, borderBottom: true }
-                    );
-                } else if (tag === 'h4') {
-                    bodyXml += buildWordParagraphXml(
-                        `<w:r><w:rPr><w:b/><w:sz w:val="22"/><w:szCs w:val="22"/><w:color w:val="1F1F1F"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
-                        { align: 'left', keepNext: true, spaceBefore: 140, spaceAfter: 60 }
-                    );
-                } else if (tag === 'p') {
-                    const runs = extractInlineRunsXml(node);
-                    bodyXml += buildWordParagraphXml(runs, { align: 'left', spaceBefore: 40, spaceAfter: 90 });
-                } else if (tag === 'ul' || tag === 'ol') {
-                    const isOrdered = tag === 'ol';
-                    const items = Array.from(node.querySelectorAll(':scope > li'));
-                    items.forEach((li, idx) => {
-                        const prefix = isOrdered ? `${idx + 1}. ` : '• ';
-                        const itemRuns = `<w:r><w:t xml:space="preserve">${escapeXmlText(prefix)}</w:t></w:r>${extractInlineRunsXml(li)}`;
-                        bodyXml += buildWordParagraphXml(itemRuns, { align: 'left', spaceBefore: 20, spaceAfter: 60 });
-                    });
-                } else if (tag === 'div') {
-                    // Check if div contains a table directly or nested blocks
-                    const nestedTables = Array.from(node.querySelectorAll(':scope > table'));
-                    if (nestedTables.length > 0 && node.children.length === nestedTables.length) {
-                        nestedTables.forEach(t => {
-                            bodyXml += convertTableElementToWordXml(t, availableWidthTwips);
-                        });
-                    } else {
-                        const innerXml = convertHtmlNodesToWordBodyXml(node, availableWidthTwips);
-                        if (innerXml) {
-                            bodyXml += innerXml;
-                        } else {
-                            const txt = (node.textContent || '').trim();
-                            if (txt) {
-                                bodyXml += buildWordParagraphXml(`<w:r><w:t xml:space="preserve">${escapeXmlText(txt)}</w:t></w:r>`);
-                            }
-                        }
-                    }
-                } else {
-                    const runs = extractInlineRunsXml(node);
-                    if (runs.trim()) {
-                        bodyXml += buildWordParagraphXml(runs, { align: 'left', spaceBefore: 40, spaceAfter: 80 });
-                    }
-                }
-            }
-
-            return bodyXml;
+        async function moveDocumentToFolder(docId, folderName) {
+            const found = appState.documents.find(d => d.id === docId);
+            if (!found) return;
+            await persistDocumentRecord({
+                id: found.id,
+                title: found.title,
+                category: found.category,
+                mapel: found.mapel,
+                kelas: found.kelas,
+                folder: folderName,
+                html: found.html
+            });
+            showToast(`Dokumen dipindahkan ke folder "${folderName}".`, 'success');
         }
 
-        function repairWordDocumentXml(docXml, fallbackTitle) {
-            let fixed = String(docXml || '');
-            if (!fixed.includes('<w:document')) {
-                fixed = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${buildWordParagraphXml(`<w:r><w:t>${escapeXmlText(fallbackTitle)}</w:t></w:r>`)}</w:body></w:document>`;
-            }
-            if (!fixed.includes('<w:body')) {
-                fixed = fixed.replace('</w:document>', `<w:body>${buildWordParagraphXml(`<w:r><w:t>${escapeXmlText(fallbackTitle)}</w:t></w:r>`)}</w:body></w:document>`);
-            }
-            if (!fixed.includes('<w:sectPr')) {
-                fixed = fixed.replace('</w:body>', '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body>');
-            }
-            // Strip any stray control characters outside valid XML 1.0
-            fixed = fixed.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
-            return fixed;
-        }
-
-        function validateDocxPackage(zipBytes, documentXml, expectedPlainText, expectedTableCount) {
-            const issues = [];
-            if (!(zipBytes instanceof Uint8Array) || zipBytes.length < 22) {
-                issues.push('Ukuran berkas arsip ZIP DOCX tidak valid');
-                return { valid: false, issues };
-            }
-            // Verify ZIP local header signature PK\x03\x04
-            if (zipBytes[0] !== 0x50 || zipBytes[1] !== 0x4B || zipBytes[2] !== 0x03 || zipBytes[3] !== 0x04) {
-                issues.push('Header arsip ZIP DOCX tidak valid');
-            }
-
-            // Parse word/document.xml using DOMParser to guarantee well-formed XML
-            try {
-                const parser = new DOMParser();
-                const parsed = parser.parseFromString(documentXml, 'application/xml');
-                const parserErr = parsed.getElementsByTagName('parsererror');
-                if (parserErr && parserErr.length > 0) {
-                    issues.push('Struktur XML word/document.xml tidak valid');
-                }
-            } catch (e) {
-                issues.push('Gagal memparsing XML word/document.xml');
-            }
-
-            // Extract text from <w:t> elements in documentXml
-            const wTextMatches = Array.from(documentXml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)).map(m => m[1]
-                .replace(/&amp;/g, '&')
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>')
-                .replace(/&quot;/g, '"')
-                .replace(/&apos;/g, "'")
+        function renameDocumentPrompt(docId) {
+            const found = appState.documents.find(d => d.id === docId);
+            if (!found) return;
+            openCustomModal(
+                'Ubah Nama Dokumen',
+                `<input type="text" id="rename-doc-input" value="${escapeHtml(found.title)}" class="w-full px-3 py-2 text-xs border border-borderCustom rounded-xl theme-card">`,
+                `
+                    <button type="button" onclick="closeCustomModal()" class="px-3.5 py-2 border border-borderCustom theme-btn-secondary rounded-xl text-xs font-bold">Batal</button>
+                    <button type="button" onclick="submitRenameDocument('${docId}')" class="px-4 py-2 theme-btn-primary rounded-xl text-xs font-bold">Simpan</button>
+                `
             );
-            const extractedText = wTextMatches.join(' ').replace(/\s+/g, ' ').trim();
-            if (!extractedText) {
-                issues.push('Isi teks dokumen kosong');
-            }
-
-            // Verify no truncated words if source had substantial text
-            const sourceTokens = (expectedPlainText || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
-            const extractedTokens = extractedText.split(' ').filter(Boolean);
-            if (sourceTokens.length > 10 && extractedTokens.length < Math.floor(sourceTokens.length * 0.7)) {
-                issues.push('Sebagian isi teks terpotong saat konversi ke DOCX');
-            }
-
-            const tblCount = (documentXml.match(/<w:tbl\b/g) || []).length;
-            if (expectedTableCount > 0 && tblCount < expectedTableCount) {
-                issues.push(`Jumlah tabel Word (${tblCount}) lebih sedikit dari tabel sumber (${expectedTableCount})`);
-            }
-
-            return {
-                valid: issues.length === 0,
-                issues,
-                tableCount: tblCount,
-                wordCount: extractedTokens.length
-            };
         }
 
-        function generateValidatedOfficeOpenXmlDocx({ title, html, isLandscape = false }) {
-            const safeTitle = (title || 'Modul_Ajar').trim();
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = html || '';
-            const expectedPlainText = (tempContainer.innerText || tempContainer.textContent || '').trim();
-            const expectedTableCount = tempContainer.querySelectorAll('table').length;
+        async function submitRenameDocument(docId) {
+            const val = (document.getElementById('rename-doc-input')?.value || '').trim();
+            const found = appState.documents.find(d => d.id === docId);
+            if (!found || !val) return;
+            await persistDocumentRecord({
+                id: found.id,
+                title: val,
+                category: found.category,
+                mapel: found.mapel,
+                kelas: found.kelas,
+                folder: found.folder || 'Umum',
+                html: found.html
+            });
+            closeCustomModal();
+            showToast('Nama dokumen diperbarui.', 'success');
+            renderDocumentsArchiveView(document.getElementById('main-content'));
+        }
 
-            // A4 dimensions in twips (1 inch = 1440 twips; A4 = 210mm x 297mm = 11906 x 16838 twips)
-            const pgWidth = isLandscape ? 16838 : 11906;
-            const pgHeight = isLandscape ? 11906 : 16838;
-            const marginTop = 1134;    // ~2.0 cm
-            const marginBottom = 1134; // ~2.0 cm
-            const marginLeft = 1247;   // ~2.2 cm
-            const marginRight = 1247;  // ~2.2 cm
-            const availableWidthTwips = pgWidth - marginLeft - marginRight;
+        function confirmDeleteDocument(docId) {
+            const found = appState.documents.find(d => d.id === docId);
+            if (!found) return;
+            openCustomModal(
+                'Hapus Dokumen',
+                `<p>Yakin ingin menghapus dokumen <strong>${escapeHtml(found.title)}</strong>?</p>`,
+                `
+                    <button type="button" onclick="closeCustomModal()" class="px-3.5 py-2 border border-borderCustom theme-btn-secondary rounded-xl text-xs font-bold">Batal</button>
+                    <button type="button" onclick="executeDeleteDocument('${docId}')" class="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold">Hapus</button>
+                `
+            );
+        }
 
-            const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
-  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
-</Types>`;
-
-            const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>`;
-
-            const docRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>
-  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
-</Relationships>`;
-
-            const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:docDefaults>
-    <w:rPrDefault>
-      <w:rPr>
-        <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>
-        <w:sz w:val="22"/>
-        <w:szCs w:val="22"/>
-        <w:color w:val="111111"/>
-      </w:rPr>
-    </w:rPrDefault>
-  </w:docDefaults>
-</w:styles>`;
-
-            const headerXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:p>
-    <w:pPr><w:jc w:val="right"/></w:pPr>
-    <w:r><w:rPr><w:i/><w:sz w:val="18"/><w:color w:val="555555"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(safeTitle)}</w:t></w:r>
-  </w:p>
-</w:hdr>`;
-
-            const footerXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:p>
-    <w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r><w:rPr><w:sz w:val="18"/><w:color w:val="555555"/></w:rPr><w:t xml:space="preserve">Halaman </w:t></w:r>
-    <w:fldSimple w:instr="PAGE"/>
-    <w:r><w:rPr><w:sz w:val="18"/><w:color w:val="555555"/></w:rPr><w:t xml:space="preserve"> dari </w:t></w:r>
-    <w:fldSimple w:instr="NUMPAGES"/>
-  </w:p>
-</w:ftr>`;
-
-            let bodyContentXml = convertHtmlNodesToWordBodyXml(tempContainer, availableWidthTwips);
-            const orientAttr = isLandscape ? ' w:orient="landscape"' : '';
-            const sectPrXml = `
-                <w:sectPr>
-                    <w:headerReference w:type="default" r:id="rId2"/>
-                    <w:footerReference w:type="default" r:id="rId3"/>
-                    <w:pgSz w:w="${pgWidth}" w:h="${pgHeight}"${orientAttr}/>
-                    <w:pgMar w:top="${marginTop}" w:right="${marginRight}" w:bottom="${marginBottom}" w:left="${marginLeft}" w:header="708" w:footer="708" w:gutter="0"/>
-                </w:sectPr>
-            `;
-
-            let documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <w:body>
-    ${bodyContentXml}
-    ${sectPrXml}
-  </w:body>
-</w:document>`;
-
-            let zipBytes = buildStoredZipArchive([
-                { name: '[Content_Types].xml', data: contentTypesXml },
-                { name: '_rels/.rels', data: rootRelsXml },
-                { name: 'word/_rels/document.xml.rels', data: docRelsXml },
-                { name: 'word/styles.xml', data: stylesXml },
-                { name: 'word/header1.xml', data: headerXml },
-                { name: 'word/footer1.xml', data: footerXml },
-                { name: 'word/document.xml', data: documentXml }
-            ]);
-
-            let validation = validateDocxPackage(zipBytes, documentXml, expectedPlainText, expectedTableCount);
-            if (!validation.valid) {
-                documentXml = repairWordDocumentXml(documentXml, safeTitle);
-                zipBytes = buildStoredZipArchive([
-                    { name: '[Content_Types].xml', data: contentTypesXml },
-                    { name: '_rels/.rels', data: rootRelsXml },
-                    { name: 'word/_rels/document.xml.rels', data: docRelsXml },
-                    { name: 'word/styles.xml', data: stylesXml },
-                    { name: 'word/header1.xml', data: headerXml },
-                    { name: 'word/footer1.xml', data: footerXml },
-                    { name: 'word/document.xml', data: documentXml }
-                ]);
-                validation = validateDocxPackage(zipBytes, documentXml, expectedPlainText, expectedTableCount);
+        async function executeDeleteDocument(docId) {
+            appState.documents = appState.documents.filter(d => d.id !== docId);
+            if (fbDb) {
+                try {
+                    await ensureFirebaseAuthSession();
+                    await deleteDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', docId));
+                } catch (e) {}
             }
+            updateHeaderDocCount();
+            closeCustomModal();
+            showToast('Dokumen dihapus.', 'info');
+            renderDocumentsArchiveView(document.getElementById('main-content'));
+        }
 
-            const blob = new Blob([zipBytes], {
-                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        function promptNewFolder() {
+            openCustomModal(
+                'Buat Folder Baru',
+                `<input type="text" id="new-folder-name" class="w-full px-3 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Contoh: Semester Genap 2026">`,
+                `
+                    <button type="button" onclick="closeCustomModal()" class="px-3.5 py-2 border border-borderCustom theme-btn-secondary rounded-xl text-xs font-bold">Batal</button>
+                    <button type="button" onclick="submitNewFolder()" class="px-4 py-2 theme-btn-primary rounded-xl text-xs font-bold">Tambah Folder</button>
+                `
+            );
+        }
+
+        function submitNewFolder() {
+            const name = (document.getElementById('new-folder-name')?.value || '').trim();
+            if (!name) return;
+            if (!appState.folders.includes(name)) {
+                appState.folders.push(name);
+            }
+            closeCustomModal();
+            showToast(`Folder "${name}" ditambahkan.`, 'success');
+            renderDocumentsArchiveView(document.getElementById('main-content'));
+        }
+
+        function renderDocumentsArchiveView(container) {
+            const uid = appState.currentUser?.uid;
+            const search = (appState.docFilter.search || '').toLowerCase();
+            const catFilter = appState.docFilter.category || 'Semua';
+            const folderFilter = appState.docFilter.folder || 'Semua';
+
+            const list = appState.documents.filter(d => {
+                if (d.ownerId && d.ownerId !== uid) return false;
+                if (catFilter !== 'Semua' && d.category !== catFilter) return false;
+                if (folderFilter !== 'Semua' && (d.folder || 'Umum') !== folderFilter) return false;
+                if (search) {
+                    const hay = `${d.title || ''} ${d.category || ''} ${d.mapel || ''} ${d.kelas || ''}`.toLowerCase();
+                    if (!hay.includes(search)) return false;
+                }
+                return true;
             });
 
-            return {
-                valid: validation.valid,
-                issues: validation.issues,
-                blob,
-                summary: `${validation.tableCount} tabel Word, ${validation.wordCount} kata, A4`
-            };
+            const categories = ['Semua', 'Modul Ajar', 'Soal dan Asesmen', 'LKPD', 'Presentasi', 'Materi Ajar', 'Ringkasan Materi', 'Refleksi Pembelajaran', 'Infografis', 'Ilustrasi', 'Naskah Video'];
+
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto space-y-5">
+                    <div class="theme-card p-5 rounded-2xl border border-borderCustom shadow-sm space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-base font-extrabold theme-heading">Arsip Dokumen Saya (${list.length})</h2>
+                                <p class="text-xs opacity-70">Kelola, buka di editor A4, gandakan, pindahkan folder, atau hapus dokumen perangkat ajar.</p>
+                            </div>
+                            <button type="button" onclick="promptNewFolder()" class="px-3.5 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">+ Folder Baru</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <input type="text" value="${escapeHtml(appState.docFilter.search || '')}" oninput="appState.docFilter.search = this.value; renderDocumentsArchiveView(document.getElementById('main-content'));" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Cari judul, mapel, kelas...">
+                            <select onchange="appState.docFilter.category = this.value; renderDocumentsArchiveView(document.getElementById('main-content'));" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card">
+                                ${categories.map(c => `<option value="${escapeHtml(c)}" ${catFilter === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}
+                            </select>
+                            <select onchange="appState.docFilter.folder = this.value; renderDocumentsArchiveView(document.getElementById('main-content'));" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card">
+                                <option value="Semua" ${folderFilter === 'Semua' ? 'selected' : ''}>Semua Folder</option>
+                                ${appState.folders.map(f => `<option value="${escapeHtml(f)}" ${folderFilter === f ? 'selected' : ''}>${escapeHtml(f)}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    ${list.length === 0
+                        ? `<div class="theme-card p-10 rounded-2xl border border-borderCustom text-center text-xs opacity-75">Belum ada dokumen tersimpan pada filter ini.</div>`
+                        : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${list.map(docItem => `
+                                <div class="theme-card p-5 rounded-2xl border border-borderCustom shadow-sm flex flex-col justify-between gap-4">
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border border-borderCustom">${escapeHtml(docItem.category || 'Dokumen')}</span>
+                                            <span class="text-[10.5px] opacity-60">${escapeHtml(docItem.updatedAt || docItem.createdAt || '')}</span>
+                                        </div>
+                                        <h3 class="text-sm font-extrabold theme-heading leading-snug">${escapeHtml(docItem.title)}</h3>
+                                        <p class="text-[11px] opacity-70">${escapeHtml(docItem.mapel || '-')} • ${escapeHtml(docItem.kelas || '-')}</p>
+                                    </div>
+
+                                    <div class="space-y-2 pt-3 border-t border-borderCustom">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="text-[10.5px] opacity-70">Folder:</span>
+                                            <select onchange="moveDocumentToFolder('${docItem.id}', this.value)" class="px-2 py-1 text-[11px] border border-borderCustom rounded-lg theme-card">
+                                                ${appState.folders.map(f => `<option value="${escapeHtml(f)}" ${(docItem.folder || 'Umum') === f ? 'selected' : ''}>${escapeHtml(f)}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-1.5">
+                                            <button type="button" onclick="openDocumentInEditor('${docItem.id}')" class="flex-1 px-3 py-1.5 rounded-lg theme-btn-primary text-[11px] font-bold">Buka Editor</button>
+                                            <button type="button" onclick="duplicateDocumentRecord('${docItem.id}')" class="px-2.5 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Salin</button>
+                                            <button type="button" onclick="renameDocumentPrompt('${docItem.id}')" class="px-2.5 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Ubah Nama</button>
+                                            <button type="button" onclick="confirmDeleteDocument('${docItem.id}')" class="px-2.5 py-1.5 rounded-lg bg-red-600 text-white text-[11px] font-bold">Hapus</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>`
+                    }
+                </div>
+            `;
         }
 
-        function changeEditorPaperOrientation(editorKey, orientation) {
+        function renderGuruTutorialView(container) {
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <div class="theme-card p-6 sm:p-8 rounded-2xl border border-borderCustom shadow-sm space-y-4">
+                        <div id="guru-tutorial-content" class="space-y-3 text-xs sm:text-sm leading-relaxed">${appState.tutorialHtml || ''}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminTutorialView(container) {
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-5">
+                    <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-4">
+                        <div class="flex items-center justify-between gap-3 border-b border-borderCustom pb-3">
+                            <div>
+                                <h2 class="text-base font-extrabold theme-heading">Editor Panduan Penggunaan Guru</h2>
+                                <p class="text-xs opacity-70">Konten panduan ini akan tampil pada menu Panduan Penggunaan Web di akun Guru.</p>
+                            </div>
+                            <button type="button" onclick="saveAdminTutorialGuide()" class="px-4 py-2.5 rounded-xl theme-btn-primary text-xs font-extrabold">Simpan Panduan</button>
+                        </div>
+                        <textarea id="admin-tutorial-editor" rows="14" class="w-full p-4 text-xs font-mono border border-borderCustom rounded-xl theme-card">${escapeHtml(appState.tutorialHtml || '')}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function saveAdminTutorialGuide() {
+            const val = document.getElementById('admin-tutorial-editor')?.value || '';
+            appState.tutorialHtml = val;
+            await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'tutorial_guide'),
+                { html: val, updatedAt: Date.now() },
+                'Panduan Guru'
+            );
+            showToast('Panduan penggunaan guru berhasil disimpan.', 'success');
+        }
+
+        function renderAdminUsersView(container) {
+            const guruUsers = appState.users.filter(u => u.role !== 'admin');
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-6">
+                    <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-4">
+                        <div class="border-b border-borderCustom pb-3">
+                            <h2 class="text-base font-extrabold theme-heading">Buat Akun Guru Baru</h2>
+                            <p class="text-xs opacity-70">Akun guru yang dibuat langsung aktif dan tersinkronisasi ke database.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <input type="text" id="new-guru-name" class="px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Nama Lengkap Guru">
+                            <input type="text" id="new-guru-username" class="px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Username">
+                            <input type="email" id="new-guru-email" class="px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Email Guru">
+                            <input type="text" id="new-guru-password" class="px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Kata sandi awal">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="button" onclick="createNewGuruAccount()" class="px-5 py-2.5 rounded-xl theme-btn-primary text-xs font-extrabold">+ Tambah Akun Guru</button>
+                        </div>
+                    </div>
+
+                    <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-4">
+                        <h3 class="text-sm font-extrabold theme-heading">Daftar Akun Guru (${guruUsers.length})</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs border-collapse">
+                                <thead>
+                                    <tr class="border-b border-borderCustom text-left">
+                                        <th class="py-2.5 px-3">Nama</th>
+                                        <th class="py-2.5 px-3">Username</th>
+                                        <th class="py-2.5 px-3">Email</th>
+                                        <th class="py-2.5 px-3">Status</th>
+                                        <th class="py-2.5 px-3 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${guruUsers.map(u => `
+                                        <tr class="border-b border-borderCustom">
+                                            <td class="py-2.5 px-3 font-bold">${escapeHtml(u.name)}</td>
+                                            <td class="py-2.5 px-3">${escapeHtml(u.username || '-')}</td>
+                                            <td class="py-2.5 px-3">${escapeHtml(u.email)}</td>
+                                            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold border border-borderCustom">${escapeHtml(u.status || 'Aktif')}</span></td>
+                                            <td class="py-2.5 px-3 text-right space-x-1.5">
+                                                <button type="button" onclick="toggleGuruStatus('${u.uid}')" class="px-2.5 py-1 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">${u.status === 'Nonaktif' ? 'Aktifkan' : 'Nonaktifkan'}</button>
+                                                <button type="button" onclick="deleteGuruAccount('${u.uid}')" class="px-2.5 py-1 rounded-lg bg-red-600 text-white text-[11px] font-bold">Hapus</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function createNewGuruAccount() {
+            const name = (document.getElementById('new-guru-name')?.value || '').trim();
+            const username = (document.getElementById('new-guru-username')?.value || '').trim();
+            const email = (document.getElementById('new-guru-email')?.value || '').trim();
+            const password = (document.getElementById('new-guru-password')?.value || '').trim();
+
+            if (!name || !email || !password) {
+                showToast('Harap lengkapi Nama, Email, dan Kata sandi guru.', 'error');
+                return;
+            }
+
+            const newGuru = {
+                uid: 'guru-' + Date.now(),
+                name,
+                username: username || email.split('@')[0],
+                email,
+                password,
+                role: 'guru',
+                status: 'Aktif'
+            };
+            appState.users.push(newGuru);
+            await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', newGuru.uid),
+                newGuru,
+                'Akun Guru'
+            );
+            showToast(`Akun guru "${name}" berhasil ditambahkan.`, 'success');
+            renderAdminUsersView(document.getElementById('main-content'));
+        }
+
+        async function toggleGuruStatus(uid) {
+            const u = appState.users.find(x => x.uid === uid);
+            if (!u) return;
+            u.status = u.status === 'Nonaktif' ? 'Aktif' : 'Nonaktif';
+            await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', u.uid),
+                u,
+                'Status Guru'
+            );
+            showToast(`Status akun ${u.name} diubah menjadi ${u.status}.`, 'info');
+            renderAdminUsersView(document.getElementById('main-content'));
+        }
+
+        async function deleteGuruAccount(uid) {
+            appState.users = appState.users.filter(x => x.uid !== uid);
+            if (fbDb) {
+                try {
+                    await ensureFirebaseAuthSession();
+                    await deleteDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', uid));
+                } catch (e) {}
+            }
+            showToast('Akun guru dihapus.', 'info');
+            renderAdminUsersView(document.getElementById('main-content'));
+        }
+
+        function updateSingleThemeColor(key, value) {
+            appState.theme = { ...appState.theme, [key]: value };
+            applyThemeVariables(appState.theme);
+        }
+
+        function updateGridConfigField(key, value) {
+            if (key === 'gridEnabled') {
+                appState.theme.gridEnabled = Boolean(value);
+            } else if (key === 'gridSize') {
+                appState.theme.gridSize = Math.max(12, Math.min(120, parseInt(value, 10) || 28));
+            } else if (key === 'gridColor') {
+                appState.theme.gridColor = value;
+            } else if (key === 'gridOpacity') {
+                appState.theme.gridOpacity = Math.max(0.01, Math.min(1, parseFloat(value) || 0.08));
+            }
+            applyThemeVariables(appState.theme);
+        }
+
+        function updateHeaderButtonConfig(key, value) {
+            appState.theme[key] = value;
+            applyThemeVariables(appState.theme);
+        }
+
+        function updateWebIdentityField(key, value) {
+            appState.theme[key] = value;
+            applyThemeVariables(appState.theme);
+        }
+
+        function applyThemePreset(presetObj = {}) {
+            appState.theme = {
+                ...appState.theme,
+                ...presetObj
+            };
+            applyThemeVariables(appState.theme);
             if (appState.currentRoute === 'admin-theme') {
                 renderAdminThemeView(document.getElementById('main-content'));
             }
             showToast('Preset tema berhasil diterapkan.', 'success');
         }
 
-        async function saveThemeToFirestore() {
+        function resetThemeToMonochromeDefault() {
+            appState.theme = { ...DEFAULT_THEME };
             applyThemeVariables(appState.theme);
-            const ok = await writeFirestoreSafe(
-                doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'theme_config'),
-                appState.theme,
-                'Identitas & Tema'
-            );
-            if (ok) {
-                showToast('Pengaturan identitas, warna, tampilan & teks footer disimpan ke Firebase Firestore!', 'success');
+            if (appState.currentRoute === 'admin-theme') {
+                renderAdminThemeView(document.getElementById('main-content'));
             }
+            showToast('Tema dikembalikan ke pengaturan default Hitam & Putih.', 'info');
         }
 
         function renderAdminThemeView(container) {
