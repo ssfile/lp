@@ -697,6 +697,10 @@
                 sort: 'newest'
             },
             modulGeneratorMode: 'simple',
+            modulTeacherMeta: {
+                penyusun: '',
+                sekolah: ''
+            },
             advancedComponents: {
                 tp: '',
                 materi: '',
@@ -1891,7 +1895,12 @@
         }
 
         function collectModulBaseInputs() {
+            const activeUserName = appState.currentUser?.name || 'Guru Pengajar';
+            const savedPenyusun = appState.modulTeacherMeta?.penyusun;
+            const savedSekolah = appState.modulTeacherMeta?.sekolah;
             return {
+                penyusun: (document.getElementById('mod-penyusun')?.value ?? (savedPenyusun || activeUserName)).trim() || activeUserName,
+                sekolah: (document.getElementById('mod-sekolah')?.value ?? (savedSekolah || 'Sekolah Menengah')).trim() || 'Sekolah Menengah',
                 mapel: (document.getElementById('mod-mapel')?.value || 'Ilmu Pengetahuan Alam (IPA)').trim(),
                 jenjang: (document.getElementById('mod-jenjang')?.value || 'SMP / MTs — Fase D').trim(),
                 kelas: (document.getElementById('mod-kelas')?.value || 'Kelas VIII').trim(),
@@ -1901,81 +1910,708 @@
             };
         }
 
+        function getModelSyntaxBlueprint(modelName, inp) {
+            const m = (modelName || '').toLowerCase();
+            if (m.includes('project')) {
+                return {
+                    label: 'Project Based Learning (PjBL)',
+                    rationale: `Model Project Based Learning (PjBL) dipilih agar murid pada ${inp.kelas} menghasilkan produk/solusi nyata yang terukur atas permasalahan atau kebutuhan terkait ${inp.materi} melalui kerja kolaboratif bertahap.`,
+                    steps: [
+                        {
+                            name: 'Tahap 1 — Penentuan Pertanyaan Mendasar',
+                            goal: 'Mengarahkan murid memahami tantangan nyata yang harus dijawab melalui proyek.',
+                            guruDo: `Menampilkan studi kasus/masalah nyata terkait ${inp.materi} di ${inp.sekolah}, menjelaskan konteks proyek, dan memandu murid merumuskan pertanyaan mendasar.`,
+                            guruHow: 'Menayangkan gambar/kasus singkat, memancing diskusi 3–4 menit, lalu menulis pertanyaan inti proyek di papan tulis.',
+                            muridDo: 'Mengamati kasus, mengaitkannya dengan pengalaman sehari-hari, dan menuliskan pertanyaan pokok proyek.',
+                            examplePrompt: `Guru bertanya: "Bagaimana kita dapat merancang solusi atau panduan praktis terkait ${inp.materi} untuk membantu warga ${inp.sekolah}?"`,
+                            caseExample: `Kasus proyek ${inp.materi} di lingkungan ${inp.sekolah} yang memerlukan rancangan solusi atau media edukasi singkat.`,
+                            muridResponse: `"Kita perlu menyusun panduan atau rancangan langkah yang jelas berdasarkan konsep ${inp.materi} agar mudah diterapkan di kelas."`,
+                            media: 'Slide kasus proyek, lembar catatan awal, papan tulis.',
+                            indicator: 'Murid merumuskan pertanyaan mendasar proyek yang relevan dengan materi dan konteks nyata.'
+                        },
+                        {
+                            name: 'Tahap 2 — Mendesain Perencanaan Proyek',
+                            goal: 'Menyusun rencana kerja, pembagian tugas, alat/bahan, dan jadwal proyek secara realistis.',
+                            guruDo: 'Membimbing setiap kelompok menyusun rencana proyek, membagi peran anggota, dan memeriksa kelayakan jadwal.',
+                            guruHow: 'Mengedarkan format rencana proyek, berkeliling memfasilitasi kesepakatan peran, dan memberi masukan teknis.',
+                            muridDo: 'Menetapkan judul proyek, membagi tugas anggota kelompok, menyiapkan alat/bahan, dan menyusun linimasa.',
+                            examplePrompt: `Guru menginstruksikan: "Tuliskan siapa yang bertugas mencari data, siapa yang menyusun struktur, dan berapa menit waktu tiap langkahnya."`,
+                            caseExample: `Penyusunan draf rencana kerja kelompok tentang ${inp.materi} dengan pembagian peran yang jelas.`,
+                            muridResponse: `"Kelompok kami membagi tugas menjadi 2 pengumpul data/contoh, 1 penyusun kerangka, dan 1 penyaji hasil."`,
+                            media: 'Format perencanaan proyek, LKPD kelompok, alat tulis.',
+                            indicator: 'Setiap kelompok memiliki rencana kerja, pembagian peran, dan target waktu yang jelas.'
+                        },
+                        {
+                            name: 'Tahap 3 — Menyusun Jadwal Pelaksanaan',
+                            goal: 'Memastikan tahapan pengerjaan proyek berjalan tepat waktu dengan tonggak capaian yang jelas.',
+                            guruDo: 'Menyepakati batas waktu tiap tahap pengerjaan bersama murid dan mengingatkan target penyelesaian.',
+                            guruHow: 'Menulis linimasa waktu di papan/layar dan menetapkan cek progres di pertengahan sesi inti.',
+                            muridDo: 'Menyesuaikan kecepatan kerja kelompok dengan jadwal dan mencatat target per bagian.',
+                            examplePrompt: `Guru mengingatkan: "Dalam 12 menit ke depan, pastikan draf utama terkait ${inp.materi} sudah selesai agar tersisa waktu untuk penyempurnaan."`,
+                            caseExample: `Pengaturan durasi diskusi, pengumpulan bukti/contoh, dan penyusunan produk proyek ${inp.materi}.`,
+                            muridResponse: `"Baik Pak/Bu, kami fokus menyelesaikan poin analisis dulu lalu menyusun kesimpulan."`,
+                            media: 'Penanda waktu / timer kelas, lembar jadwal kelompok.',
+                            indicator: 'Murid mengelola waktu kerja kelompok sesuai jadwal yang disepakati.'
+                        },
+                        {
+                            name: 'Tahap 4 — Memonitor Keaktifan dan Perkembangan Proyek',
+                            goal: 'Memantau proses kerja kelompok, mendeteksi hambatan sejak dini, dan memberi bimbingan tepat sasaran.',
+                            guruDo: 'Berkeliling antar-kelompok, mengamati partisipasi murid, mengajukan pertanyaan penuntun, dan membantu mengatasi kendala.',
+                            guruHow: 'Melakukan observasi langsung, memberikan scaffolding saat murid menemui kebuntuan, dan mencatat kemajuan.',
+                            muridDo: 'Mengerjakan bagian proyek sesuai peran, berdiskusi menyelesaikan kendala, dan melaporkan progres kepada guru.',
+                            examplePrompt: `Guru bertanya: "Bagian mana dari ${inp.materi} yang paling menantang bagi kelompok kalian saat ini, dan bukti apa yang sudah ditemukan?"`,
+                            caseExample: `Kelompok mengalami perbedaan pendapat saat menentukan contoh penerapan paling tepat untuk ${inp.materi}.`,
+                            muridResponse: `"Kami membandingkan dua contoh dan memilih yang paling sesuai dengan konsep inti ${inp.materi}."`,
+                            media: 'Rubrik observasi proses, LKPD/bahan proyek.',
+                            indicator: 'Seluruh anggota kelompok terlibat aktif dan hambatan proyek teratasi secara konstruktif.'
+                        },
+                        {
+                            name: 'Tahap 5 — Menguji Hasil Proyek',
+                            goal: 'Menilai ketepatan isi, keterkaitan konsep, dan kejelasan produk proyek terhadap tujuan pembelajaran.',
+                            guruDo: 'Memfasilitasi presentasi/pameran hasil proyek, memberi umpan balik kritis, dan mengarahkan tanya jawab antar-kelompok.',
+                            guruHow: 'Meminta setiap kelompok memaparkan hasil proyek secara singkat lalu membuka sesi tanggapan berbasis kriteria.',
+                            muridDo: 'Mempresentasikan hasil proyek, menjawab pertanyaan teman/guru, dan mencatat masukan perbaikan.',
+                            examplePrompt: `Guru bertanya: "Bagaimana hasil proyek ini menunjukkan pemahaman kalian tentang ${inp.materi}, dan apa keterbatasannya?"`,
+                            caseExample: `Presentasi hasil proyek ${inp.materi} di depan kelas beserta tanya jawab kritis.`,
+                            muridResponse: `"Hasil proyek kami menjelaskan konsep utama, contoh nyata, serta langkah perbaikan yang dapat diterapkan."`,
+                            media: 'Hasil proyek kelompok, lembar umpan balik.',
+                            indicator: 'Produk proyek menunjukkan penguasaan konsep materi dan dapat dipertanggungjawabkan.'
+                        },
+                        {
+                            name: 'Tahap 6 — Evaluasi Pengalaman Belajar',
+                            goal: 'Merefleksikan proses pembuatan proyek, kerja sama tim, dan pembelajaran yang diperoleh.',
+                            guruDo: 'Membimbing murid mengevaluasi proses kerja sama dan menyimpulkan pembelajaran utama dari proyek.',
+                            guruHow: 'Mengajukan pertanyaan reflektif mengenai proses kerja tim dan meluruskan konsep penting.',
+                            muridDo: 'Menyampaikan pengalaman selama mengerjakan proyek, hal yang berjalan baik, dan rencana perbaikan.',
+                            examplePrompt: `Guru bertanya: "Apa pelajaran terpenting dari proses menyusun proyek ${inp.materi} bersama kelompok kalian?"`,
+                            caseExample: `Evaluasi bersama mengenai ketepatan konsep, pembagian kerja, dan perbaikan proyek ke depan.`,
+                            muridResponse: `"Kami belajar bahwa diskusi berbasis bukti membuat hasil proyek lebih tepat dan rapi."`,
+                            media: 'Lembar refleksi singkat, catatan penguatan guru.',
+                            indicator: 'Murid mampu mengevaluasi proses dan hasil proyek secara jujur dan reflektif.'
+                        }
+                    ]
+                };
+            }
+
+            if (m.includes('discovery')) {
+                return {
+                    label: 'Discovery Learning',
+                    rationale: `Model Discovery Learning dipilih agar murid pada ${inp.kelas} menemukan sendiri pola, konsep, dan prinsip ${inp.materi} melalui pengamatan terarah dan pembuktian.`,
+                    steps: [
+                        {
+                            name: 'Tahap 1 — Stimulation (Pemberian Rangsangan)',
+                            goal: 'Membangkitkan rasa ingin tahu murid melalui fenomena/contoh yang memancing pengamatan.',
+                            guruDo: 'Menampilkan fenomena, data, atau contoh situasi terkait ${inp.materi} dan mengarahkan perhatian murid pada detail penting.',
+                            guruHow: 'Menunjukkan contoh/kasus di papan atau lembar kerja tanpa langsung memberi kesimpulan akhir.',
+                            muridDo: 'Mengamati rangsangan secara cermat dan mencatat hal menarik atau mengejutkan.',
+                            examplePrompt: `Guru bertanya: "Amati contoh berikut terkait ${inp.materi}. Pola atau perbedaan apa yang mulai kalian perhatikan?"`,
+                            caseExample: `Perbandingan dua contoh/situasi terkait ${inp.materi} yang memiliki perbedaan hasil atau penerapan.`,
+                            muridResponse: `"Terlihat ada perbedaan langkah dan hasil antara contoh pertama dan contoh kedua."`,
+                            media: 'Gambar/data/contoh kasus, LKPD.',
+                            indicator: 'Murid mengamati stimulus secara aktif dan mengidentifikasi keunikan/pola awal.'
+                        },
+                        {
+                            name: 'Tahap 2 — Problem Statement (Identifikasi Masalah)',
+                            goal: 'Merumuskan masalah atau pertanyaan penyelidikan yang fokus pada inti materi.',
+                            guruDo: 'Membimbing murid merumuskan pertanyaan masalah dari hasil pengamatan rangsangan.',
+                            guruHow: 'Meminta tiap kelompok menuliskan 1–2 pertanyaan "mengapa" atau "bagaimana" terkait temuan awal.',
+                            muridDo: 'Merumuskan masalah/pertanyaan penyelidikan secara jelas dalam kelompok.',
+                            examplePrompt: `Guru mengarahkan: "Rumuskan pertanyaan masalah utama dari pengamatan kalian mengenai ${inp.materi}."`,
+                            caseExample: `Perumusan pertanyaan mengapa suatu kondisi pada ${inp.materi} dapat terjadi.`,
+                            muridResponse: `"Mengapa unsur tersebut memengaruhi hasil pada ${inp.materi}?"`,
+                            media: 'LKPD, papan tulis.',
+                            indicator: 'Rumusan masalah selaras dengan topik dan dapat ditelusuri melalui data/informasi.'
+                        },
+                        {
+                            name: 'Tahap 3 — Data Collection (Pengumpulan Data)',
+                            goal: 'Mengumpulkan informasi, fakta, atau contoh pendukung untuk menjawab pertanyaan masalah.',
+                            guruDo: 'Mengatur sumber belajar dan membimbing murid mencari data/bukti yang relevan dengan ${inp.materi}.',
+                            guruHow: 'Menyediakan bahan bacaan/contoh kasus dan mengarahkan murid mencatat bukti secara sistematis.',
+                            muridDo: 'Menelaah sumber belajar, mengidentifikasi fakta/contoh, dan mencatat temuan.',
+                            examplePrompt: `Guru menginstruksikan: "Catat minimal tiga fakta atau contoh dari bahan ajar yang mendukung jawaban sementara kalian."`,
+                            caseExample: `Penelusuran contoh penerapan dan ciri-ciri ${inp.materi} dari sumber belajar.`,
+                            muridResponse: `"Kami menemukan beberapa contoh dan ciri utama yang berkaitan langsung dengan pertanyaan kami."`,
+                            media: 'Buku teks, LKPD, bahan bacaan/contoh.',
+                            indicator: 'Murid mengumpulkan data/contoh yang relevan dan akurat.'
+                        },
+                        {
+                            name: 'Tahap 4 — Data Processing (Pengolahan Data)',
+                            goal: 'Mengklasifikasikan, membandingkan, dan mengolah data yang terkumpul menjadi pola informasi.',
+                            guruDo: 'Membimbing murid mengorganisasikan data ke dalam tabel, bagan, atau poin terstruktur.',
+                            guruHow: 'Memberi contoh cara mengelompokkan data lalu memantau proses diskusi kelompok.',
+                            muridDo: 'Mengelompokkan temuan, membandingkan persamaan/perbedaan, dan menyusun pola.',
+                            examplePrompt: `Guru bertanya: "Bagaimana kalian mengelompokkan data tersebut agar hubungan antarkonsep pada ${inp.materi} terlihat jelas?"`,
+                            caseExample: `Pengelompokan ciri, contoh, dan dampak terkait ${inp.materi}.`,
+                            muridResponse: `"Kami memisahkan antara konsep dasar, contoh penerapan, dan akibatnya."`,
+                            media: 'Tabel/bagan pada LKPD, alat tulis.',
+                            indicator: 'Data terolah secara rapi dan menunjukkan hubungan yang logis.'
+                        },
+                        {
+                            name: 'Tahap 5 — Verification (Pembuktian)',
+                            goal: 'Memeriksa kebenaran temuan/dugaan awal melalui pengujian ulang terhadap konsep dan bukti.',
+                            guruDo: 'Mengajak murid menguji kesesuaian hasil pengolahan data dengan prinsip/konsep ${inp.materi}.',
+                            guruHow: 'Mengajukan pertanyaan penguji dan meminta kelompok memverifikasi argumennya.',
+                            muridDo: 'Memeriksa ulang kesesuaian kesimpulan sementara dengan data dan menanggapi tanggapan kelompok lain.',
+                            examplePrompt: `Guru bertanya: "Apakah temuan kelompok kalian tetap berlaku jika kondisinya diubah? Mengapa?"`,
+                            caseExample: `Pengujian ulang ketepatan analisis kasus ${inp.materi} antar-kelompok.`,
+                            muridResponse: `"Setelah dicek kembali, alasan kami sesuai karena memenuhi syarat utama konsep ${inp.materi}."`,
+                            media: 'Hasil kerja kelompok, catatan verifikasi.',
+                            indicator: 'Murid mampu membuktikan dan mempertanggungjawabkan ketepatan temuannya.'
+                        },
+                        {
+                            name: 'Tahap 6 — Generalization (Menarik Kesimpulan)',
+                            goal: 'Merumuskan kesimpulan atau prinsip umum dari hasil penemuan pembelajaran.',
+                            guruDo: 'Membimbing murid menyusun kesimpulan umum yang jelas serta memberi penegasan konsep.',
+                            guruHow: 'Meminta perwakilan murid menyampaikan simpulan lalu merangkum poin kunci bersama.',
+                            muridDo: 'Menyusun kesimpulan umum mengenai ${inp.materi} dengan bahasa yang jelas dan runtut.',
+                            examplePrompt: `Guru meminta: "Simpulkan inti materi ${inp.materi} yang baru kalian temukan dalam kalimat yang jelas."`,
+                            caseExample: `Perumusan simpulan konsep dan penerapan ${inp.materi} untuk kelas ${inp.kelas}.`,
+                            muridResponse: `"Kesimpulannya, ${inp.materi} dapat dipahami melalui hubungan unsur dan penerapannya secara tepat."`,
+                            media: 'Papan tulis / ringkasan kelas.',
+                            indicator: 'Kesimpulan akurat, menyeluruh, dan sesuai tujuan pembelajaran.'
+                        }
+                    ]
+                };
+            }
+
+            if (m.includes('inquiry')) {
+                return {
+                    label: 'Inquiry Learning',
+                    rationale: `Model Inquiry Learning dipilih untuk melatih murid pada ${inp.kelas} meneliti fenomena terkait ${inp.materi} secara sistematis melalui perumusan masalah, hipotesis, penyelidikan, dan penarikan simpulan.`,
+                    steps: [
+                        {
+                            name: 'Tahap 1 — Orientasi Masalah',
+                            goal: 'Menghadirkan fenomena/masalah autentik untuk memicu proses penyelidikan.',
+                            guruDo: 'Menyajikan situasi/masalah nyata terkait ${inp.materi} dan mengarahkan fokus penyelidikan.',
+                            guruHow: 'Menjelaskan konteks masalah secara singkat dan mengajukan pertanyaan pemicu.',
+                            muridDo: 'Mengamati masalah dan mengidentifikasi hal yang perlu diselidiki.',
+                            examplePrompt: `Guru bertanya: "Apa persoalan utama yang muncul pada situasi ${inp.materi} ini, dan informasi apa yang kita butuhkan?"`,
+                            caseExample: `Situasi masalah sehari-hari yang terkait dengan ${inp.materi}.`,
+                            muridResponse: `"Kita perlu mengetahui penyebab utama dan bukti pendukungnya."`,
+                            media: 'Stimulus kasus, LKPD.',
+                            indicator: 'Murid memahami fokus masalah penyelidikan.'
+                        },
+                        {
+                            name: 'Tahap 2 — Merumuskan Masalah',
+                            goal: 'Menyusun pertanyaan penyelidikan yang spesifik dan dapat dijawab melalui analisis.',
+                            guruDo: 'Membimbing murid mengubah masalah umum menjadi pertanyaan penyelidikan yang terarah.',
+                            guruHow: 'Memberi contoh pertanyaan penyelidikan yang baik dan mengoreksi rumusan kelompok.',
+                            muridDo: 'Menuliskan pertanyaan penyelidikan utama kelompok.',
+                            examplePrompt: `Guru mengarahkan: "Ubah masalah tersebut menjadi pertanyaan yang jelas tentang bagaimana atau mengapa hal itu terjadi pada ${inp.materi}."`,
+                            caseExample: `Penyusunan pertanyaan penyelidikan berbasis kasus ${inp.materi}.`,
+                            muridResponse: `"Bagaimana pengaruh faktor tersebut terhadap penerapan ${inp.materi}?"`,
+                            media: 'LKPD penyelidikan.',
+                            indicator: 'Pertanyaan penyelidikan terarah dan relevan.'
+                        },
+                        {
+                            name: 'Tahap 3 — Merumuskan Hipotesis',
+                            goal: 'Menyusun dugaan/jawaban sementara yang beralasan sebelum pembuktian.',
+                            guruDo: 'Membimbing murid mengajukan dugaan awal beserta alasan logisnya.',
+                            guruHow: 'Meminta murid menulis "Jika ..., maka ... karena ..." pada LKPD.',
+                            muridDo: 'Menyusun hipotesis/dugaan awal berdasarkan pengetahuan yang dimiliki.',
+                            examplePrompt: `Guru bertanya: "Menurut dugaan awal kalian, apa yang akan terjadi dan apa alasannya?"`,
+                            caseExample: `Perumusan dugaan awal atas kasus ${inp.materi}.`,
+                            muridResponse: `"Dugaan kami, jika langkah tersebut diterapkan maka hasilnya akan lebih tepat karena..."`,
+                            media: 'LKPD.',
+                            indicator: 'Hipotesis logis dan terkait dengan rumusan masalah.'
+                        },
+                        {
+                            name: 'Tahap 4 — Mengumpulkan Data',
+                            goal: 'Menghimpun informasi dan bukti untuk menguji hipotesis.',
+                            guruDo: 'Membimbing murid menelaah sumber/contoh dan mencatat bukti yang relevan.',
+                            guruHow: 'Mengawasi diskusi kelompok dan memastikan data yang dicatat akurat.',
+                            muridDo: 'Mengumpulkan data/fakta/contoh dari bahan ajar dan diskusi.',
+                            examplePrompt: `Guru menginstruksikan: "Kumpulkan bukti yang mendukung atau membantah hipotesis kelompok kalian."`,
+                            caseExample: `Pengumpulan contoh dan fakta terkait ${inp.materi}.`,
+                            muridResponse: `"Kami mencatat beberapa bukti dari materi dan contoh kasus."`,
+                            media: 'Sumber belajar, LKPD.',
+                            indicator: 'Data yang dikumpulkan relevan untuk menguji hipotesis.'
+                        },
+                        {
+                            name: 'Tahap 5 — Menguji Hipotesis',
+                            goal: 'Membandingkan data yang diperoleh dengan hipotesis untuk menilai kebenarannya.',
+                            guruDo: 'Membimbing murid menelaah apakah data mendukung hipotesis awal.',
+                            guruHow: 'Mengajukan pertanyaan kritis agar murid menilai bukti secara objektif.',
+                            muridDo: 'Menganalisis kesesuaian data dengan hipotesis dan menyusun argumen.',
+                            examplePrompt: `Guru bertanya: "Apakah bukti yang kalian temukan menguatkan hipotesis awal atau justru perlu disesuaikan?"`,
+                            caseExample: `Pengujian hipotesis berdasarkan analisis kasus ${inp.materi}.`,
+                            muridResponse: `"Sebagian besar bukti mendukung hipotesis kami, namun ada catatan penting yang perlu ditambahkan."`,
+                            media: 'Catatan analisis kelompok.',
+                            indicator: 'Pengujian hipotesis dilakukan secara objektif berdasarkan bukti.'
+                        },
+                        {
+                            name: 'Tahap 6 — Menyimpulkan',
+                            goal: 'Menyusun kesimpulan akhir penyelidikan dan merefleksikan proses inkuiri.',
+                            guruDo: 'Membimbing murid merumuskan kesimpulan akhir dan memberi penguatan.',
+                            guruHow: 'Memfasilitasi presentasi singkat dan merangkum simpulan utama.',
+                            muridDo: 'Menyampaikan kesimpulan hasil penyelidikan dan refleksi singkat.',
+                            examplePrompt: `Guru meminta: "Sampaikan kesimpulan akhir dari penyelidikan kalian mengenai ${inp.materi}."`,
+                            caseExample: `Kesimpulan akhir penyelidikan materi ${inp.materi}.`,
+                            muridResponse: `"Kesimpulannya, ${inp.materi} terbukti bekerja melalui pola dan prinsip yang telah kami analisis."`,
+                            media: 'Papan tulis / dokumen hasil.',
+                            indicator: 'Kesimpulan jelas, logis, dan menjawab rumusan masalah.'
+                        }
+                    ]
+                };
+            }
+
+            if (m.includes('cooperative')) {
+                return {
+                    label: 'Cooperative Learning (Jigsaw / TPS)',
+                    rationale: `Model Cooperative Learning dipilih untuk membangun saling ketergantungan positif, tanggung jawab individu, dan kolaborasi aktif antar-murid ${inp.kelas} dalam memahami ${inp.materi}.`,
+                    steps: [
+                        {
+                            name: 'Tahap 1 — Menyampaikan Tujuan & Memotivasi',
+                            goal: 'Menjelaskan tujuan belajar dan pentingnya kerja sama tim yang saling mendukung.',
+                            guruDo: 'Menyampaikan tujuan pembelajaran ${inp.materi} dan menjelaskan aturan kerja sama kelompok.',
+                            guruHow: 'Menjelaskan bahwa setiap anggota berkontribusi pada pemahaman bersama.',
+                            muridDo: 'Menyimak tujuan pembelajaran dan menyiapkan sikap kolaboratif.',
+                            examplePrompt: `Guru menyampaikan: "Hari ini kita belajar ${inp.materi} secara kooperatif; setiap anggota punya peran penting agar semua paham."`,
+                            caseExample: `Pengantar kerja sama kelompok untuk topik ${inp.materi}.`,
+                            muridResponse: `"Siap Pak/Bu, kami akan saling membantu memahami bagian masing-masing."`,
+                            media: 'Papan tulis / slide tujuan.',
+                            indicator: 'Murid memahami tujuan dan prinsip kerja sama kelompok.'
+                        },
+                        {
+                            name: 'Tahap 2 — Menyajikan Informasi',
+                            goal: 'Memberikan pengantar konsep dasar dan pembagian fokus materi.',
+                            guruDo: 'Menyajikan gambaran umum ${inp.materi} dan membagi sub-fokus tugas tiap anggota/kelompok.',
+                            guruHow: 'Menguraikan poin kunci singkat lalu membagikan tugas/LKPD.',
+                            muridDo: 'Menyimak pengantar materi dan menerima bagian tugasnya.',
+                            examplePrompt: `Guru mengarahkan: "Perhatikan kerangka utama ${inp.materi} berikut sebelum kalian mendalami bagian masing-masing."`,
+                            caseExample: `Pembagian sub-topik/kasus ${inp.materi} antar-anggota kelompok.`,
+                            muridResponse: `"Kami sudah jelas dengan bagian yang harus kami pelajari dan diskusikan."`,
+                            media: 'Bahan ajar / LKPD.',
+                            indicator: 'Murid mengetahui bagian tugas dan sumber rujukannya.'
+                        },
+                        {
+                            name: 'Tahap 3 — Mengorganisasikan Kelompok Belajar',
+                            goal: 'Membentuk kelompok kecil heterogen dengan peran kerja yang jelas.',
+                            guruDo: 'Mengatur formasi kelompok (3–5 murid) dan menetapkan peran (ketua, pencatat, penyaji/penanya).',
+                            guruHow: 'Memberi instruksi perpindahan tempat duduk yang tertib dan efisien.',
+                            muridDo: 'Bergabung ke kelompoknya dan menyepakati peran masing-masing.',
+                            examplePrompt: `Guru menginstruksikan: "Bentuk kelompok beranggotakan 4 orang, tentukan peran masing-masing, dan mulai diskusi dalam 1 menit."`,
+                            caseExample: `Pembentukan kelompok diskusi topik ${inp.materi} di kelas ${inp.kelas}.`,
+                            muridResponse: `"Kelompok kami sudah siap dengan pembagian peran masing-masing."`,
+                            media: 'Kartu peran / panduan kelompok.',
+                            indicator: 'Kelompok terbentuk tertib dan setiap anggota memiliki peran aktif.'
+                        },
+                        {
+                            name: 'Tahap 4 — Membimbing Kelompok Bekerja & Belajar',
+                            goal: 'Mendampingi diskusi kelompok agar seluruh anggota berpartisipasi dan memahami materi.',
+                            guruDo: 'Berkeliling memfasilitasi diskusi, mendorong anggota yang pasif berbicara, dan meluruskan konsep.',
+                            guruHow: 'Mengajukan pertanyaan klarifikasi dan memastikan tidak hanya satu orang yang bekerja.',
+                            muridDo: 'Berdiskusi, saling bertukar penjelasan, dan mengisi LKPD bersama.',
+                            examplePrompt: `Guru bertanya: "Bagaimana anggota lain menanggapi penjelasan teman kalian mengenai ${inp.materi}?"`,
+                            caseExample: `Diskusi pemecahan kasus dan contoh penerapan ${inp.materi}.`,
+                            muridResponse: `"Kami saling melengkapi contoh dan mengecek ketepatan jawaban bersama."`,
+                            media: 'LKPD, sumber belajar.',
+                            indicator: 'Terjadi diskusi dua arah dan seluruh anggota kelompok memahami hasil kerja.'
+                        },
+                        {
+                            name: 'Tahap 5 — Evaluasi Hasil Kerja Kelompok',
+                            goal: 'Menguji pemahaman kelompok melalui presentasi, tanya jawab, atau kuis singkat.',
+                            guruDo: 'Meminta kelompok memaparkan hasil diskusi dan memandu tanggapan kelas.',
+                            guruHow: 'Memberi umpan balik konstruktif atas ketepatan konsep dan kerja sama.',
+                            muridDo: 'Mempresentasikan hasil kelompok dan menanggapi pertanyaan.',
+                            examplePrompt: `Guru bertanya: "Apa poin utama yang disepakati kelompok kalian terkait ${inp.materi}, dan mengapa itu penting?"`,
+                            caseExample: `Presentasi dan klarifikasi hasil diskusi kelompok ${inp.materi}.`,
+                            muridResponse: `"Kami menyimpulkan bahwa ${inp.materi} memerlukan ketepatan konsep dan penerapan yang sesuai."`,
+                            media: 'Hasil LKPD kelompok.',
+                            indicator: 'Hasil diskusi kelompok akurat dan dipresentasikan dengan jelas.'
+                        },
+                        {
+                            name: 'Tahap 6 — Memberikan Penghargaan / Apresiasi',
+                            goal: 'Mengapresiasi usaha, ketepatan, dan kerja sama seluruh kelompok.',
+                            guruDo: 'Memberikan apresiasi atas kerja sama tim dan ketepatan hasil belajar.',
+                            guruHow: 'Menyebutkan kekuatan spesifik tiap kelompok secara positif.',
+                            muridDo: 'Menerima umpan balik dan mengapresiasi kerja teman sejawat.',
+                            examplePrompt: `Guru menyampaikan: "Apresiasi untuk seluruh kelompok atas kerja sama dan ketepatan analisis kalian pada materi ${inp.materi}."`,
+                            caseExample: `Apresiasi kerja tim dan penegasan hasil belajar di akhir sesi inti.`,
+                            muridResponse: `"Terima kasih Pak/Bu, kami jadi lebih semangat belajar bersama."`,
+                            media: 'Catatan apresiasi guru.',
+                            indicator: 'Suasana belajar positif dan motivasi kolaborasi meningkat.'
+                        }
+                    ]
+                };
+            }
+
+            // Default: Problem Based Learning (PBL) — 5 Sintaks Baku
+            return {
+                label: 'Problem Based Learning (PBL)',
+                rationale: `Model Problem Based Learning (PBL) dipilih karena sangat sesuai untuk melatih murid pada ${inp.kelas} menganalisis masalah nyata terkait ${inp.materi}, menelusuri konsep/bukti, dan merumuskan solusi yang beralasan.`,
+                steps: [
+                    {
+                        name: 'Tahap 1 — Orientasi Murid terhadap Masalah',
+                        goal: 'Mengenalkan masalah kontekstual terkait materi agar murid terdorong mengidentifikasi inti persoalan.',
+                        guruDo: `Menampilkan situasi atau kasus nyata yang berkaitan dengan ${inp.materi} pada ${inp.kelas} dan menjelaskan bahwa masalah tersebut perlu dianalisis menggunakan konsep pembelajaran.`,
+                        guruHow: 'Menampilkan kasus/ilustrasi di layar atau lembar kerja, memberi waktu mengamati 3–4 menit, lalu mengajukan pertanyaan pemantik analisis.',
+                        muridDo: 'Mengamati kasus/situasi secara cermat, mengidentifikasi masalah utama, dan menyampaikan pendapat awal.',
+                        examplePrompt: `Guru bertanya: "1) Apa permasalahan yang kalian temukan pada kasus ${inp.materi} ini? 2) Mengapa situasi tersebut dapat terjadi? 3) Konsep atau aturan apa yang paling berkaitan?"`,
+                        caseExample: `Kasus nyata di lingkungan sekolah/masyarakat terkait ${inp.materi} yang menunjukkan adanya ketidaksesuaian atau tantangan yang perlu dipecahkan.`,
+                        muridResponse: `"Permasalahan utamanya terjadi karena penerapan ${inp.materi} belum memperhatikan faktor pendukung sehingga dampaknya terasa pada kegiatan bersama."`,
+                        media: 'Teks/gambar studi kasus, papan tulis, LKPD.',
+                        indicator: 'Murid mampu mengidentifikasi masalah utama dari kasus dan menghubungkannya dengan materi.'
+                    },
+                    {
+                        name: 'Tahap 2 — Mengorganisasikan Murid untuk Belajar',
+                        goal: 'Membentuk kelompok kerja dan menetapkan fokus masalah yang akan diselidiki tiap kelompok.',
+                        guruDo: 'Membagi murid ke dalam kelompok kecil (4–5 orang), membagikan LKPD, dan memastikan setiap anggota mengetahui tugasnya.',
+                        guruHow: 'Menyebutkan pembagian kelompok secara jelas, meminta tiap kelompok menunjuk koordinator/pencatat/penyaji, dan menjelaskan target LKPD.',
+                        muridDo: 'Bergabung ke kelompok dengan tertib, membaca instruksi LKPD, dan membagi peran anggota.',
+                        examplePrompt: `Guru menginstruksikan: "Silakan berkumpul dengan kelompok masing-masing, baca bagian masalah di LKPD, dan tentukan siapa yang mencatat analisis serta siapa yang menyiapkan penyampaian hasil."`,
+                        caseExample: `Pembagian fokus analisis sub-masalah terkait ${inp.materi} pada tiap kelompok.`,
+                        muridResponse: `"Kelompok kami sudah membagi peran dan mulai membaca studi kasus di LKPD."`,
+                        media: 'LKPD, daftar pembagian kelompok.',
+                        indicator: 'Kelompok terbentuk tertib dan setiap murid memahami tugas serta fokus masalahnya.'
+                    },
+                    {
+                        name: 'Tahap 3 — Membimbing Penyelidikan Individu maupun Kelompok',
+                        goal: 'Membantu murid menelaah konsep, mengumpulkan bukti/contoh, dan menganalisis penyebab serta dampak masalah.',
+                        guruDo: 'Berkeliling dari satu kelompok ke kelompok lain, mengajukan pertanyaan penuntun, dan membantu murid menghubungkan teori dengan fakta kasus.',
+                        guruHow: 'Tidak langsung memberi jawaban, melainkan memberi pertanyaan bertingkat (scaffolding) dan memeriksa ketepatan rujukan materi.',
+                        muridDo: 'Menelaah materi ${inp.materi}, berdiskusi menguraikan penyebab dan dampak kasus, serta mengisi tabel/poin analisis di LKPD.',
+                        examplePrompt: `Guru bertanya: "Bukti apa pada kasus ini yang mendukung analisis kalian? Bagaimana hubungan antarunsur pada ${inp.materi} menjelaskan kondisi tersebut?"`,
+                        caseExample: `Penelusuran faktor penyebab, bukti pendukung, dan alternatif solusi pada kasus ${inp.materi}.`,
+                        muridResponse: `"Berdasarkan konsep ${inp.materi}, faktor utama yang memengaruhi adalah ... dan dampaknya terlihat pada ..."`,
+                        media: 'Buku teks ${inp.mapel}, LKPD, bahan rujukan.',
+                        indicator: 'Murid mampu menguraikan analisis masalah dengan bukti dan konsep yang relevan.'
+                    },
+                    {
+                        name: 'Tahap 4 — Mengembangkan dan Menyajikan Hasil Karya',
+                        goal: 'Menyusun hasil analisis dan rancangan solusi ke dalam format yang runtut serta menyajikannya di depan kelas.',
+                        guruDo: 'Membimbing kelompok merapikan hasil diskusi menjadi poin presentasi/laporan singkat dan mengatur giliran penyajian.',
+                        guruHow: 'Memberi batas waktu penyajian yang jelas (misalnya 3–4 menit per kelompok) dan mengarahkan kelompok lain menyimak serta menyiapkan tanggapan.',
+                        muridDo: 'Menyusun poin hasil analisis dan solusi di LKPD/papan, lalu mempresentasikannya dengan bahasa yang jelas.',
+                        examplePrompt: `Guru menginstruksikan: "Sampaikan inti masalah, hasil analisis berdasarkan ${inp.materi}, dan solusi yang kalian usulkan. Kelompok lain silakan menyimak dan menyiapkan pertanyaan."`,
+                        caseExample: `Pemaparan hasil analisis kasus dan usulan solusi terkait ${inp.materi}.`,
+                        muridResponse: `"Kami mengusulkan langkah ... karena lebih realistis diterapkan di ${inp.kelas} dan sesuai dengan prinsip ${inp.materi}."`,
+                        media: 'LKPD hasil kerja, papan tulis/media presentasi.',
+                        indicator: 'Kelompok menyajikan hasil analisis dan solusi secara runtut, jelas, dan tepat waktu.'
+                    },
+                    {
+                        name: 'Tahap 5 — Menganalisis dan Mengevaluasi Proses Pemecahan Masalah',
+                        goal: 'Membandingkan berbagai solusi, meluruskan miskonsepsi, dan menyimpulkan solusi terbaik serta proses belajar.',
+                        guruDo: 'Memimpin diskusi evaluasi antar-solusi, meluruskan konsep yang kurang tepat, dan menguatkan prinsip utama ${inp.materi}.',
+                        guruHow: 'Menyoroti kelebihan dan catatan tiap usulan solusi, lalu menyimpulkan pembelajaran bersama murid.',
+                        muridDo: 'Membandingkan usulan antar-kelompok, menanggapi masukan, dan menyimpulkan solusi terbaik serta pembelajaran yang didapat.',
+                        examplePrompt: `Guru bertanya: "Dari beberapa solusi yang disampaikan tadi, solusi mana yang paling tepat dan dapat diterapkan? Mengapa?"`,
+                        caseExample: `Perbandingan kelebihan dan kelayakan solusi pemecahan masalah ${inp.materi}.`,
+                        muridResponse: `"Solusi dari kelompok ... paling tepat karena mempertimbangkan langkah pelaksanaan, bukti konsep, dan dampaknya."`,
+                        media: 'Catatan kelas, ringkasan evaluasi guru.',
+                        indicator: 'Murid mampu menilai ketepatan solusi dan menyimpulkan pembelajaran secara menyeluruh.'
+                    }
+                ]
+            };
+        }
+
         function buildDetailedAlurHtml(inp) {
             const totalMin = parseInt((inp.waktu.match(/\d+/g) || [80]).pop(), 10) || 80;
-            const pendMin = Math.max(10, Math.round(totalMin * 0.15));
-            const penutupMin = Math.max(10, Math.round(totalMin * 0.15));
-            const intiMin = Math.max(20, totalMin - pendMin - penutupMin);
+            const pendMin = Math.max(12, Math.round(totalMin * 0.15));
+            const penutupMin = Math.max(12, Math.round(totalMin * 0.15));
+            const intiMin = Math.max(25, totalMin - pendMin - penutupMin);
+            const syntax = getModelSyntaxBlueprint(inp.model, inp);
+
+            const pendSteps = [
+                {
+                    no: '1',
+                    step: 'Membuka Pembelajaran & Salam',
+                    time: `${Math.max(2, Math.round(pendMin * 0.12))} Menit`,
+                    guru: `Memberi salam hangat, menyapa murid, dan memimpin doa pembuka sebelum memulai pelajaran ${inp.mapel}.`,
+                    how: 'Berdiri di depan kelas dengan kontak mata ramah, memberi jeda tenang, dan menunjuk/memimpin doa bersama.',
+                    murid: 'Menjawab salam, berdoa dengan khidmat, dan memusatkan perhatian kepada guru.',
+                    dialog: `<strong>Guru:</strong> "Selamat pagi, anak-anak. Sebelum kita mulai pembelajaran ${escapeHtml(inp.mapel)} hari ini, mari kita berdoa bersama terlebih dahulu."<br><strong>Murid:</strong> "Selamat pagi, Pak/Bu. Berdoa mulai..."`,
+                    response: 'Murid menjawab salam dengan tertib dan mengikuti doa dengan tenang.',
+                    indicator: 'Suasana kelas kondusif dan siap memulai pembelajaran.'
+                },
+                {
+                    no: '2',
+                    step: 'Mengondisikan Murid & Kehadiran',
+                    time: `${Math.max(2, Math.round(pendMin * 0.12))} Menit`,
+                    guru: `Mengecek kehadiran murid, kerapian posisi duduk, serta ketertiban lingkungan kelas ${inp.kelas}.`,
+                    how: 'Menyebutkan presensi secara singkat dan meminta murid merapikan meja/alat tulis.',
+                    murid: 'Merespons presensi, merapikan tempat duduk, dan menyiapkan buku/alat tulis.',
+                    dialog: `<strong>Guru:</strong> "Ibu/Bapak cek kehadiran dulu ya. Pastikan meja bersih dari barang yang tidak diperlukan dan alat tulis sudah siap."<br><strong>Murid:</strong> "Hadir, Bu/Pak!"`,
+                    response: 'Murid merapikan perlengkapan belajar dan merespons absensi dengan tertib.',
+                    indicator: 'Kehadiran tercatat dan kondisi kelas tertata rapi.'
+                },
+                {
+                    no: '3',
+                    step: 'Memeriksa Kesiapan Belajar',
+                    time: `${Math.max(2, Math.round(pendMin * 0.13))} Menit`,
+                    guru: 'Memastikan kesiapan psikologis, fokus perhatian, dan perlengkapan belajar murid sebelum masuk materi.',
+                    how: 'Melakukan cek fokus singkat atau ice-breaking ringan 30–60 detik.',
+                    murid: 'Menyatakan kesiapan belajar dan menyesuaikan fokus perhatian.',
+                    dialog: `<strong>Guru:</strong> "Tarik napas sejenak, lepaskan. Apakah semua sudah siap mengikuti pembahasan ${escapeHtml(inp.materi)} hari ini?"<br><strong>Murid:</strong> "Sudah siap!"`,
+                    response: 'Murid menunjukkan perhatian penuh dan kesiapan mengikuti kegiatan.',
+                    indicator: 'Murid berada dalam kondisi siap belajar secara mental dan perlengkapan.'
+                },
+                {
+                    no: '4',
+                    step: 'Melakukan Apersepsi',
+                    time: `${Math.max(2, Math.round(pendMin * 0.13))} Menit`,
+                    guru: `Mengaitkan pengalaman sehari-hari murid di ${inp.sekolah} atau rumah dengan topik ${inp.materi}.`,
+                    how: 'Mengajukan pertanyaan pengalaman nyata yang akrab bagi murid.',
+                    murid: 'Mengingat pengalaman sehari-hari dan menceritakannya secara singkat.',
+                    dialog: `<strong>Guru:</strong> "Siapa yang pernah mengalami atau melihat situasi sehari-hari yang berhubungan dengan ${escapeHtml(inp.materi)}?"<br><strong>Murid:</strong> "Saya pernah melihatnya saat..."`,
+                    response: 'Murid mengaitkan pengalaman pribadi dengan topik yang akan dipelajari.',
+                    indicator: 'Murid mampu mengaitkan pengalaman nyata dengan topik pembelajaran.'
+                },
+                {
+                    no: '5',
+                    step: 'Menghubungkan Materi Sebelumnya dengan Materi Baru',
+                    time: `${Math.max(2, Math.round(pendMin * 0.13))} Menit`,
+                    guru: `Menghubungkan pengetahuan prasyarat/pertemuan sebelumnya dengan fokus baru pada ${inp.materi}.`,
+                    how: 'Menanyakan kembali konsep dasar sebelumnya lalu menunjukkan jembatan ke materi baru.',
+                    murid: 'Menyebutkan kembali konsep sebelumnya dan menyimak keterkaitannya dengan materi baru.',
+                    dialog: `<strong>Guru:</strong> "Masih ingat konsep dasar yang kita pelajari sebelumnya? Hari ini kita mengembangkannya pada ${escapeHtml(inp.materi)}."<br><strong>Murid:</strong> "Ingat, kaitannya adalah..."`,
+                    response: 'Murid melihat kesinambungan antar-materi secara logis.',
+                    indicator: 'Keterkaitan pengetahuan awal dan materi baru terbangun jelas.'
+                },
+                {
+                    no: '6',
+                    step: 'Memberikan Pertanyaan Pemantik',
+                    time: `${Math.max(2, Math.round(pendMin * 0.14))} Menit`,
+                    guru: `Menampilkan situasi/contoh terkait ${inp.materi} dan mengajukan pertanyaan pemantik yang memicu rasa ingin tahu serta berpikir kritis.`,
+                    how: 'Menampilkan contoh/kasus singkat, memberi waktu berpikir 1 menit, lalu meminta beberapa murid berpendapat.',
+                    murid: 'Mengamati contoh/situasi dan menyampaikan dugaan atau pendapat kritis.',
+                    dialog: `<strong>Guru:</strong> "Perhatikan contoh terkait ${escapeHtml(inp.materi)} ini. Menurut kalian, mengapa hal ini bisa terjadi dan bagaimana cara menilainya?"<br><strong>Murid:</strong> "Menurut saya, hal itu terjadi karena..."`,
+                    response: 'Murid memberikan pendapat awal yang beragam dan beralasan.',
+                    indicator: 'Murid merespons pertanyaan pemantik dengan argumen awal yang relevan.'
+                },
+                {
+                    no: '7',
+                    step: 'Menyampaikan Tujuan Pembelajaran',
+                    time: `${Math.max(2, Math.round(pendMin * 0.12))} Menit`,
+                    guru: `Menyampaikan tujuan pembelajaran ${inp.materi} secara jelas agar murid tahu kompetensi yang akan dicapai.`,
+                    how: 'Menuliskan/menampilkan tujuan utama dengan bahasa yang mudah dipahami murid.',
+                    murid: 'Menyimak dan mencatat tujuan pembelajaran yang harus dicapai.',
+                    dialog: `<strong>Guru:</strong> "Tujuan kita hari ini adalah memahami, menganalisis, dan menyimpulkan ${escapeHtml(inp.materi)} agar kalian mampu menerapkannya secara tepat."<br><strong>Murid:</strong> Murid menyimak dan mencatat poin tujuan.`,
+                    response: 'Murid mengetahui target kemampuan yang diharapkan pada akhir pertemuan.',
+                    indicator: 'Murid dapat menyebutkan kembali fokus tujuan belajar hari ini.'
+                },
+                {
+                    no: '8',
+                    step: 'Menjelaskan Aktivitas & Penilaian',
+                    time: `${Math.max(1, pendMin - 7 * Math.max(2, Math.round(pendMin * 0.12)))} Menit`,
+                    guru: `Menjelaskan alur aktivitas melalui ${inp.model} serta aspek yang dinilai (partisipasi diskusi, ketepatan analisis LKPD, dan pemahaman akhir).`,
+                    how: 'Menyampaikan urutan langkah kegiatan dan kriteria penilaian secara transparan.',
+                    murid: 'Memahami alur kerja dan kriteria penilaian yang berlaku.',
+                    dialog: `<strong>Guru:</strong> "Kita akan bekerja dalam kelompok menggunakan ${escapeHtml(inp.model)}. Penilaian dilihat dari ketepatan analisis, kerja sama, dan simpulan kalian."<br><strong>Murid:</strong> "Baik, Bu/Pak!"`,
+                    response: 'Murid memahami langkah kegiatan dan cara penilaiannya.',
+                    indicator: 'Murid memahami urutan aktivitas dan aspek penilaian pembelajaran.'
+                }
+            ];
+
+            const perStepMin = Math.max(5, Math.floor(intiMin / syntax.steps.length));
+            const intiRows = syntax.steps.map((st, idx) => {
+                const dur = idx === syntax.steps.length - 1
+                    ? Math.max(5, intiMin - perStepMin * (syntax.steps.length - 1))
+                    : perStepMin;
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(st.name)}</strong><br><span style="font-size:9.5pt;">Tujuan: ${escapeHtml(st.goal)}</span></td>
+                        <td><strong>${dur} Menit</strong></td>
+                        <td>
+                            <strong>Aktivitas Guru:</strong> ${escapeHtml(st.guruDo)}<br>
+                            <strong>Cara Melaksanakan:</strong> ${escapeHtml(st.guruHow)}<br>
+                            <strong>Contoh Ucapan/Instruksi:</strong> <em>${escapeHtml(st.examplePrompt)}</em><br>
+                            <strong>Contoh Kasus/Situasi:</strong> ${escapeHtml(st.caseExample)}<br>
+                            <strong>Media &amp; Sumber:</strong> ${escapeHtml(st.media)}
+                        </td>
+                        <td>
+                            <strong>Aktivitas Murid:</strong> ${escapeHtml(st.muridDo)}<br>
+                            <strong>Contoh Respons/Hasil Murid:</strong> <em>${escapeHtml(st.muridResponse)}</em><br>
+                            <strong>Indikator Keberhasilan:</strong> ${escapeHtml(st.indicator)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const penutupSteps = [
+                {
+                    no: '1',
+                    step: 'Membimbing Murid Menyimpulkan Pembelajaran',
+                    time: `${Math.max(2, Math.round(penutupMin * 0.18))} Menit`,
+                    guru: `Memandu murid merangkum inti materi ${inp.materi} dan hasil diskusi/penyelidikan yang telah dilakukan.`,
+                    how: 'Mengajukan pertanyaan rangkuman dan meminta 2–3 murid menyusun simpulan dengan bahasa sendiri.',
+                    murid: 'Menyampaikan kesimpulan pokok materi dan hasil pembelajaran.',
+                    dialog: `<strong>Guru:</strong> "Siapa yang bisa menyimpulkan poin utama ${escapeHtml(inp.materi)} yang kita pelajari hari ini?"<br><strong>Murid (Contoh Kesimpulan):</strong> "Intinya, ${escapeHtml(inp.materi)} melibatkan pemahaman konsep, analisis kasus, dan penerapan yang tepat."`,
+                    response: 'Murid menyusun kesimpulan yang selaras dengan tujuan pembelajaran.',
+                    indicator: 'Kesimpulan murid mencakup inti materi dan hasil aktivitas.'
+                },
+                {
+                    no: '2',
+                    step: 'Memberikan Penguatan Materi',
+                    time: `${Math.max(2, Math.round(penutupMin * 0.16))} Menit`,
+                    guru: `Memberikan umpan balik dan penguatan konsep kunci ${inp.materi} agar tidak terjadi miskonsepsi.`,
+                    how: 'Menegaskan kembali istilah/prinsip utama dan mengapresiasi usaha murid.',
+                    murid: 'Menyimak penguatan guru dan meluruskan catatan/pemahaman bila perlu.',
+                    dialog: `<strong>Guru (Contoh Umpan Balik):</strong> "Bagus sekali simpulannya. Sebagai penguatan, pastikan kalian selalu mengaitkan alasan/bukti saat menerapkan ${escapeHtml(inp.materi)}."`,
+                    response: 'Murid memperoleh kepastian pemahaman atas konsep kunci.',
+                    indicator: 'Konsep inti tersampaikan jelas dan miskonsepsi teratasi.'
+                },
+                {
+                    no: '3',
+                    step: 'Melakukan Evaluasi atau Asesmen Akhir',
+                    time: `${Math.max(2, Math.round(penutupMin * 0.16))} Menit`,
+                    guru: 'Memberikan kuis singkat, tiket keluar (exit ticket), atau 1–2 pertanyaan cek pemahaman akhir.',
+                    how: 'Meminta murid menjawab singkat secara mandiri di buku/lembar tugas.',
+                    murid: 'Mengerjakan pertanyaan cek pemahaman akhir secara mandiri dan jujur.',
+                    dialog: `<strong>Guru:</strong> "Sebelum menutup sesi, jawablah satu pertanyaan singkat ini: bagaimana cara menerapkan ${escapeHtml(inp.materi)} pada situasi nyata?"`,
+                    response: 'Murid menuliskan jawaban cek pemahaman akhir.',
+                    indicator: 'Data pemahaman akhir murid terkumpul sebagai bahan tindak lanjut.'
+                },
+                {
+                    no: '4',
+                    step: 'Mengajak Murid Melakukan Refleksi',
+                    time: `${Math.max(2, Math.round(penutupMin * 0.15))} Menit`,
+                    guru: 'Mengajak murid merefleksikan pengalaman belajar, bagian yang paling dipahami, dan bagian yang masih sulit.',
+                    how: 'Mengajukan pertanyaan refleksi yang sederhana dan ramah murid.',
+                    murid: 'Menuliskan atau menyampaikan refleksi belajarnya.',
+                    dialog: `<strong>Guru (Pertanyaan Refleksi):</strong> "Bagian mana dari ${escapeHtml(inp.materi)} yang paling mudah kalian pahami hari ini, dan bagian mana yang masih perlu latihan?"<br><strong>Murid:</strong> "Saya sudah paham bagian awal, tetapi perlu berlatih lagi pada analisis kasus."`,
+                    response: 'Murid mengenali kekuatan dan kesulitan belajarnya sendiri.',
+                    indicator: 'Refleksi murid mencerminkan kesadaran belajar yang jujur.'
+                },
+                {
+                    no: '5',
+                    step: 'Memberikan Tindak Lanjut',
+                    time: `${Math.max(2, Math.round(penutupMin * 0.13))} Menit`,
+                    guru: `Memberikan arahan pengayaan bagi murid yang sudah tuntas dan bimbingan/latihan terarah bagi yang memerlukan pendampingan pada ${inp.materi}.`,
+                    how: 'Menyampaikan tugas tindak lanjut sesuai kebutuhan belajar murid.',
+                    murid: 'Mencatat tugas tindak lanjut yang diberikan guru.',
+                    dialog: `<strong>Guru (Contoh Tindak Lanjut):</strong> "Bagi yang sudah lancar, silakan siapkan contoh kasus lanjutan ${escapeHtml(inp.materi)}. Bagi yang masih butuh latihan, ikuti sesi pendampingan singkat bersama saya."`,
+                    response: 'Murid mengetahui langkah tindak lanjut sesuai kebutuhannya.',
+                    indicator: 'Tindak lanjut terdiferensiasi tersampaikan secara jelas.'
+                },
+                {
+                    no: '6',
+                    step: 'Menyampaikan Materi Pertemuan Berikutnya',
+                    time: `${Math.max(1, Math.round(penutupMin * 0.11))} Menit`,
+                    guru: 'Menginformasikan topik atau persiapan untuk pertemuan selanjutnya.',
+                    how: 'Menyebutkan judul topik berikutnya dan persiapan ringan yang perlu dilakukan.',
+                    murid: 'Mencatat informasi pertemuan berikutnya.',
+                    dialog: `<strong>Guru:</strong> "Pada pertemuan berikutnya, kita akan melanjutkan ke bahasan lanjutan yang terkait dengan ${escapeHtml(inp.materi)}. Silakan baca pengantarnya di rumah."`,
+                    response: 'Murid siap menyambut topik pertemuan berikutnya.',
+                    indicator: 'Murid mengetahui agenda pertemuan selanjutnya.'
+                },
+                {
+                    no: '7',
+                    step: 'Menutup Pembelajaran',
+                    time: `${Math.max(1, penutupMin - 6 * Math.max(2, Math.round(penutupMin * 0.14)))} Menit`,
+                    guru: 'Mengajak murid berdoa penutup, memberi salam, dan mengakhiri pembelajaran dengan tertib.',
+                    how: 'Memimpin doa penutup dan memberi salam perpisahan.',
+                    murid: 'Berdoa bersama, merapikan perlengkapan, dan menjawab salam.',
+                    dialog: `<strong>Guru:</strong> "Terima kasih atas semangat belajar kalian hari ini. Mari kita tutup dengan doa dan salam."<br><strong>Murid:</strong> "Terima kasih, Pak/Bu. Selamat siang!"`,
+                    response: 'Pembelajaran ditutup dengan tertib dan penuh apresiasi.',
+                    indicator: 'Kegiatan pembelajaran berakhir tertib dan tepat waktu.'
+                }
+            ];
 
             return `
-                <h3>13–16. LANGKAH-LANGKAH PEMBELAJARAN &amp; CONTOH DIALOG LENGKAP (TOTAL: ${escapeHtml(inp.waktu)})</h3>
+                <h3>ANALISIS KETERKAITAN KOMPONEN PEMBELAJARAN (PRA-PENYUSUNAN MODUL)</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:18%;">Tahap Pembelajaran</th>
-                            <th style="width:14%;">Alokasi Waktu</th>
-                            <th style="width:34%;">Kegiatan Guru &amp; Murid</th>
-                            <th style="width:34%;">Contoh Dialog Kelas</th>
+                            <th style="width:28%;">Aspek Analisis Pedagogis</th>
+                            <th style="width:72%;">Hasil Analisis &amp; Keterkaitan dengan Pembelajaran</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr><td><strong>1. Karakteristik &amp; Kompleksitas Materi</strong></td><td>Materi <strong>${escapeHtml(inp.materi)}</strong> pada ${escapeHtml(inp.mapel)} (${escapeHtml(inp.kelas)}) menuntut pemahaman konsep dasar sekaligus kemampuan menelaah keterkaitan unsur dan penerapannya pada situasi nyata.</td></tr>
+                        <tr><td><strong>2. Perkembangan &amp; Kebutuhan Murid</strong></td><td>Murid pada ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}) memerlukan penjelasan bertahap, contoh konkret dari kehidupan sehari-hari, serta ruang diskusi yang aman untuk membangun kepercayaan diri.</td></tr>
+                        <tr><td><strong>3. Pengetahuan Awal yang Dibutuhkan</strong></td><td>Pemahaman prasyarat terkait istilah dasar, pengalaman sehari-hari yang relevan, dan keterampilan dasar membaca/berdiskusi kelompok.</td></tr>
+                        <tr><td><strong>4. Keselarasan Model &amp; Aktivitas</strong></td><td><strong>${escapeHtml(syntax.label)}</strong>: ${escapeHtml(syntax.rationale)} Alokasi waktu <strong>${escapeHtml(inp.waktu)}</strong> dibagi proporsional (${pendMin} menit Pendahuluan, ${intiMin} menit Kegiatan Inti, ${penutupMin} menit Penutup).</td></tr>
+                        <tr><td><strong>5. Asesmen, Media &amp; Tindak Lanjut</strong></td><td>Asesmen awal, formatif, dan sumatif disusun selaras dengan Tujuan Pembelajaran serta dilengkapi rubrik indikator terukur, pengayaan, remedial non-repetitif, dan refleksi guru–murid.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>13. KEGIATAN PENDAHULUAN OPERASIONAL (${pendMin} MENIT — 8 LANGKAH BERURUTAN)</h3>
+                <table>
+                    <thead>
                         <tr>
-                            <td><strong>13. Kegiatan Pendahuluan — Salam, Doa &amp; Kesiapan</strong></td>
-                            <td>${Math.max(2, Math.round(pendMin * 0.25))} Menit</td>
-                            <td>Guru menyapa, memeriksa kehadiran serta kerapian kelas, dan memimpin doa sebelum belajar <strong>${escapeHtml(inp.mapel)}</strong>.</td>
-                            <td><strong>Guru:</strong> "Selamat pagi anak-anak. Sebelum memulai pelajaran ${escapeHtml(inp.mapel)}, mari kita berdoa bersama dan periksa kesiapan belajar kalian."<br><strong>Murid:</strong> "Selamat pagi, Bu/Pak! Kami sudah siap."</td>
+                            <th style="width:8%;">No</th>
+                            <th style="width:20%;">Langkah</th>
+                            <th style="width:11%;">Waktu</th>
+                            <th style="width:31%;">Aktivitas Guru, Cara &amp; Contoh Dialog</th>
+                            <th style="width:30%;">Aktivitas Murid, Respons &amp; Indikator</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        ${pendSteps.map(ps => `
+                            <tr>
+                                <td><strong>${ps.no}</strong></td>
+                                <td><strong>${escapeHtml(ps.step)}</strong></td>
+                                <td>${escapeHtml(ps.time)}</td>
+                                <td>
+                                    <strong>Dilakukan Guru:</strong> ${escapeHtml(ps.guru)}<br>
+                                    <strong>Cara Pelaksanaan:</strong> ${escapeHtml(ps.how)}<br>
+                                    <strong>Contoh Ucapan/Instruksi:</strong><br>${ps.dialog}
+                                </td>
+                                <td>
+                                    <strong>Dilakukan Murid:</strong> ${escapeHtml(ps.murid)}<br>
+                                    <strong>Respons Murid:</strong> ${escapeHtml(ps.response)}<br>
+                                    <strong>Indikator Keberhasilan:</strong> ${escapeHtml(ps.indicator)}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h3>14. KEGIATAN INTI — SINTAKS ${escapeHtml(syntax.label.toUpperCase())} (${intiMin} MENIT)</h3>
+                <table>
+                    <thead>
                         <tr>
-                            <td><strong>13. Kegiatan Pendahuluan — Apersepsi &amp; Asesmen Awal</strong></td>
-                            <td>${Math.max(3, Math.round(pendMin * 0.35))} Menit</td>
-                            <td>Guru mengaitkan pengalaman awal murid dengan <strong>${escapeHtml(inp.materi)}</strong> dan memetakan kesiapan belajar.</td>
-                            <td><strong>Guru:</strong> "Siapa yang pagi tadi sempat mengamati hal terkait <em>${escapeHtml(inp.materi)}</em>? Coba ceritakan satu contohnya."<br><strong>Murid:</strong> Murid menyampaikan pengalaman awalnya.</td>
+                            <th style="width:20%;">Sintaks &amp; Tujuan</th>
+                            <th style="width:10%;">Waktu</th>
+                            <th style="width:36%;">Langkah Guru, Instruksi, Kasus &amp; Media</th>
+                            <th style="width:34%;">Langkah Murid, Contoh Respons &amp; Indikator</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        ${intiRows}
+                    </tbody>
+                </table>
+
+                <h3>15. KEGIATAN PENUTUP OPERASIONAL (${penutupMin} MENIT — 7 LANGKAH BERURUTAN)</h3>
+                <table>
+                    <thead>
                         <tr>
-                            <td><strong>13. Kegiatan Pendahuluan — Pemantik &amp; Tujuan</strong></td>
-                            <td>${Math.max(3, pendMin - Math.max(2, Math.round(pendMin * 0.25)) - Math.max(3, Math.round(pendMin * 0.35)))} Menit</td>
-                            <td>Guru menyampaikan tujuan pembelajaran, alur kegiatan, dan pertanyaan pemantik topik <strong>${escapeHtml(inp.materi)}</strong>.</td>
-                            <td><strong>Guru:</strong> "Hari ini kita membahas <strong>${escapeHtml(inp.materi)}</strong> melalui <strong>${escapeHtml(inp.model)}</strong>. Bagaimana kita memastikan penerapannya tepat?"</td>
+                            <th style="width:8%;">No</th>
+                            <th style="width:20%;">Langkah</th>
+                            <th style="width:11%;">Waktu</th>
+                            <th style="width:31%;">Aktivitas Guru, Umpan Balik &amp; Contoh Dialog</th>
+                            <th style="width:30%;">Aktivitas Murid, Refleksi/Tindak Lanjut &amp; Indikator</th>
                         </tr>
-                        <tr>
-                            <td><strong>14. Kegiatan Inti — Orientasi Masalah &amp; Observasi</strong></td>
-                            <td>${Math.max(4, Math.round(intiMin * 0.2))} Menit</td>
-                            <td>Guru menghadirkan kasus kontekstual <strong>${escapeHtml(inp.materi)}</strong> untuk kelas ${escapeHtml(inp.kelas)} dan memantik identifikasi masalah.</td>
-                            <td><strong>Guru:</strong> "Perhatikan studi kasus <em>${escapeHtml(inp.materi)}</em>. Bagian mana yang paling perlu kita cermati lebih dulu?"</td>
-                        </tr>
-                        <tr>
-                            <td><strong>14. Kegiatan Inti — Organisasi &amp; Penyelidikan Kelompok</strong></td>
-                            <td>${Math.max(6, Math.round(intiMin * 0.35))} Menit</td>
-                            <td>Murid bekerja dalam kelompok, membagi peran, menelaah konsep, dan mengumpulkan bukti pendukung.</td>
-                            <td><strong>Guru:</strong> "Diskusikan bukti yang mendukung solusi kelompok kalian."<br><strong>Murid:</strong> "Kami menemukan bahwa faktor ini paling berpengaruh karena..."</td>
-                        </tr>
-                        <tr>
-                            <td><strong>14. Kegiatan Inti — Penyajian &amp; Evaluasi Proses</strong></td>
-                            <td>${Math.max(6, intiMin - Math.max(4, Math.round(intiMin * 0.2)) - Math.max(6, Math.round(intiMin * 0.35)))} Menit</td>
-                            <td>Kelompok mempresentasikan hasil analisis, saling menanggapi, dan guru meluruskan konsep inti <strong>${escapeHtml(inp.materi)}</strong>.</td>
-                            <td><strong>Guru:</strong> "Mari kita simpulkan bersama prinsip utama pada <strong>${escapeHtml(inp.materi)}</strong> dan kaitannya dengan kasus tadi."</td>
-                        </tr>
-                        <tr>
-                            <td><strong>15. Kegiatan Penutup — Penyimpulan &amp; Refleksi</strong></td>
-                            <td>${Math.max(5, Math.round(penutupMin * 0.55))} Menit</td>
-                            <td>Murid menyimpulkan poin utama materi dan menuliskan refleksi pemahaman serta bagian yang masih perlu diperdalam.</td>
-                            <td><strong>Guru:</strong> "Siapa yang bisa merangkum 2 hal terpenting dari <strong>${escapeHtml(inp.materi)}</strong> hari ini?"<br><strong>Murid:</strong> Murid menyampaikan simpulan singkat.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>16. Kegiatan Penutup — Tindak Lanjut &amp; Penutup</strong></td>
-                            <td>${Math.max(4, penutupMin - Math.max(5, Math.round(penutupMin * 0.55)))} Menit</td>
-                            <td>Guru menyampaikan tugas tindak lanjut, memberi apresiasi, memimpin doa, dan menutup pembelajaran dengan salam.</td>
-                            <td><strong>Guru:</strong> "Siapkan catatan lanjutan untuk pertemuan berikutnya. Mari kita tutup dengan doa dan salam."</td>
-                        </tr>
+                    </thead>
+                    <tbody>
+                        ${penutupSteps.map(pt => `
+                            <tr>
+                                <td><strong>${pt.no}</strong></td>
+                                <td><strong>${escapeHtml(pt.step)}</strong></td>
+                                <td>${escapeHtml(pt.time)}</td>
+                                <td>
+                                    <strong>Dilakukan Guru:</strong> ${escapeHtml(pt.guru)}<br>
+                                    <strong>Cara Pelaksanaan:</strong> ${escapeHtml(pt.how)}<br>
+                                    <strong>Contoh Dialog/Umpan Balik:</strong><br>${pt.dialog}
+                                </td>
+                                <td>
+                                    <strong>Dilakukan Murid:</strong> ${escapeHtml(pt.murid)}<br>
+                                    <strong>Respons Murid:</strong> ${escapeHtml(pt.response)}<br>
+                                    <strong>Indikator Keberhasilan:</strong> ${escapeHtml(pt.indicator)}
+                                </td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             `;
         }
 
         function buildFullModul28Html(inp) {
+            const syntax = getModelSyntaxBlueprint(inp.model, inp);
             return `
                 <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 8pt; margin-bottom: 12pt;">
-                    <h1>MODUL AJAR KURIKULUM MERDEKA</h1>
+                    <h1>MODUL AJAR KURIKULUM MERDEKA — OPERASIONAL &amp; TERPERINCI</h1>
                     <h2>${escapeHtml(inp.mapel.toUpperCase())} — ${escapeHtml(inp.materi.toUpperCase())}</h2>
                 </div>
 
@@ -1984,7 +2620,7 @@
                         <tr>
                             <th style="width:10%;">No</th>
                             <th style="width:26%;">Komponen Modul Ajar</th>
-                            <th style="width:64%;">Uraian / Isi Komponen</th>
+                            <th style="width:64%;">Uraian Lengkap &amp; Operasional</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1992,146 +2628,162 @@
                             <td><strong>1</strong></td>
                             <td><strong>Identitas Modul</strong></td>
                             <td>
-                                <strong>Mata Pelajaran:</strong> ${escapeHtml(inp.mapel)} | <strong>Jenjang / Fase:</strong> ${escapeHtml(inp.jenjang)}<br>
-                                <strong>Kelas / Semester:</strong> ${escapeHtml(inp.kelas)} / Ganjil–Genap | <strong>Alokasi Waktu:</strong> ${escapeHtml(inp.waktu)}<br>
-                                <strong>Materi Pokok:</strong> <strong>${escapeHtml(inp.materi)}</strong>
+                                <strong>Nama Penyusun:</strong> ${escapeHtml(inp.penyusun)} | <strong>Nama Sekolah:</strong> ${escapeHtml(inp.sekolah)}<br>
+                                <strong>Mata Pelajaran:</strong> ${escapeHtml(inp.mapel)} | <strong>Kelas / Fase:</strong> ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)})<br>
+                                <strong>Materi Pokok:</strong> <strong>${escapeHtml(inp.materi)}</strong> | <strong>Alokasi Waktu:</strong> ${escapeHtml(inp.waktu)}<br>
+                                <strong>Model Pembelajaran:</strong> ${escapeHtml(syntax.label)} | <strong>Metode Pembelajaran:</strong> Diskusi kelompok, studi kasus kontekstual, tanya jawab terbimbing, presentasi, dan refleksi.
                             </td>
                         </tr>
                         <tr>
                             <td><strong>2</strong></td>
                             <td><strong>Kompetensi Awal</strong></td>
-                            <td>Peserta didik pada ${escapeHtml(inp.kelas)} memiliki pengetahuan awal mengenai konsep dasar dan pengalaman sehari-hari yang berkaitan dengan <strong>${escapeHtml(inp.materi)}</strong> serta mampu berdiskusi dalam kelompok kecil.</td>
+                            <td>
+                                Sebelum mempelajari <strong>${escapeHtml(inp.materi)}</strong>, murid pada ${escapeHtml(inp.kelas)} diharapkan sudah memiliki pengetahuan dasar tentang konsep/istilah awal yang terkait, keterampilan membaca dan menyimak informasi, serta kemampuan bekerja sama dalam kelompok kecil.<br>
+                                <strong>Contoh Kemampuan Awal Teramati:</strong> Murid mampu menyebutkan contoh pengalaman sehari-hari yang berkaitan dengan topik dan mengutarakan pendapat sederhana saat diskusi kelas.
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>3</strong></td>
-                            <td><strong>Profil Pelajar Pancasila / Dimensi Profil Lulusan</strong></td>
+                            <td><strong>Karakteristik Murid &amp; Dimensi Profil Lulusan</strong></td>
                             <td>
-                                <strong>Bernalar Kritis:</strong> Menganalisis informasi, mengevaluasi argumen, dan menarik simpulan berdasarkan bukti pada topik <em>${escapeHtml(inp.materi)}</em>.<br>
-                                <strong>Gotong Royong / Kolaborasi:</strong> Bekerja sama aktif, menghargai pendapat, dan berbagi peran dalam diskusi maupun tugas kelompok.<br>
-                                <strong>Kemandirian:</strong> Bertanggung jawab menyelesaikan tugas individu dan merefleksikan proses belajar secara jujur.
+                                Murid di ${escapeHtml(inp.sekolah)} (${escapeHtml(inp.kelas)}) memiliki keragaman kesiapan belajar, kecepatan memahami konsep, serta gaya belajar (visual, auditori, kinestetik). Guru menerapkan pendekatan berdiferensiasi melalui contoh konkret, pendampingan bertahap, serta tugas berjenjang.<br>
+                                <strong>Profil Pelajar Pancasila / Dimensi Lulusan:</strong> <em>Bernalar Kritis</em> (menganalisis kasus &amp; bukti), <em>Gotong Royong</em> (berkolaborasi aktif), dan <em>Mandiri</em> (menyelesaikan tugas &amp; merefleksi proses belajar).
                             </td>
                         </tr>
                         <tr>
                             <td><strong>4</strong></td>
                             <td><strong>Sarana dan Prasarana</strong></td>
-                            <td>Buku teks mata pelajaran ${escapeHtml(inp.mapel)}, LKPD cetak/digital, papan tulis/spidol, proyektor/media visual pendukung, serta alat tulis peserta didik.</td>
+                            <td>Buku teks ${escapeHtml(inp.mapel)} (${escapeHtml(inp.jenjang)}), LKPD cetak/digital berbasis kasus ${escapeHtml(inp.materi)}, papan tulis/spidol, media visual/tayangan kasus, dan alat tulis murid.</td>
                         </tr>
                         <tr>
                             <td><strong>5</strong></td>
                             <td><strong>Target Murid</strong></td>
-                            <td>Peserta didik reguler/tipikal pada ${escapeHtml(inp.kelas)} dengan keragaman gaya belajar (visual, auditori, kinestetik) serta dukungan diferensiasi bagi murid yang membutuhkan bimbingan tambahan maupun pengayaan.</td>
+                            <td>Murid reguler/tipikal pada ${escapeHtml(inp.kelas)} di ${escapeHtml(inp.sekolah)}, termasuk murid yang memerlukan pengayaan maupun bimbingan remedial terarah.</td>
                         </tr>
                         <tr>
                             <td><strong>6</strong></td>
                             <td><strong>Model dan Metode Pembelajaran</strong></td>
-                            <td><strong>Model Pembelajaran:</strong> ${escapeHtml(inp.model)} • <strong>Metode:</strong> Diskusi kelompok, studi kasus kontekstual, tanya jawab, presentasi, dan refleksi terbimbing.</td>
+                            <td><strong>Model:</strong> ${escapeHtml(syntax.label)} — ${escapeHtml(syntax.rationale)}<br><strong>Metode:</strong> Studi kasus kontekstual, diskusi kelompok terstruktur, tanya jawab pemantik, presentasi hasil, dan refleksi.</td>
                         </tr>
                         <tr>
                             <td><strong>7</strong></td>
                             <td><strong>Capaian Pembelajaran (CP)</strong></td>
-                            <td>Pada akhir fase (${escapeHtml(inp.jenjang)}), peserta didik memahami konsep, prinsip, dan penerapan <strong>${escapeHtml(inp.materi)}</strong> pada mata pelajaran ${escapeHtml(inp.mapel)} serta mampu mengomunikasikan hasil analisisnya secara sistematis dan bertanggung jawab.</td>
+                            <td>Pada fase (${escapeHtml(inp.jenjang)}), murid memahami konsep, hubungan antarunsur, dan penerapan <strong>${escapeHtml(inp.materi)}</strong> pada mata pelajaran ${escapeHtml(inp.mapel)} serta mengomunikasikan analisis dan solusinya secara runtut dan bertanggung jawab.</td>
                         </tr>
                         <tr>
                             <td><strong>8</strong></td>
-                            <td><strong>Tujuan Pembelajaran (TP)</strong></td>
+                            <td><strong>Tujuan Pembelajaran (TP) &amp; Indikator Ketercapaian</strong></td>
                             <td>
-                                1. Peserta didik mampu menjelaskan pengertian dan unsur utama <strong>${escapeHtml(inp.materi)}</strong> secara tepat dan sistematis.<br>
-                                2. Peserta didik mampu menganalisis hubungan antarunsur serta contoh penerapan <strong>${escapeHtml(inp.materi)}</strong> pada studi kasus nyata.<br>
-                                3. Peserta didik mampu menyusun dan mempresentasikan solusi atau simpulan terkait <strong>${escapeHtml(inp.materi)}</strong> dengan argumen yang logis.
+                                <strong>TP 1:</strong> Murid mampu menjelaskan pengertian dan konsep inti <strong>${escapeHtml(inp.materi)}</strong> secara tepat. <em>(Indikator: menyebutkan definisi, ciri/unsur utama, dan contoh awal dengan benar).</em><br>
+                                <strong>TP 2:</strong> Murid mampu menganalisis hubungan antarunsur dan studi kasus nyata terkait <strong>${escapeHtml(inp.materi)}</strong>. <em>(Indikator: menguraikan penyebab, dampak, dan bukti pendukung secara logis).</em><br>
+                                <strong>TP 3:</strong> Murid mampu merumuskan dan menyajikan simpulan atau solusi atas permasalahan <strong>${escapeHtml(inp.materi)}</strong>. <em>(Indikator: menyusun simpulan/solusi yang realistis dan sesuai konsep).</em>
                             </td>
                         </tr>
                         <tr>
                             <td><strong>9</strong></td>
                             <td><strong>Pemahaman Bermakna</strong></td>
-                            <td>Memahami <strong>${escapeHtml(inp.materi)}</strong> membantu peserta didik mengambil keputusan yang tepat, kritis, dan bertanggung jawab dalam kehidupan sehari-hari di lingkungan rumah maupun sekolah.</td>
+                            <td>Memahami <strong>${escapeHtml(inp.materi)}</strong> membantu murid membuat keputusan yang logis dan bertanggung jawab. Dalam kehidupan keluarga, murid menerapkannya pada kebiasaan/aturan rumah; di sekolah (${escapeHtml(inp.sekolah)}), pada kerja kelompok dan tata tertib; dan di masyarakat, pada kepedulian terhadap lingkungan serta kepentingan bersama.</td>
                         </tr>
                         <tr>
                             <td><strong>10</strong></td>
-                            <td><strong>Pertanyaan Pemantik</strong></td>
+                            <td><strong>Pertanyaan Pemantik &amp; Tujuannya</strong></td>
                             <td>
-                                • Apa yang terjadi apabila konsep dan prinsip dalam <strong>${escapeHtml(inp.materi)}</strong> diabaikan dalam situasi nyata?<br>
-                                • Bagaimana cara membedakan informasi yang akurat dan tidak akurat terkait <strong>${escapeHtml(inp.materi)}</strong>?
+                                1. <em>"Apa yang terjadi apabila prinsip dalam ${escapeHtml(inp.materi)} diabaikan pada situasi sehari-hari?"</em> — <strong>Tujuan:</strong> memancing kesadaran sebab-akibat.<br>
+                                2. <em>"Mengapa dua situasi yang tampak mirip dapat menghasilkan dampak berbeda terkait ${escapeHtml(inp.materi)}?"</em> — <strong>Tujuan:</strong> melatih analisis kritis dan ketelitian.<br>
+                                3. <em>"Bagaimana cara memilih langkah terbaik saat menghadapi masalah terkait ${escapeHtml(inp.materi)}?"</em> — <strong>Tujuan:</strong> mengarahkan pengambilan keputusan berbasis pertimbangan.
                             </td>
                         </tr>
                         <tr>
                             <td><strong>11</strong></td>
                             <td><strong>Persiapan Pembelajaran</strong></td>
-                            <td>1. Menyiapkan perangkat asesmen awal, lembar kasus/LKPD, dan media ilustrasi materi <strong>${escapeHtml(inp.materi)}</strong>.<br>2. Menata formasi tempat duduk kelompok dan memastikan alokasi waktu tiap tahap pembelajaran realistis.</td>
+                            <td>Menyiapkan asesmen awal singkat, materi ajar &amp; studi kasus ${escapeHtml(inp.materi)}, LKPD kelompok, rubrik observasi, serta memastikan waktu tiap tahap pembelajaran terukur.</td>
                         </tr>
                         <tr>
                             <td><strong>12</strong></td>
-                            <td><strong>Materi Pembelajaran Lengkap</strong></td>
-                            <td>Materi <strong>${escapeHtml(inp.materi)}</strong> pada ${escapeHtml(inp.kelas)} mencakup definisi konsep dasar, identifikasi komponen/unsur utama, alur hubungan/proses, contoh penerapan dalam kehidupan sehari-hari, serta analisis studi kasus kontekstual yang selaras dengan tujuan pembelajaran.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>13–16</strong></td>
-                            <td><strong>Tahap Pembelajaran &amp; Dialog</strong></td>
-                            <td>Diuraikan rinci dalam tabel <strong>Tahap Pembelajaran (Pendahuluan, Inti &amp; Penutup)</strong> di bawah ini agar setiap tahap dan alokasi waktunya terstruktur jelas.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>17</strong></td>
-                            <td><strong>Sintaks Model Pembelajaran (${escapeHtml(inp.model.toUpperCase())})</strong></td>
-                            <td>1. Orientasi / Stimulus masalah <em>${escapeHtml(inp.materi)}</em>; 2. Organisasi kelompok &amp; perumusan fokus; 3. Penyelidikan &amp; pengumpulan bukti; 4. Penyajian / presentasi hasil; 5. Analisis, evaluasi &amp; penguatan konsep.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>18</strong></td>
-                            <td><strong>Asesmen Awal</strong></td>
-                            <td>Tanya jawab lisan atau kuis singkat 3 pertanyaan prasyarat mengenai <strong>${escapeHtml(inp.materi)}</strong> untuk memetakan kesiapan belajar awal peserta didik.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>19</strong></td>
-                            <td><strong>Asesmen Formatif</strong></td>
-                            <td>Observasi keaktifan diskusi kelompok, ketepatan pengisian LKPD, dan ketajaman argumen saat sesi presentasi serta tanya jawab.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>20</strong></td>
-                            <td><strong>Asesmen Sumatif</strong></td>
-                            <td>Tes uraian/studi kasus pada akhir pembelajaran untuk mengukur ketercapaian seluruh Tujuan Pembelajaran pada topik <strong>${escapeHtml(inp.materi)}</strong>.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>21</strong></td>
-                            <td><strong>Instrumen Penilaian</strong></td>
-                            <td>Lembar observasi sikap/kolaborasi, lembar penilaian produk/LKPD, dan butir soal uraian/studi kasus berbasis indikator TP.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>22</strong></td>
-                            <td><strong>Rubrik Penilaian (Skala 1–4)</strong></td>
+                            <td><strong>Materi Pembelajaran Lengkap &amp; Mendalam</strong></td>
                             <td>
-                                <strong>Skor 4 (Sangat Baik):</strong> Menjelaskan konsep &amp; analisis kasus secara lengkap, tepat, dan berargumen logis.<br>
-                                <strong>Skor 3 (Baik):</strong> Menjelaskan konsep dengan tepat dan menganalisis kasus cukup runtut.<br>
-                                <strong>Skor 2 (Cukup):</strong> Penjelasan/analisis masih sebagian tepat dan memerlukan arahan.<br>
-                                <strong>Skor 1 (Perlu Bimbingan):</strong> Belum memahami konsep inti atau belum menjawab secara tepat.
+                                <strong>Pengertian Dasar:</strong> <strong>${escapeHtml(inp.materi)}</strong> merupakan pokok bahasan pada ${escapeHtml(inp.mapel)} (${escapeHtml(inp.kelas)}) yang menguraikan konsep pokok, komponen penyusun, dan cara penerapannya.<br>
+                                <strong>Konsep Utama &amp; Submateri:</strong> Mencakup (a) hakikat dan definisi konsep, (b) unsur/komponen utama serta keterkaitan sebab-akibatnya, dan (c) penerapan pada berbagai situasi.<br>
+                                <strong>Contoh Konkret &amp; Ilustrasi Nyata:</strong> Dalam aktivitas belajar maupun kehidupan sehari-hari di ${escapeHtml(inp.sekolah)}, penerapan yang tepat terlihat ketika langkah yang diambil selaras dengan kaidah materi dan mempertimbangkan dampaknya.<br>
+                                <strong>Hubungan Antarkonsep &amp; Kesimpulan:</strong> Penguasaan definisi menjadi dasar menganalisis hubungan antarunsur, yang selanjutnya menentukan ketepatan kesimpulan dan solusi. <strong>Istilah Penting:</strong> <em>${escapeHtml(inp.materi)}</em> (topik utama pembelajaran), <em>Analisis Kasus</em> (penelaahan masalah nyata berdasarkan konsep dan bukti).
                             </td>
                         </tr>
                         <tr>
-                            <td><strong>23</strong></td>
-                            <td><strong>Lembar Kerja Peserta Didik (LKPD)</strong></td>
-                            <td>LKPD memuat identitas, tujuan kegiatan, stimulus kasus <strong>${escapeHtml(inp.materi)}</strong>, langkah kerja diskusi, ruang jawaban, kesimpulan, dan refleksi singkat.</td>
+                            <td><strong>13–15</strong></td>
+                            <td><strong>Kegiatan Pendahuluan, Inti &amp; Penutup</strong></td>
+                            <td>Diuraikan secara rinci dalam tabel operasional di bawah ini (lengkap dengan langkah guru, cara pelaksanaan, aktivitas murid, contoh dialog/kasus, respons murid, waktu, dan indikator keberhasilan).</td>
                         </tr>
                         <tr>
-                            <td><strong>24</strong></td>
-                            <td><strong>Pengayaan dan Remedial</strong></td>
-                            <td><strong>Pengayaan:</strong> Tantangan analisis kasus lanjutan/HOTS atau perancangan proyek mini terkait <em>${escapeHtml(inp.materi)}</em>.<br><strong>Remedial:</strong> Bimbingan ulang konsep dasar dengan contoh yang lebih sederhana diikuti evaluasi ulang terarah.</td>
+                            <td><strong>16</strong></td>
+                            <td><strong>Sintaks Model Pembelajaran (${escapeHtml(syntax.label.toUpperCase())})</strong></td>
+                            <td>${syntax.steps.map((s, idx) => `${idx + 1}. <strong>${escapeHtml(s.name)}</strong>: ${escapeHtml(s.goal)}`).join('<br>')}</td>
                         </tr>
                         <tr>
-                            <td><strong>25</strong></td>
-                            <td><strong>Refleksi Guru</strong></td>
-                            <td>Guru mengevaluasi ketercapaian TP, ketepatan waktu tiap tahap pembelajaran, tingkat partisipasi murid, dan efektivitas media pembelajaran untuk perbaikan pertemuan berikutnya.</td>
+                            <td><strong>17</strong></td>
+                            <td><strong>Asesmen Awal</strong></td>
+                            <td>
+                                <strong>Tujuan:</strong> Memetakan pengetahuan awal dan kesiapan belajar murid sebelum masuk materi inti.<br>
+                                <strong>Bentuk &amp; Pelaksanaan:</strong> Tanya jawab lisan atau kuis singkat 3 pertanyaan di awal sesi (3–5 menit).<br>
+                                <strong>Contoh Pertanyaan:</strong> Apa yang kalian ketahui tentang <em>${escapeHtml(inp.materi)}</em> dan contoh nyatanya?<br>
+                                <strong>Pemanfaatan Hasil:</strong> Mengelompokkan pendampingan dan menyesuaikan contoh pada kegiatan inti.
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>26</strong></td>
-                            <td><strong>Refleksi Murid</strong></td>
-                            <td>Murid menuliskan hal baru yang dipahami, bagian yang masih membingungkan, serta manfaat materi <strong>${escapeHtml(inp.materi)}</strong> dalam kehidupan sehari-hari.</td>
+                            <td><strong>18</strong></td>
+                            <td><strong>Asesmen Formatif</strong></td>
+                            <td>
+                                <strong>Tujuan &amp; Teknik:</strong> Memantau proses belajar murid melalui observasi diskusi dan penilaian LKPD selama kegiatan inti.<br>
+                                <strong>Indikator Pengamatan:</strong> Keaktifan berdiskusi, ketepatan analisis kasus, dan ketepatan penggunaan istilah/konsep.<br>
+                                <strong>Contoh Hasil Pengamatan:</strong> Kelompok mampu mengidentifikasi masalah dan menuliskan alasan yang logis di LKPD.<br>
+                                <strong>Interpretasi Hasil:</strong> Murid yang masih keliru pada konsep dasar diberi bimbingan langsung saat diskusi berlangsung.
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>27</strong></td>
-                            <td><strong>Glosarium</strong></td>
-                            <td><strong>${escapeHtml(inp.materi)}:</strong> Pokok bahasan utama dalam pembelajaran ${escapeHtml(inp.mapel)} yang dipelajari melalui aktivitas terstruktur. • <strong>Scaffolding:</strong> Dukungan belajar bertahap hingga murid mandiri.</td>
+                            <td><strong>19</strong></td>
+                            <td><strong>Asesmen Sumatif</strong></td>
+                            <td>
+                                <strong>Tujuan &amp; Kisi-Kisi:</strong> Mengukur ketercapaian TP 1–TP 3 melalui soal uraian/studi kasus pada akhir unit/pembelajaran.<br>
+                                <strong>Contoh Soal:</strong> Analisislah satu situasi nyata terkait <strong>${escapeHtml(inp.materi)}</strong> di ${escapeHtml(inp.kelas)}, jelaskan penyebab utamanya, dan rumuskan solusi yang tepat.<br>
+                                <strong>Kunci &amp; Pembahasan Acuan:</strong> Jawaban tepat menyebutkan konsep kunci, menguraikan hubungan/penyebab dari kasus, dan memberi solusi beralasan.<br>
+                                <strong>Pedoman Penskoran:</strong> Skor maksimal tiap butir sesuai rubrik; Nilai Akhir = (Total Skor ÷ Skor Maksimal) × 100.
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>28</strong></td>
-                            <td><strong>Daftar Pustaka</strong></td>
-                            <td>Kemendikbudristek. (2024). <em>Capaian Pembelajaran pada Kurikulum Merdeka</em>. Jakarta: Kemendikbudristek; serta Buku Teks Utama <strong>${escapeHtml(inp.mapel)}</strong> (${escapeHtml(inp.jenjang)}).</td>
+                            <td><strong>20–21</strong></td>
+                            <td><strong>Instrumen &amp; Rubrik Penilaian Terukur</strong></td>
+                            <td>
+                                <strong>Aspek Dinilai:</strong> Pemahaman Konsep, Analisis Kasus/Solusi, dan Kolaborasi/Komunikasi.<br>
+                                <strong>Kriteria &amp; Skor (1–4):</strong> <strong>Skor 4 (Sangat Baik)</strong>: konsep tepat, analisis/solusi tajam &amp; berargumen kuat; <strong>Skor 3 (Baik)</strong>: konsep tepat, analisis cukup runtut; <strong>Skor 2 (Cukup)</strong>: konsep/analisis baru sebagian tepat; <strong>Skor 1 (Perlu Bimbingan)</strong>: belum tepat atau belum menjawab. Cara hitung nilai: <em>(Skor Diperoleh ÷ Skor Maksimal) × 100</em>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>22</strong></td>
+                            <td><strong>Rancangan LKPD</strong></td>
+                            <td>LKPD berisi identitas, tujuan belajar, stimulus kasus <strong>${escapeHtml(inp.materi)}</strong>, langkah kerja kelompok, tabel analisis/pengamatan, ruang kesimpulan, dan refleksi singkat.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>23–24</strong></td>
+                            <td><strong>Pengayaan &amp; Remedial (Non-Repetitif)</strong></td>
+                            <td>
+                                <strong>Pengayaan:</strong> Bagi murid yang sudah mencapai TP — merancang studi kasus/solusi lanjutan atau menyusun rangkuman/panduan penerapan <strong>${escapeHtml(inp.materi)}</strong> untuk teman sebaya. Dievaluasi dari ketajaman gagasan dan ketepatan konsep.<br>
+                                <strong>Remedial:</strong> Bagi murid yang belum mencapai TP — tidak sekadar mengulang soal yang sama, melainkan pendampingan konsep bertahap dengan contoh konkret yang lebih sederhana, latihan terarah, dan tugas analisis baru dengan tingkat kesulitan bertahap.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>25–26</strong></td>
+                            <td><strong>Refleksi Guru &amp; Refleksi Murid</strong></td>
+                            <td>
+                                <strong>Refleksi Guru:</strong> Mengevaluasi ketercapaian TP, ketepatan model <em>${escapeHtml(syntax.label)}</em>, tingkat keterlibatan murid, kendala waktu/materi, dan perbaikan pertemuan berikutnya.<br>
+                                <strong>Refleksi Murid:</strong> Pertanyaan sederhana &amp; sesuai usia, misalnya: <em>"Hal baru apa yang paling mudah kamu pahami hari ini?"</em> dan <em>"Bagian mana yang masih ingin kamu tanyakan?"</em>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>27–28</strong></td>
+                            <td><strong>Glosarium &amp; Daftar Pustaka</strong></td>
+                            <td>
+                                <strong>Glosarium:</strong> <em>${escapeHtml(inp.materi)}</em> (materi pokok pembelajaran); <em>Scaffolding</em> (dukungan belajar bertahap).<br>
+                                <strong>Daftar Pustaka:</strong> Kemendikbudristek. (2024). <em>Capaian Pembelajaran pada Kurikulum Merdeka</em>. Jakarta: Kemendikbudristek; serta Buku Teks Utama <strong>${escapeHtml(inp.mapel)}</strong> (${escapeHtml(inp.jenjang)}).
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -2149,8 +2801,8 @@
                     <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-5">
                         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-borderCustom pb-4">
                             <div>
-                                <h2 class="text-base font-extrabold theme-heading">AI Specialist Generator Modul Ajar (28 Komponen)</h2>
-                                <p class="text-xs opacity-70">Aturan wajib: setiap nomor komponen dan setiap tahap pembelajaran disajikan dalam format <strong>tabel</strong> terstruktur serta dapat diunduh langsung sebagai <strong>.DOCX</strong>.</p>
+                                <h2 class="text-base font-extrabold theme-heading">AI Specialist Generator Modul Ajar (Terperinci &amp; Operasional)</h2>
+                                <p class="text-xs opacity-70">Menganalisis input pembelajaran, menyusun setiap bagian secara utuh &amp; operasional dengan contoh konkret, serta menyajikan komponen dan tahap pembelajaran dalam <strong>tabel</strong> siap unduh <strong>.DOCX</strong>.</p>
                             </div>
                             <div class="inline-flex rounded-xl border border-borderCustom p-1" style="background-color: var(--bg-custom);">
                                 <button type="button" onclick="switchModulGeneratorMode('simple')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold ${!isAdv ? 'theme-btn-primary' : ''}">Mode Praktis</button>
@@ -2158,25 +2810,33 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-xs font-bold mb-1">1. Mata Pelajaran *</label>
+                                <label class="block text-xs font-bold mb-1">1. Nama Penyusun / Guru *</label>
+                                <input type="text" id="mod-penyusun" value="${escapeHtml(inp.penyusun)}" oninput="appState.modulTeacherMeta.penyusun = this.value" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1">2. Nama Sekolah *</label>
+                                <input type="text" id="mod-sekolah" value="${escapeHtml(inp.sekolah)}" oninput="appState.modulTeacherMeta.sekolah = this.value" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1">3. Mata Pelajaran *</label>
                                 <input type="text" id="mod-mapel" value="${escapeHtml(inp.mapel)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">2. Jenjang / Fase *</label>
+                                <label class="block text-xs font-bold mb-1">4. Jenjang / Fase *</label>
                                 <input type="text" id="mod-jenjang" value="${escapeHtml(inp.jenjang)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">3. Kelas *</label>
+                                <label class="block text-xs font-bold mb-1">5. Kelas *</label>
                                 <input type="text" id="mod-kelas" value="${escapeHtml(inp.kelas)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">4. Materi Pokok *</label>
+                                <label class="block text-xs font-bold mb-1">6. Materi Pokok *</label>
                                 <input type="text" id="mod-materi" value="${escapeHtml(inp.materi)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">5. Model Pembelajaran *</label>
+                                <label class="block text-xs font-bold mb-1">7. Model Pembelajaran *</label>
                                 <select id="mod-model" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                                     <option value="Problem Based Learning (PBL)" ${inp.model.includes('Problem') ? 'selected' : ''}>Problem Based Learning (PBL)</option>
                                     <option value="Project Based Learning (PjBL)" ${inp.model.includes('Project') ? 'selected' : ''}>Project Based Learning (PjBL)</option>
@@ -2186,7 +2846,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">6. Alokasi Waktu *</label>
+                                <label class="block text-xs font-bold mb-1">8. Alokasi Waktu *</label>
                                 <input type="text" id="mod-waktu" value="${escapeHtml(inp.waktu)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                         </div>
