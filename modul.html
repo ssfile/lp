@@ -1051,6 +1051,19 @@
             countEl.textContent = String(myCount);
         }
 
+        async function writeFirestoreSafe(docRef, payload, label = 'Data') {
+            if (!fbDb) return false;
+            try {
+                await ensureFirebaseAuthSession();
+                await setDoc(docRef, payload, { merge: true });
+                return true;
+            } catch (e) {
+                console.error(`Firestore write failed (${label}):`, e);
+                showToast(`Firestore (${label}) belum tersimpan ke cloud: ${e.code || e.message}. Periksa Firestore Rules di Firebase Console.`, 'warning');
+                return false;
+            }
+        }
+
         async function persistDocumentRecord({ id, title, category, mapel, kelas, html, folder = 'Umum' }) {
             if (!appState.currentUser) return null;
             const nowStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1069,12 +1082,7 @@
                     updatedTs: Date.now()
                 };
                 appState.documents[existingIdx] = updated;
-                if (fbDb) {
-                    try {
-                        await ensureFirebaseAuthSession();
-                        await setDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', updated.id), updated);
-                    } catch (e) {}
-                }
+                await writeFirestoreSafe(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', updated.id), updated, 'Dokumen');
                 updateHeaderDocCount();
                 return updated;
             } else {
@@ -1093,12 +1101,7 @@
                     updatedTs: Date.now()
                 };
                 appState.documents.unshift(record);
-                if (fbDb) {
-                    try {
-                        await ensureFirebaseAuthSession();
-                        await setDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', newId), record);
-                    } catch (e) {}
-                }
+                await writeFirestoreSafe(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', newId), record, 'Dokumen');
                 updateHeaderDocCount();
                 return record;
             }
@@ -1180,6 +1183,16 @@
                             appState.users[existingIdx] = { ...appState.users[existingIdx], ...matchedUser };
                         } else {
                             appState.users.push(matchedUser);
+                        }
+                        if (fbDb) {
+                            await writeFirestoreSafe(doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', matchedUser.uid), {
+                                uid: matchedUser.uid,
+                                name: matchedUser.name,
+                                username: matchedUser.username,
+                                email: matchedUser.email,
+                                role: matchedUser.role,
+                                status: matchedUser.status
+                            }, 'Profil Pengguna');
                         }
                     } catch (fbErr) {
                         // Fallback gracefully if not in Firebase Auth console
@@ -3622,13 +3635,12 @@
         async function saveAdminTutorialGuide() {
             const htmlVal = document.getElementById('admin-tutorial-editor')?.value || '';
             appState.tutorialHtml = htmlVal;
-            if (fbDb) {
-                try {
-                    await ensureFirebaseAuthSession();
-                    await setDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'tutorial_guide'), { html: htmlVal, updatedAt: Date.now() });
-                } catch (e) {}
-            }
-            showToast('Panduan penggunaan guru berhasil disimpan.', 'success');
+            const ok = await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'tutorial_guide'),
+                { html: htmlVal, updatedAt: Date.now() },
+                'Panduan Guru'
+            );
+            if (ok) showToast('Panduan penggunaan guru berhasil disimpan ke Firebase Firestore.', 'success');
         }
 
         function renderAdminUsersView(container) {
@@ -3701,14 +3713,13 @@
                 status: 'Aktif'
             };
             appState.users.push(newUser);
-            if (fbDb) {
-                try {
-                    await ensureFirebaseAuthSession();
-                    await setDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', newUser.uid), newUser);
-                } catch (e) {}
-            }
+            const ok = await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', newUser.uid),
+                newUser,
+                'Akun Guru'
+            );
             renderAdminUsersView(document.getElementById('main-content'));
-            showToast(`Akun guru "${name}" berhasil ditambahkan.`, 'success');
+            if (ok) showToast(`Akun guru "${name}" berhasil ditambahkan & disimpan ke Firebase Firestore.`, 'success');
         }
 
         function toggleGuruStatus(uid) {
@@ -3809,13 +3820,14 @@
 
         async function saveThemeToFirestore() {
             applyThemeVariables(appState.theme);
-            if (fbDb) {
-                try {
-                    await ensureFirebaseAuthSession();
-                    await setDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'theme_config'), appState.theme);
-                } catch (e) {}
+            const ok = await writeFirestoreSafe(
+                doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'theme_config'),
+                appState.theme,
+                'Identitas & Tema'
+            );
+            if (ok) {
+                showToast('Pengaturan identitas, warna, tampilan & teks footer disimpan ke Firebase Firestore!', 'success');
             }
-            showToast('Pengaturan identitas, warna, tampilan & teks footer disimpan dan disinkronkan!', 'success');
         }
 
         function renderAdminThemeView(container) {
