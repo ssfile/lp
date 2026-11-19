@@ -792,7 +792,7 @@
                     kelas: 'Fase D',
                     orientation: 'portrait',
                     docId: null,
-                    html: '<h1>RINGKASAN MATERI PEMBELAJARAN</h1><p>Hasil dari <strong>Generator Ringkasan Materi</strong> akan tampil di editor khusus ini beserta tombol penyempurnaan cepat.</p>'
+                    html: '<h1>RINGKASAN MATERI PEMBELAJARAN</h1><p>Hasil dari <strong>Generator Ringkasan Materi</strong> akan tampil otomatis di editor khusus ini beserta tombol penyempurnaan cepat.</p>'
                 },
                 refleksi: {
                     title: 'Refleksi Pembelajaran Guru',
@@ -801,7 +801,7 @@
                     kelas: 'Fase D',
                     orientation: 'portrait',
                     docId: null,
-                    html: '<h1>REFLEKSI PEMBELAJARAN GURU</h1><p>Hasil dari <strong>Generator Refleksi Pembelajaran</strong> akan tampil di editor khusus ini dalam sudut pandang orang pertama (Saya).</p>'
+                    html: '<h1>REFLEKSI PEMBELAJARAN GURU</h1><p>Hasil dari <strong>Generator Refleksi Pembelajaran</strong> akan tampil otomatis di editor khusus ini dalam sudut pandang orang pertama (Saya).</p>'
                 }
             },
             tutorialHtml: `
@@ -1201,13 +1201,12 @@
                 const crc = computeCrc32(dataBytes);
                 const size = dataBytes.length;
 
-                // Local file header (30 bytes + filename)
                 const localHeader = new Uint8Array(30 + nameBytes.length);
                 const lv = new DataView(localHeader.buffer);
                 lv.setUint32(0, 0x04034b50, true);
-                lv.setUint16(4, 20, true); // version needed to extract (2.0)
-                lv.setUint16(6, 0x0800, true); // UTF-8 flag
-                lv.setUint16(8, 0, true); // method 0 = store
+                lv.setUint16(4, 20, true);
+                lv.setUint16(6, 0x0800, true);
+                lv.setUint16(8, 0, true);
                 lv.setUint16(10, 0, true);
                 lv.setUint16(12, 0x0021, true);
                 lv.setUint32(14, crc, true);
@@ -1219,7 +1218,6 @@
 
                 localParts.push(localHeader, dataBytes);
 
-                // Central directory header (46 bytes + filename)
                 const centralHeader = new Uint8Array(46 + nameBytes.length);
                 const cv = new DataView(centralHeader.buffer);
                 cv.setUint32(0, 0x02014b50, true);
@@ -1488,12 +1486,11 @@
             tempDiv.innerHTML = htmlContent || '<p></p>';
             const bodyInnerXml = htmlNodesToDocxBodyXml(tempDiv, isLandscape);
 
-            // A4 dimensions in twips (1 inch = 1440 twips; A4 = 8.27in x 11.69in -> 11906 x 16838 twips)
             const pgW = isLandscape ? 16838 : 11906;
             const pgH = isLandscape ? 11906 : 16838;
-            const marginTop = 1134; // ~2cm
+            const marginTop = 1134;
             const marginBottom = 1134;
-            const marginLeft = 1247; // ~2.2cm
+            const marginLeft = 1247;
             const marginRight = 1247;
 
             const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -1563,7 +1560,6 @@
                 { name: 'word/document.xml', data: documentXml }
             ]);
 
-            // Automatic validation of generated OOXML & ZIP structure
             const view = new DataView(zipBytes.buffer);
             if (view.getUint32(0, true) !== 0x04034b50) {
                 throw new Error('Header ZIP DOCX tidak valid.');
@@ -5307,7 +5303,6 @@
                             </div>
                         </div>
 
-                        <!-- Identitas Web, Logo, Tagline, Deskripsi & Tab Title -->
                         <div class="p-4 rounded-2xl border border-borderCustom space-y-4" style="background-color: var(--bg-custom);">
                             <h3 class="text-xs font-extrabold theme-heading">Identitas Web, Logo, Tagline, Deskripsi &amp; Tab Title</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -5342,7 +5337,6 @@
                             </div>
                         </div>
 
-                        <!-- Pengaturan Warna 14 Elemen -->
                         <div class="space-y-2.5">
                             <h3 class="text-xs font-extrabold theme-heading">Pengaturan Warna Elemen</h3>
                             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
@@ -5355,7 +5349,6 @@
                             </div>
                         </div>
 
-                        <!-- Grid Background, Tombol Header & Teks Footer -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-borderCustom">
                             <div class="p-4 rounded-2xl border border-borderCustom space-y-3" style="background-color: var(--bg-custom);">
                                 <h3 class="text-xs font-extrabold theme-heading">Garis Kotak-Kotak Background</h3>
@@ -5472,7 +5465,6 @@
             appState
         });
 
-        // Initialize default Black & White theme on page load and load shared Firestore theme if available
         applyThemeVariables(DEFAULT_THEME);
         loadSystemSettingsFromFirestore();
     </script>
