@@ -450,26 +450,27 @@
         import { getAuth, signInWithEmailAndPassword, signInAnonymously, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase Terintegrasi
-        const embeddedFirebaseConfig = {
-  apiKey: "AIzaSyCCiFOkeNr2lRFhM6MzrQnF1nG1bWxR7P8",
-  authDomain: "ss-module.firebaseapp.com",
-  projectId: "ss-module",
-  storageBucket: "ss-module.firebasestorage.app",
-  messagingSenderId: "956398596538",
-  appId: "1:956398596538:web:80779011bcfd8a4dbbad83"
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCiFOkeNr2lRFhM6MzrQnF1nG1bWxR7P8",
+            authDomain: "ss-module.firebaseapp.com",
+            projectId: "ss-module",
+            storageBucket: "ss-module.firebasestorage.app",
+            messagingSenderId: "956398596538",
+            appId: "1:956398596538:web:80779011bcfd8a4dbbad83"
         };
 
+        // Initialize Firebase
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'modulajar-ai-default';
-        let fbApp = null;
+        let app = null;
         let fbAuth = null;
         let fbDb = null;
 
         try {
-            const cfg = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : embeddedFirebaseConfig;
-            fbApp = initializeApp(cfg);
-            fbAuth = getAuth(fbApp);
-            fbDb = getFirestore(fbApp);
+            const cfg = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+            app = initializeApp(cfg);
+            fbAuth = getAuth(app);
+            fbDb = getFirestore(app);
         } catch (err) {
             console.warn('Firebase init fallback to local mode:', err);
         }
@@ -1138,15 +1139,48 @@
                 if (!matchedUser && fbAuth && emailInput.includes('@')) {
                     try {
                         const cred = await signInWithEmailAndPassword(fbAuth, emailInput, passInput);
+                        let resolvedRole = 'admin';
+                        let resolvedName = emailInput.split('@')[0];
+                        let resolvedStatus = 'Aktif';
+
+                        if (fbDb) {
+                            try {
+                                const userDocSnap = await getDoc(doc(fbDb, 'users', cred.user.uid));
+                                if (userDocSnap.exists()) {
+                                    const uData = userDocSnap.data();
+                                    if (uData.role) resolvedRole = uData.role;
+                                    if (uData.name) resolvedName = uData.name;
+                                    if (uData.status) resolvedStatus = uData.status;
+                                } else {
+                                    const publicUserSnap = await getDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', cred.user.uid));
+                                    if (publicUserSnap.exists()) {
+                                        const uData = publicUserSnap.data();
+                                        if (uData.role) resolvedRole = uData.role;
+                                        if (uData.name) resolvedName = uData.name;
+                                        if (uData.status) resolvedStatus = uData.status;
+                                    }
+                                }
+                            } catch (roleErr) {
+                                console.warn('Firestore role lookup fallback to admin:', roleErr);
+                            }
+                        }
+
                         matchedUser = {
                             uid: cred.user.uid,
-                            name: emailInput.split('@')[0],
+                            name: resolvedName,
                             username: emailInput.split('@')[0],
-                            email: emailInput,
+                            email: cred.user.email || emailInput,
                             password: passInput,
-                            role: emailInput.includes('admin') ? 'admin' : 'guru',
-                            status: 'Aktif'
+                            role: resolvedRole,
+                            status: resolvedStatus
                         };
+
+                        const existingIdx = appState.users.findIndex(u => u.email.toLowerCase() === matchedUser.email.toLowerCase());
+                        if (existingIdx >= 0) {
+                            appState.users[existingIdx] = { ...appState.users[existingIdx], ...matchedUser };
+                        } else {
+                            appState.users.push(matchedUser);
+                        }
                     } catch (fbErr) {
                         // Fallback gracefully if not in Firebase Auth console
                     }
