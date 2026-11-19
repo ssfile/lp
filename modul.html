@@ -443,7 +443,7 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- APPLICATION SCRIPT (FIREBASE + OFFLINE AI SPECIALIST ENGINE)          -->
+    <!-- APPLICATION SCRIPT (FIREBASE + MASTER BRAIN PEDAGOGICAL ENGINE)       -->
     <!-- ===================================================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -699,7 +699,9 @@
             modulGeneratorMode: 'simple',
             modulTeacherMeta: {
                 penyusun: '',
-                sekolah: ''
+                sekolah: '',
+                semester: 'Ganjil',
+                cpInput: ''
             },
             advancedComponents: {
                 tp: '',
@@ -736,7 +738,7 @@
                     kelas: 'Fase D',
                     orientation: 'portrait',
                     docId: null,
-                    html: '<h1>MODUL AJAR KURIKULUM MERDEKA</h1><p>Silakan gunakan menu <strong>Generator Modul Ajar</strong> untuk menyusun modul ajar 28 komponen secara otomatis, lalu sunting naskah di sini.</p>'
+                    html: '<h1>MODUL AJAR KURIKULUM MERDEKA</h1><p>Silakan gunakan menu <strong>Generator Modul Ajar</strong> untuk menyusun modul ajar terstruktur (Informasi Umum, Komponen Inti, dan Lampiran) secara otomatis, lalu sunting naskah di sini.</p>'
                 },
                 soal: {
                     title: 'Perangkat Soal & Asesmen Lengkap',
@@ -790,8 +792,8 @@
                 <h3>1. Menyusun Modul Ajar (Mode Praktis &amp; Mode Advanced)</h3>
                 <ul>
                     <li>Buka menu <strong>Generator Modul Ajar</strong> pada bilah navigasi samping.</li>
-                    <li>Isi 6 input utama (Mata Pelajaran, Jenjang/Fase, Kelas, Materi Pokok, Model Pembelajaran, dan Alokasi Waktu).</li>
-                    <li>Pilih <strong>Mode Praktis</strong> untuk menyusun seluruh 28 komponen modul sekaligus (termasuk contoh dialog langkah pembelajaran di setiap poin Pendahuluan, Inti, dan Penutup), atau pilih <strong>Mode Advanced</strong> untuk menyusun setiap komponen secara terpisah.</li>
+                    <li>Isi identitas satuan pendidikan, semester, mata pelajaran, fase/kelas, materi pokok, alokasi waktu, model pembelajaran (PBL, PjBL, Discovery Learning, Inquiry Learning, Cooperative Learning, Direct Instruction), serta CP resmi jika sudah tersedia.</li>
+                    <li>Modul tersusun sistematis dalam <strong>A. Informasi Umum</strong>, <strong>B. Komponen Inti</strong> (termasuk Pendahuluan, Inti, Penutup, Asesmen Diagnostik/Formatif/Sumatif, Pengayaan &amp; Remedial, Refleksi Guru &amp; Peserta Didik), dan <strong>C. Lampiran</strong> (LKPD, Bahan Bacaan Guru &amp; Peserta Didik, Media Pembelajaran, Instrumen Penilaian, Rubrik Penilaian, Kunci Jawaban, Glosarium, dan Daftar Pustaka) dalam format tabel siap unduh <strong>.DOCX</strong>.</li>
                 </ul>
                 <h3>2. Generator Soal &amp; Asesmen</h3>
                 <ul>
@@ -801,7 +803,7 @@
                 <h3>3. Generator LKPD, Media Ajar, Ringkasan Materi &amp; Refleksi</h3>
                 <ul>
                     <li>Setiap generator memiliki <strong>halaman editor mandiri</strong> sehingga naskah Modul Ajar, Soal, LKPD, Media, Ringkasan, maupun Refleksi tidak saling menimpa.</li>
-                    <li>Gunakan tombol <strong>Simpan ke Dokumen Saya</strong>, <strong>Unduh Word (.doc)</strong>, atau <strong>Cetak / PDF</strong> pada bilah atas setiap editor.</li>
+                    <li>Gunakan tombol <strong>Simpan ke Dokumen Saya</strong>, <strong>Unduh Word (.doc/.docx)</strong>, atau <strong>Cetak / PDF</strong> pada bilah atas setiap editor.</li>
                 </ul>
             `
         };
@@ -880,13 +882,13 @@
         // REAL-TIME MULTI-STEP AI PROGRESS UI
         // =====================================================================
         const AI_PROGRESS_STAGES = [
-            'Menganalisis informasi pembelajaran & kurikulum...',
-            'Menyusun struktur dokumen & pemetaan kompetensi...',
-            'Mengembangkan materi inti & konteks nyata...',
-            'Menyusun aktivitas pembelajaran & dialog kelas...',
-            'Membuat instrumen penilaian, kunci & rubrik...',
-            'Memeriksa kesesuaian isi (Pedagogical Audit)...',
-            'Menyelesaikan dokumen siap sunting...'
+            'Menganalisis CP, TP, fase & keterkaitan pedagogis...',
+            'Menyusun Informasi Umum & Komponen Inti modul...',
+            'Mengembangkan materi ajar, LKPD & media selaras TP...',
+            'Menyusun kegiatan Pendahuluan, Inti & Penutup terukur...',
+            'Menyusun asesmen diagnostik, formatif, sumatif & rubrik...',
+            'Menyusun pengayaan, remedial, refleksi & lampiran...',
+            'Menyelaraskan alokasi waktu & validasi kelengkapan...'
         ];
 
         async function runWithAiProgress(panelId, taskFn) {
@@ -1308,7 +1310,7 @@
         // =====================================================================
         const ROUTE_META = {
             'dashboard': { title: 'Dashboard Utama', subtitle: 'Ringkasan Ruang Kerja & Pintasan Generator Perangkat Ajar' },
-            'gen-modul': { title: 'Generator Modul Ajar', subtitle: 'Penyusunan Modul Ajar 28 Komponen Lengkap & Alur Dialog Kelas' },
+            'gen-modul': { title: 'Generator Modul Ajar', subtitle: 'Struktur Wajib Modul Ajar (Informasi Umum, Komponen Inti & Lampiran) + Dialog Kelas' },
             'gen-soal': { title: 'Generator Soal & Asesmen', subtitle: 'Pembuatan Soal Berbasis Kasus Variatif, Kisi-Kisi, Kunci & Rubrik' },
             'gen-lkpd': { title: 'Generator LKPD', subtitle: 'Lembar Kerja Peserta Didik Terstruktur dengan Template & Ruang Jawaban' },
             'gen-media': { title: 'Generator Media Pembelajaran', subtitle: 'Presentasi Slide, Ringkasan, Infografis, Ilustrasi & Naskah Video' },
@@ -1840,14 +1842,14 @@
         }
 
         // =====================================================================
-        // DASHBOARD, MODUL AJAR, SOAL, LKPD, MEDIA, RINGKASAN & REFLEKSI
+        // DASHBOARD, MASTER BRAIN MODUL AJAR, SOAL, LKPD, MEDIA, RINGKASAN & REFLEKSI
         // =====================================================================
         function renderDashboardView(container) {
             const uid = appState.currentUser?.uid;
             const myDocsCount = appState.documents.filter(d => d.ownerId === uid).length;
             const isAdmin = appState.currentUser?.role === 'admin';
             const webName = appState.theme.webName || 'ModulAjar AI';
-            const webDesc = appState.theme.webDescription || 'Susun Modul Ajar 28 komponen lengkap, Soal & Asesmen, LKPD, Presentasi, Materi Ajar, Ringkasan, dan Refleksi Pembelajaran.';
+            const webDesc = appState.theme.webDescription || 'Susun Modul Ajar terstruktur (Informasi Umum, Komponen Inti & Lampiran), Soal & Asesmen, LKPD, Presentasi, Materi Ajar, Ringkasan, dan Refleksi Pembelajaran.';
 
             container.innerHTML = `
                 <div class="max-w-6xl mx-auto space-y-6">
@@ -1866,8 +1868,8 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div onclick="navigate('gen-modul')" class="theme-card p-5 rounded-2xl border border-borderCustom shadow-sm cursor-pointer hover:opacity-95 transition space-y-1.5">
                             <p class="text-[11px] font-bold opacity-60 uppercase">Generator Utama</p>
-                            <h3 class="text-sm font-extrabold theme-heading">Modul Ajar (28 Poin)</h3>
-                            <p class="text-xs opacity-75">Mode Praktis &amp; Advanced + contoh dialog Pendahuluan, Inti &amp; Penutup.</p>
+                            <h3 class="text-sm font-extrabold theme-heading">Modul Ajar (Master Brain)</h3>
+                            <p class="text-xs opacity-75">Informasi Umum, Komponen Inti &amp; Lampiran + sintaks model &amp; dialog kelas.</p>
                         </div>
                         <div onclick="navigate('gen-soal')" class="theme-card p-5 rounded-2xl border border-borderCustom shadow-sm cursor-pointer hover:opacity-95 transition space-y-1.5">
                             <p class="text-[11px] font-bold opacity-60 uppercase">Penilaian &amp; HOTS</p>
@@ -1896,26 +1898,101 @@
 
         function collectModulBaseInputs() {
             const activeUserName = appState.currentUser?.name || 'Guru Pengajar';
-            const savedPenyusun = appState.modulTeacherMeta?.penyusun;
-            const savedSekolah = appState.modulTeacherMeta?.sekolah;
+            const savedMeta = appState.modulTeacherMeta || {};
             return {
-                penyusun: (document.getElementById('mod-penyusun')?.value ?? (savedPenyusun || activeUserName)).trim() || activeUserName,
-                sekolah: (document.getElementById('mod-sekolah')?.value ?? (savedSekolah || 'Sekolah Menengah')).trim() || 'Sekolah Menengah',
+                penyusun: (document.getElementById('mod-penyusun')?.value ?? (savedMeta.penyusun || activeUserName)).trim() || activeUserName,
+                sekolah: (document.getElementById('mod-sekolah')?.value ?? (savedMeta.sekolah || 'SMP Negeri / Satuan Pendidikan')).trim() || 'SMP Negeri / Satuan Pendidikan',
+                semester: (document.getElementById('mod-semester')?.value ?? (savedMeta.semester || 'Ganjil')).trim() || 'Ganjil',
                 mapel: (document.getElementById('mod-mapel')?.value || 'Ilmu Pengetahuan Alam (IPA)').trim(),
                 jenjang: (document.getElementById('mod-jenjang')?.value || 'SMP / MTs — Fase D').trim(),
                 kelas: (document.getElementById('mod-kelas')?.value || 'Kelas VIII').trim(),
                 materi: (document.getElementById('mod-materi')?.value || 'Sistem Pencernaan dan Pola Makan Sehat').trim(),
                 model: (document.getElementById('mod-model')?.value || 'Problem Based Learning (PBL)').trim(),
-                waktu: (document.getElementById('mod-waktu')?.value || '2 x 40 Menit (80 Menit)').trim()
+                waktu: (document.getElementById('mod-waktu')?.value || '2 x 40 Menit (80 Menit)').trim(),
+                cpInput: (document.getElementById('mod-cp')?.value ?? (savedMeta.cpInput || '')).trim()
             };
         }
 
         function getModelSyntaxBlueprint(modelName, inp) {
             const m = (modelName || '').toLowerCase();
+            if (m.includes('direct')) {
+                return {
+                    label: 'Direct Instruction (Pembelajaran Langsung)',
+                    rationale: `Model Direct Instruction dipilih untuk membangun penguasaan konsep dasar, prosedur, dan langkah terstruktur pada materi ${inp.materi} di ${inp.kelas} (${inp.jenjang}) secara runtut melalui pemodelan guru, latihan terbimbing, dan latihan mandiri sebelum peserta didik mengaplikasikannya.`,
+                    steps: [
+                        {
+                            name: 'Tahap 1 — Menyampaikan Tujuan & Menyiapkan Peserta Didik',
+                            goal: 'Menetapkan fokus belajar, mengaktifkan pengetahuan prasyarat, dan mengarahkan perhatian murid.',
+                            guruDo: `Menyampaikan tujuan pembelajaran ${inp.materi} dan mengaitkannya dengan pengalaman awal murid di ${inp.sekolah}.`,
+                            guruHow: 'Menuliskan pokok tujuan di papan/layar dan mengajukan 1–2 pertanyaan cek pengetahuan awal.',
+                            muridDo: 'Menyimak tujuan pembelajaran, menjawab pertanyaan prasyarat, dan menyiapkan alat tulis.',
+                            examplePrompt: `Guru bertanya/menginstruksikan: "Hari ini kita fokus pada ${inp.materi}. Sebelum masuk ke contoh, apa yang sudah kalian pahami tentang istilah dasarnya?"`,
+                            caseExample: `Pengantar konsep dan prasyarat ${inp.materi} pada ${inp.kelas}.`,
+                            muridResponse: `"Kami sudah mengenal istilah awalnya dan siap menyimak langkah/konsep utama ${inp.materi}."`,
+                            media: 'Papan tulis/slide, buku teks, LKPD.',
+                            assessmentNote: 'Asesmen Diagnostik / Prasyarat lisan singkat.',
+                            indicator: 'Murid memahami tujuan belajar dan kesiapan prasyarat terpetakan.'
+                        },
+                        {
+                            name: 'Tahap 2 — Mendemonstrasikan Pengetahuan atau Keterampilan (Modeling)',
+                            goal: 'Menjelaskan konsep inti dan mendemonstrasikan langkah/prosedur secara jelas dan bertahap.',
+                            guruDo: `Menguraikan konsep ${inp.materi} secara sistematis dan mendemonstrasikan 1 contoh penyelesaian/analisis langkah demi langkah.`,
+                            guruHow: 'Menjelaskan dengan bahasa baku dan komunikatif sambil menuliskan alur langkah di papan/media ajar.',
+                            muridDo: 'Mengamati demonstrasi/penjelasan guru secara cermat dan mencatat langkah-langkah utamanya.',
+                            examplePrompt: `Guru menjelaskan: "Perhatikan urutan langkah pada contoh ${inp.materi} ini: pertama tentukan unsurnya, kedua hubungkan buktinya, lalu simpulkan."`,
+                            caseExample: `Demonstrasi satu contoh penerapan/analisis ${inp.materi} oleh guru.`,
+                            muridResponse: `"Oh, ternyata urutan menelaah ${inp.materi} dimulai dari mengenali unsur utamanya dulu."`,
+                            media: 'Bahan bacaan, media visual/contoh terstruktur.',
+                            assessmentNote: 'Observasi perhatian dan pencatatan awal murid.',
+                            indicator: 'Murid mengikuti alur penjelasan/demonstrasi konsep secara runtut.'
+                        },
+                        {
+                            name: 'Tahap 3 — Membimbing Pelatihan Terbimbing (Guided Practice)',
+                            goal: 'Melatih murid menerapkan konsep/prosedur bersama guru dengan umpan balik langsung.',
+                            guruDo: `Memberikan latihan terbimbing pada LKPD terkait ${inp.materi}, memandu langkah demi langkah, dan mengoreksi kekeliruan segera.`,
+                            guruHow: 'Mengerjakan soal/kasus contoh bersama kelas lalu memantau pengerjaan awal tiap kelompok/individu.',
+                            muridDo: 'Mengerjakan latihan terbimbing pada LKPD dan bertanya apabila menemukan bagian yang belum jelas.',
+                            examplePrompt: `Guru bertanya: "Pada bagian kedua latihan ${inp.materi} ini, langkah mana yang perlu kita periksa terlebih dahulu dan mengapa?"`,
+                            caseExample: `Latihan terbimbing analisis/penerapan ${inp.materi} pada LKPD.`,
+                            muridResponse: `"Kita periksa dulu kesesuaian unsur pada kasus tersebut sebelum menuliskan kesimpulan."`,
+                            media: 'LKPD, bahan bacaan.',
+                            assessmentNote: 'Asesmen Formatif (cek pemahaman proses & umpan balik langsung).',
+                            indicator: 'Sebagian besar murid mampu mengerjakan latihan terbimbing dengan bimbingan minimal.'
+                        },
+                        {
+                            name: 'Tahap 4 — Mengecek Pemahaman & Memberikan Umpan Balik',
+                            goal: 'Memastikan ketepatan pemahaman murid dan meluruskan kesalahan konsep sebelum latihan mandiri.',
+                            guruDo: 'Membahas hasil latihan terbimbing, memberi umpan balik spesifik, dan meluruskan miskonsepsi.',
+                            guruHow: 'Meminta beberapa murid menjelaskan jawabannya lalu memberi penguatan dan koreksi konstruktif.',
+                            muridDo: 'Memeriksa kembali jawabannya, menanggapi pembahasan, dan memperbaiki bagian yang kurang tepat.',
+                            examplePrompt: `Guru memberi umpan balik: "Jawaban kalian sudah mengarah tepat; pastikan alasan yang ditulis mengacu langsung pada konsep ${inp.materi}."`,
+                            caseExample: `Klarifikasi kesalahan umum dan penguatan konsep ${inp.materi}.`,
+                            muridResponse: `"Baik Bu/Pak, kami perbaiki alasannya agar lebih jelas dan sesuai konsep."`,
+                            media: 'Hasil LKPD, papan tulis.',
+                            assessmentNote: 'Asesmen Formatif (umpan balik korektif).',
+                            indicator: 'Miskonsepsi teridentifikasi dan diperbaiki sebelum latihan mandiri.'
+                        },
+                        {
+                            name: 'Tahap 5 — Memberikan Kesempatan Pelatihan Mandiri & Penerapan',
+                            goal: 'Mengukuhkan penguasaan murid melalui latihan mandiri pada LKPD yang selaras dengan TP.',
+                            guruDo: `Menugaskan murid menyelesaikan bagian latihan mandiri/kasus lanjutan pada LKPD ${inp.materi} secara mandiri dan mendampingi yang masih kesulitan.`,
+                            guruHow: 'Menetapkan waktu pengerjaan mandiri dan berkeliling memberi bimbingan individu/kelompok kecil.',
+                            muridDo: 'Mengerjakan tugas mandiri pada LKPD, menyusun kesimpulan, dan menyiapkan jawaban untuk dibahas.',
+                            examplePrompt: `Guru menginstruksikan: "Sekarang kerjakan bagian penerapan mandiri pada LKPD secara teliti; periksa kembali konsep ${inp.materi} sebelum mengumpulkan."`,
+                            caseExample: `Penyelesaian latihan mandiri & kasus lanjutan pada LKPD ${inp.materi}.`,
+                            muridResponse: `Murid menyelesaikan latihan mandiri di LKPD dan menuliskan simpulan.`,
+                            media: 'LKPD, instrumen penilaian.',
+                            assessmentNote: 'Asesmen Formatif / Sumatif awal berbasis LKPD.',
+                            indicator: 'Murid menyelesaikan tugas mandiri sesuai TP dengan ketepatan yang terukur.'
+                        }
+                    ]
+                };
+            }
+
             if (m.includes('project')) {
                 return {
                     label: 'Project Based Learning (PjBL)',
-                    rationale: `Model Project Based Learning (PjBL) dipilih agar murid pada ${inp.kelas} menghasilkan produk/solusi nyata yang terukur atas permasalahan atau kebutuhan terkait ${inp.materi} melalui kerja kolaboratif bertahap.`,
+                    rationale: `Model Project Based Learning (PjBL) dipilih agar murid pada ${inp.kelas} (${inp.jenjang}) menghasilkan produk/solusi nyata yang terukur atas permasalahan atau kebutuhan terkait ${inp.materi} melalui kerja kolaboratif bertahap.`,
                     steps: [
                         {
                             name: 'Tahap 1 — Penentuan Pertanyaan Mendasar',
@@ -1927,6 +2004,7 @@
                             caseExample: `Kasus proyek ${inp.materi} di lingkungan ${inp.sekolah} yang memerlukan rancangan solusi atau media edukasi singkat.`,
                             muridResponse: `"Kita perlu menyusun panduan atau rancangan langkah yang jelas berdasarkan konsep ${inp.materi} agar mudah diterapkan di kelas."`,
                             media: 'Slide kasus proyek, lembar catatan awal, papan tulis.',
+                            assessmentNote: 'Observasi awal pemahaman masalah proyek.',
                             indicator: 'Murid merumuskan pertanyaan mendasar proyek yang relevan dengan materi dan konteks nyata.'
                         },
                         {
@@ -1939,6 +2017,7 @@
                             caseExample: `Penyusunan draf rencana kerja kelompok tentang ${inp.materi} dengan pembagian peran yang jelas.`,
                             muridResponse: `"Kelompok kami membagi tugas menjadi 2 pengumpul data/contoh, 1 penyusun kerangka, dan 1 penyaji hasil."`,
                             media: 'Format perencanaan proyek, LKPD kelompok, alat tulis.',
+                            assessmentNote: 'Asesmen Formatif (penilaian draf rencana proyek).',
                             indicator: 'Setiap kelompok memiliki rencana kerja, pembagian peran, dan target waktu yang jelas.'
                         },
                         {
@@ -1951,6 +2030,7 @@
                             caseExample: `Pengaturan durasi diskusi, pengumpulan bukti/contoh, dan penyusunan produk proyek ${inp.materi}.`,
                             muridResponse: `"Baik Pak/Bu, kami fokus menyelesaikan poin analisis dulu lalu menyusun kesimpulan."`,
                             media: 'Penanda waktu / timer kelas, lembar jadwal kelompok.',
+                            assessmentNote: 'Pemantauan ketepatan waktu kerja tim.',
                             indicator: 'Murid mengelola waktu kerja kelompok sesuai jadwal yang disepakati.'
                         },
                         {
@@ -1963,6 +2043,7 @@
                             caseExample: `Kelompok mengalami perbedaan pendapat saat menentukan contoh penerapan paling tepat untuk ${inp.materi}.`,
                             muridResponse: `"Kami membandingkan dua contoh dan memilih yang paling sesuai dengan konsep inti ${inp.materi}."`,
                             media: 'Rubrik observasi proses, LKPD/bahan proyek.',
+                            assessmentNote: 'Asesmen Formatif (rubrik observasi proses & kolaborasi).',
                             indicator: 'Seluruh anggota kelompok terlibat aktif dan hambatan proyek teratasi secara konstruktif.'
                         },
                         {
@@ -1974,7 +2055,8 @@
                             examplePrompt: `Guru bertanya: "Bagaimana hasil proyek ini menunjukkan pemahaman kalian tentang ${inp.materi}, dan apa keterbatasannya?"`,
                             caseExample: `Presentasi hasil proyek ${inp.materi} di depan kelas beserta tanya jawab kritis.`,
                             muridResponse: `"Hasil proyek kami menjelaskan konsep utama, contoh nyata, serta langkah perbaikan yang dapat diterapkan."`,
-                            media: 'Hasil proyek kelompok, lembar umpan balik.',
+                            media: 'Hasil proyek kelompok, lembar umpan balik, LKPD.',
+                            assessmentNote: 'Asesmen Formatif / Produk sesuai rubrik.',
                             indicator: 'Produk proyek menunjukkan penguasaan konsep materi dan dapat dipertanggungjawabkan.'
                         },
                         {
@@ -1987,6 +2069,7 @@
                             caseExample: `Evaluasi bersama mengenai ketepatan konsep, pembagian kerja, dan perbaikan proyek ke depan.`,
                             muridResponse: `"Kami belajar bahwa diskusi berbasis bukti membuat hasil proyek lebih tepat dan rapi."`,
                             media: 'Lembar refleksi singkat, catatan penguatan guru.',
+                            assessmentNote: 'Refleksi dan umpan balik formatif.',
                             indicator: 'Murid mampu mengevaluasi proses dan hasil proyek secara jujur dan reflektif.'
                         }
                     ]
@@ -1996,7 +2079,7 @@
             if (m.includes('discovery')) {
                 return {
                     label: 'Discovery Learning',
-                    rationale: `Model Discovery Learning dipilih agar murid pada ${inp.kelas} menemukan sendiri pola, konsep, dan prinsip ${inp.materi} melalui pengamatan terarah dan pembuktian.`,
+                    rationale: `Model Discovery Learning dipilih agar murid pada ${inp.kelas} (${inp.jenjang}) menemukan sendiri pola, konsep, dan prinsip ${inp.materi} melalui pengamatan terarah dan pembuktian.`,
                     steps: [
                         {
                             name: 'Tahap 1 — Stimulation (Pemberian Rangsangan)',
@@ -2008,6 +2091,7 @@
                             caseExample: `Perbandingan dua contoh/situasi terkait ${inp.materi} yang memiliki perbedaan hasil atau penerapan.`,
                             muridResponse: `"Terlihat ada perbedaan langkah dan hasil antara contoh pertama dan contoh kedua."`,
                             media: 'Gambar/data/contoh kasus, LKPD.',
+                            assessmentNote: 'Observasi keaktifan mengamati stimulus.',
                             indicator: 'Murid mengamati stimulus secara aktif dan mengidentifikasi keunikan/pola awal.'
                         },
                         {
@@ -2020,6 +2104,7 @@
                             caseExample: `Perumusan pertanyaan mengapa suatu kondisi pada ${inp.materi} dapat terjadi.`,
                             muridResponse: `"Mengapa unsur tersebut memengaruhi hasil pada ${inp.materi}?"`,
                             media: 'LKPD, papan tulis.',
+                            assessmentNote: 'Asesmen Formatif (ketepatan rumusan masalah).',
                             indicator: 'Rumusan masalah selaras dengan topik dan dapat ditelusuri melalui data/informasi.'
                         },
                         {
@@ -2032,6 +2117,7 @@
                             caseExample: `Penelusuran contoh penerapan dan ciri-ciri ${inp.materi} dari sumber belajar.`,
                             muridResponse: `"Kami menemukan beberapa contoh dan ciri utama yang berkaitan langsung dengan pertanyaan kami."`,
                             media: 'Buku teks, LKPD, bahan bacaan/contoh.',
+                            assessmentNote: 'Observasi pengumpulan bukti pada LKPD.',
                             indicator: 'Murid mengumpulkan data/contoh yang relevan dan akurat.'
                         },
                         {
@@ -2044,6 +2130,7 @@
                             caseExample: `Pengelompokan ciri, contoh, dan dampak terkait ${inp.materi}.`,
                             muridResponse: `"Kami memisahkan antara konsep dasar, contoh penerapan, dan akibatnya."`,
                             media: 'Tabel/bagan pada LKPD, alat tulis.',
+                            assessmentNote: 'Asesmen Formatif (pengolahan data di LKPD).',
                             indicator: 'Data terolah secara rapi dan menunjukkan hubungan yang logis.'
                         },
                         {
@@ -2056,6 +2143,7 @@
                             caseExample: `Pengujian ulang ketepatan analisis kasus ${inp.materi} antar-kelompok.`,
                             muridResponse: `"Setelah dicek kembali, alasan kami sesuai karena memenuhi syarat utama konsep ${inp.materi}."`,
                             media: 'Hasil kerja kelompok, catatan verifikasi.',
+                            assessmentNote: 'Asesmen Formatif (ketepatan pembuktian/argumen).',
                             indicator: 'Murid mampu membuktikan dan mempertanggungjawabkan ketepatan temuannya.'
                         },
                         {
@@ -2068,6 +2156,7 @@
                             caseExample: `Perumusan simpulan konsep dan penerapan ${inp.materi} untuk kelas ${inp.kelas}.`,
                             muridResponse: `"Kesimpulannya, ${inp.materi} dapat dipahami melalui hubungan unsur dan penerapannya secara tepat."`,
                             media: 'Papan tulis / ringkasan kelas.',
+                            assessmentNote: 'Penilaian kesimpulan selaras TP.',
                             indicator: 'Kesimpulan akurat, menyeluruh, dan sesuai tujuan pembelajaran.'
                         }
                     ]
@@ -2077,7 +2166,7 @@
             if (m.includes('inquiry')) {
                 return {
                     label: 'Inquiry Learning',
-                    rationale: `Model Inquiry Learning dipilih untuk melatih murid pada ${inp.kelas} meneliti fenomena terkait ${inp.materi} secara sistematis melalui perumusan masalah, hipotesis, penyelidikan, dan penarikan simpulan.`,
+                    rationale: `Model Inquiry Learning dipilih untuk melatih murid pada ${inp.kelas} (${inp.jenjang}) meneliti fenomena terkait ${inp.materi} secara sistematis melalui perumusan masalah, hipotesis, penyelidikan, dan penarikan simpulan.`,
                     steps: [
                         {
                             name: 'Tahap 1 — Orientasi Masalah',
@@ -2089,6 +2178,7 @@
                             caseExample: `Situasi masalah sehari-hari yang terkait dengan ${inp.materi}.`,
                             muridResponse: `"Kita perlu mengetahui penyebab utama dan bukti pendukungnya."`,
                             media: 'Stimulus kasus, LKPD.',
+                            assessmentNote: 'Observasi orientasi masalah.',
                             indicator: 'Murid memahami fokus masalah penyelidikan.'
                         },
                         {
@@ -2101,6 +2191,7 @@
                             caseExample: `Penyusunan pertanyaan penyelidikan berbasis kasus ${inp.materi}.`,
                             muridResponse: `"Bagaimana pengaruh faktor tersebut terhadap penerapan ${inp.materi}?"`,
                             media: 'LKPD penyelidikan.',
+                            assessmentNote: 'Asesmen Formatif (rumusan pertanyaan inkuiri).',
                             indicator: 'Pertanyaan penyelidikan terarah dan relevan.'
                         },
                         {
@@ -2113,6 +2204,7 @@
                             caseExample: `Perumusan dugaan awal atas kasus ${inp.materi}.`,
                             muridResponse: `"Dugaan kami, jika langkah tersebut diterapkan maka hasilnya akan lebih tepat karena..."`,
                             media: 'LKPD.',
+                            assessmentNote: 'Observasi logika hipotesis.',
                             indicator: 'Hipotesis logis dan terkait dengan rumusan masalah.'
                         },
                         {
@@ -2125,6 +2217,7 @@
                             caseExample: `Pengumpulan contoh dan fakta terkait ${inp.materi}.`,
                             muridResponse: `"Kami mencatat beberapa bukti dari materi dan contoh kasus."`,
                             media: 'Sumber belajar, LKPD.',
+                            assessmentNote: 'Asesmen Formatif (kelengkapan bukti LKPD).',
                             indicator: 'Data yang dikumpulkan relevan untuk menguji hipotesis.'
                         },
                         {
@@ -2137,6 +2230,7 @@
                             caseExample: `Pengujian hipotesis berdasarkan analisis kasus ${inp.materi}.`,
                             muridResponse: `"Sebagian besar bukti mendukung hipotesis kami, namun ada catatan penting yang perlu ditambahkan."`,
                             media: 'Catatan analisis kelompok.',
+                            assessmentNote: 'Asesmen Formatif (ketepatan pengujian bukti).',
                             indicator: 'Pengujian hipotesis dilakukan secara objektif berdasarkan bukti.'
                         },
                         {
@@ -2149,6 +2243,7 @@
                             caseExample: `Kesimpulan akhir penyelidikan materi ${inp.materi}.`,
                             muridResponse: `"Kesimpulannya, ${inp.materi} terbukti bekerja melalui pola dan prinsip yang telah kami analisis."`,
                             media: 'Papan tulis / dokumen hasil.',
+                            assessmentNote: 'Penilaian simpulan penyelidikan.',
                             indicator: 'Kesimpulan jelas, logis, dan menjawab rumusan masalah.'
                         }
                     ]
@@ -2158,30 +2253,32 @@
             if (m.includes('cooperative')) {
                 return {
                     label: 'Cooperative Learning (Jigsaw / TPS)',
-                    rationale: `Model Cooperative Learning dipilih untuk membangun saling ketergantungan positif, tanggung jawab individu, dan kolaborasi aktif antar-murid ${inp.kelas} dalam memahami ${inp.materi}.`,
+                    rationale: `Model Cooperative Learning dipilih untuk membangun saling ketergantungan positif, tanggung jawab individu, dan kolaborasi aktif antar-murid ${inp.kelas} (${inp.jenjang}) dalam memahami ${inp.materi}.`,
                     steps: [
                         {
                             name: 'Tahap 1 — Menyampaikan Tujuan & Memotivasi',
                             goal: 'Menjelaskan tujuan belajar dan pentingnya kerja sama tim yang saling mendukung.',
-                            guruDo: 'Menyampaikan tujuan pembelajaran ${inp.materi} dan menjelaskan aturan kerja sama kelompok.',
+                            guruDo: `Menyampaikan tujuan pembelajaran ${inp.materi} dan menjelaskan aturan kerja sama kelompok.`,
                             guruHow: 'Menjelaskan bahwa setiap anggota berkontribusi pada pemahaman bersama.',
                             muridDo: 'Menyimak tujuan pembelajaran dan menyiapkan sikap kolaboratif.',
                             examplePrompt: `Guru menyampaikan: "Hari ini kita belajar ${inp.materi} secara kooperatif; setiap anggota punya peran penting agar semua paham."`,
                             caseExample: `Pengantar kerja sama kelompok untuk topik ${inp.materi}.`,
                             muridResponse: `"Siap Pak/Bu, kami akan saling membantu memahami bagian masing-masing."`,
                             media: 'Papan tulis / slide tujuan.',
+                            assessmentNote: 'Observasi kesiapan belajar.',
                             indicator: 'Murid memahami tujuan dan prinsip kerja sama kelompok.'
                         },
                         {
                             name: 'Tahap 2 — Menyajikan Informasi',
                             goal: 'Memberikan pengantar konsep dasar dan pembagian fokus materi.',
-                            guruDo: 'Menyajikan gambaran umum ${inp.materi} dan membagi sub-fokus tugas tiap anggota/kelompok.',
+                            guruDo: `Menyajikan gambaran umum ${inp.materi} dan membagi sub-fokus tugas tiap anggota/kelompok.`,
                             guruHow: 'Menguraikan poin kunci singkat lalu membagikan tugas/LKPD.',
                             muridDo: 'Menyimak pengantar materi dan menerima bagian tugasnya.',
                             examplePrompt: `Guru mengarahkan: "Perhatikan kerangka utama ${inp.materi} berikut sebelum kalian mendalami bagian masing-masing."`,
                             caseExample: `Pembagian sub-topik/kasus ${inp.materi} antar-anggota kelompok.`,
                             muridResponse: `"Kami sudah jelas dengan bagian yang harus kami pelajari dan diskusikan."`,
                             media: 'Bahan ajar / LKPD.',
+                            assessmentNote: 'Cek pemahaman pembagian tugas.',
                             indicator: 'Murid mengetahui bagian tugas dan sumber rujukannya.'
                         },
                         {
@@ -2194,18 +2291,20 @@
                             caseExample: `Pembentukan kelompok diskusi topik ${inp.materi} di kelas ${inp.kelas}.`,
                             muridResponse: `"Kelompok kami sudah siap dengan pembagian peran masing-masing."`,
                             media: 'Kartu peran / panduan kelompok.',
+                            assessmentNote: 'Observasi keteraturan & peran kelompok.',
                             indicator: 'Kelompok terbentuk tertib dan setiap anggota memiliki peran aktif.'
                         },
                         {
                             name: 'Tahap 4 — Membimbing Kelompok Bekerja & Belajar',
                             goal: 'Mendampingi diskusi kelompok agar seluruh anggota berpartisipasi dan memahami materi.',
-                            guruDo: 'Berkeliling memfasilitasi diskusi, mendorong anggota yang pasif berbicara, dan meluruskan konsep.',
+                            guruDo: `Berkeliling memfasilitasi diskusi, mendorong anggota yang pasif berbicara, dan meluruskan konsep.`,
                             guruHow: 'Mengajukan pertanyaan klarifikasi dan memastikan tidak hanya satu orang yang bekerja.',
                             muridDo: 'Berdiskusi, saling bertukar penjelasan, dan mengisi LKPD bersama.',
                             examplePrompt: `Guru bertanya: "Bagaimana anggota lain menanggapi penjelasan teman kalian mengenai ${inp.materi}?"`,
                             caseExample: `Diskusi pemecahan kasus dan contoh penerapan ${inp.materi}.`,
                             muridResponse: `"Kami saling melengkapi contoh dan mengecek ketepatan jawaban bersama."`,
                             media: 'LKPD, sumber belajar.',
+                            assessmentNote: 'Asesmen Formatif (rubrik kolaborasi & LKPD).',
                             indicator: 'Terjadi diskusi dua arah dan seluruh anggota kelompok memahami hasil kerja.'
                         },
                         {
@@ -2218,6 +2317,7 @@
                             caseExample: `Presentasi dan klarifikasi hasil diskusi kelompok ${inp.materi}.`,
                             muridResponse: `"Kami menyimpulkan bahwa ${inp.materi} memerlukan ketepatan konsep dan penerapan yang sesuai."`,
                             media: 'Hasil LKPD kelompok.',
+                            assessmentNote: 'Asesmen Formatif (ketepatan hasil kelompok).',
                             indicator: 'Hasil diskusi kelompok akurat dan dipresentasikan dengan jelas.'
                         },
                         {
@@ -2230,6 +2330,7 @@
                             caseExample: `Apresiasi kerja tim dan penegasan hasil belajar di akhir sesi inti.`,
                             muridResponse: `"Terima kasih Pak/Bu, kami jadi lebih semangat belajar bersama."`,
                             media: 'Catatan apresiasi guru.',
+                            assessmentNote: 'Penguatan sikap kolaboratif.',
                             indicator: 'Suasana belajar positif dan motivasi kolaborasi meningkat.'
                         }
                     ]
@@ -2239,7 +2340,7 @@
             // Default: Problem Based Learning (PBL) — 5 Sintaks Baku
             return {
                 label: 'Problem Based Learning (PBL)',
-                rationale: `Model Problem Based Learning (PBL) dipilih karena sangat sesuai untuk melatih murid pada ${inp.kelas} menganalisis masalah nyata terkait ${inp.materi}, menelusuri konsep/bukti, dan merumuskan solusi yang beralasan.`,
+                rationale: `Model Problem Based Learning (PBL) dipilih karena sangat sesuai untuk melatih murid pada ${inp.kelas} (${inp.jenjang}) menganalisis masalah nyata terkait ${inp.materi}, menelusuri konsep/bukti, dan merumuskan solusi yang beralasan.`,
                 steps: [
                     {
                         name: 'Tahap 1 — Orientasi Murid terhadap Masalah',
@@ -2251,6 +2352,7 @@
                         caseExample: `Kasus nyata di lingkungan sekolah/masyarakat terkait ${inp.materi} yang menunjukkan adanya ketidaksesuaian atau tantangan yang perlu dipecahkan.`,
                         muridResponse: `"Permasalahan utamanya terjadi karena penerapan ${inp.materi} belum memperhatikan faktor pendukung sehingga dampaknya terasa pada kegiatan bersama."`,
                         media: 'Teks/gambar studi kasus, papan tulis, LKPD.',
+                        assessmentNote: 'Observasi kepekaan mengidentifikasi masalah.',
                         indicator: 'Murid mampu mengidentifikasi masalah utama dari kasus dan menghubungkannya dengan materi.'
                     },
                     {
@@ -2263,6 +2365,7 @@
                         caseExample: `Pembagian fokus analisis sub-masalah terkait ${inp.materi} pada tiap kelompok.`,
                         muridResponse: `"Kelompok kami sudah membagi peran dan mulai membaca studi kasus di LKPD."`,
                         media: 'LKPD, daftar pembagian kelompok.',
+                        assessmentNote: 'Observasi kesiapan kerja kelompok.',
                         indicator: 'Kelompok terbentuk tertib dan setiap murid memahami tugas serta fokus masalahnya.'
                     },
                     {
@@ -2270,11 +2373,12 @@
                         goal: 'Membantu murid menelaah konsep, mengumpulkan bukti/contoh, dan menganalisis penyebab serta dampak masalah.',
                         guruDo: 'Berkeliling dari satu kelompok ke kelompok lain, mengajukan pertanyaan penuntun, dan membantu murid menghubungkan teori dengan fakta kasus.',
                         guruHow: 'Tidak langsung memberi jawaban, melainkan memberi pertanyaan bertingkat (scaffolding) dan memeriksa ketepatan rujukan materi.',
-                        muridDo: 'Menelaah materi ${inp.materi}, berdiskusi menguraikan penyebab dan dampak kasus, serta mengisi tabel/poin analisis di LKPD.',
+                        muridDo: `Menelaah materi ${inp.materi}, berdiskusi menguraikan penyebab dan dampak kasus, serta mengisi tabel/poin analisis di LKPD.`,
                         examplePrompt: `Guru bertanya: "Bukti apa pada kasus ini yang mendukung analisis kalian? Bagaimana hubungan antarunsur pada ${inp.materi} menjelaskan kondisi tersebut?"`,
                         caseExample: `Penelusuran faktor penyebab, bukti pendukung, dan alternatif solusi pada kasus ${inp.materi}.`,
                         muridResponse: `"Berdasarkan konsep ${inp.materi}, faktor utama yang memengaruhi adalah ... dan dampaknya terlihat pada ..."`,
-                        media: 'Buku teks ${inp.mapel}, LKPD, bahan rujukan.',
+                        media: `Buku teks ${inp.mapel}, LKPD, bahan rujukan.`,
+                        assessmentNote: 'Asesmen Formatif (rubrik analisis LKPD & observasi).',
                         indicator: 'Murid mampu menguraikan analisis masalah dengan bukti dan konsep yang relevan.'
                     },
                     {
@@ -2287,285 +2391,225 @@
                         caseExample: `Pemaparan hasil analisis kasus dan usulan solusi terkait ${inp.materi}.`,
                         muridResponse: `"Kami mengusulkan langkah ... karena lebih realistis diterapkan di ${inp.kelas} dan sesuai dengan prinsip ${inp.materi}."`,
                         media: 'LKPD hasil kerja, papan tulis/media presentasi.',
+                        assessmentNote: 'Asesmen Formatif (presentasi & kejelasan argumen).',
                         indicator: 'Kelompok menyajikan hasil analisis dan solusi secara runtut, jelas, dan tepat waktu.'
                     },
                     {
                         name: 'Tahap 5 — Menganalisis dan Mengevaluasi Proses Pemecahan Masalah',
                         goal: 'Membandingkan berbagai solusi, meluruskan miskonsepsi, dan menyimpulkan solusi terbaik serta proses belajar.',
-                        guruDo: 'Memimpin diskusi evaluasi antar-solusi, meluruskan konsep yang kurang tepat, dan menguatkan prinsip utama ${inp.materi}.',
+                        guruDo: `Memimpin diskusi evaluasi antar-solusi, meluruskan konsep yang kurang tepat, dan menguatkan prinsip utama ${inp.materi}.`,
                         guruHow: 'Menyoroti kelebihan dan catatan tiap usulan solusi, lalu menyimpulkan pembelajaran bersama murid.',
                         muridDo: 'Membandingkan usulan antar-kelompok, menanggapi masukan, dan menyimpulkan solusi terbaik serta pembelajaran yang didapat.',
                         examplePrompt: `Guru bertanya: "Dari beberapa solusi yang disampaikan tadi, solusi mana yang paling tepat dan dapat diterapkan? Mengapa?"`,
                         caseExample: `Perbandingan kelebihan dan kelayakan solusi pemecahan masalah ${inp.materi}.`,
                         muridResponse: `"Solusi dari kelompok ... paling tepat karena mempertimbangkan langkah pelaksanaan, bukti konsep, dan dampaknya."`,
                         media: 'Catatan kelas, ringkasan evaluasi guru.',
+                        assessmentNote: 'Asesmen Formatif akhir sesi inti (ketepatan simpulan).',
                         indicator: 'Murid mampu menilai ketepatan solusi dan menyimpulkan pembelajaran secara menyeluruh.'
                     }
                 ]
             };
         }
 
-        function buildDetailedAlurHtml(inp) {
-            const totalMin = parseInt((inp.waktu.match(/\d+/g) || [80]).pop(), 10) || 80;
-            const pendMin = Math.max(12, Math.round(totalMin * 0.15));
-            const penutupMin = Math.max(12, Math.round(totalMin * 0.15));
-            const intiMin = Math.max(25, totalMin - pendMin - penutupMin);
-            const syntax = getModelSyntaxBlueprint(inp.model, inp);
+        function computeTimeAllocation(waktuStr, stepCount) {
+            const nums = (waktuStr || '').match(/\d+/g);
+            let totalMin = 80;
+            if (nums && nums.length >= 2) {
+                totalMin = Math.max(30, parseInt(nums[0], 10) * parseInt(nums[1], 10));
+            } else if (nums && nums.length === 1) {
+                totalMin = Math.max(30, parseInt(nums[0], 10));
+            }
 
-            const pendSteps = [
+            const pendMin = Math.max(10, Math.round(totalMin * 0.15));
+            const penutupMin = Math.max(10, Math.round(totalMin * 0.15));
+            const intiMin = Math.max(15, totalMin - pendMin - penutupMin);
+
+            const pendDurs = Array(8).fill(1);
+            let remPend = pendMin - 8;
+            const pendOrder = [5, 3, 6, 4, 2, 7, 1, 0];
+            for (let i = 0; i < remPend; i++) {
+                pendDurs[pendOrder[i % pendOrder.length]] += 1;
+            }
+
+            const safeSteps = Math.max(1, stepCount);
+            const baseInti = Math.floor(intiMin / safeSteps);
+            const intiDurs = Array(safeSteps).fill(baseInti);
+            let remInti = intiMin - baseInti * safeSteps;
+            for (let i = 0; i < remInti; i++) {
+                intiDurs[i % safeSteps] += 1;
+            }
+
+            const penutupDurs = Array(7).fill(1);
+            let remPenutup = penutupMin - 7;
+            const penutupOrder = [0, 1, 2, 3, 4, 5, 6];
+            for (let i = 0; i < remPenutup; i++) {
+                penutupDurs[penutupOrder[i % penutupOrder.length]] += 1;
+            }
+
+            const sumPend = pendDurs.reduce((a, b) => a + b, 0);
+            const sumInti = intiDurs.reduce((a, b) => a + b, 0);
+            const sumPenutup = penutupDurs.reduce((a, b) => a + b, 0);
+
+            return {
+                totalMin: sumPend + sumInti + sumPenutup,
+                pendMin: sumPend,
+                intiMin: sumInti,
+                penutupMin: sumPenutup,
+                pendDurs,
+                intiDurs,
+                penutupDurs
+            };
+        }
+
+        function buildDetailedAlurHtml(inp) {
+            const syntax = getModelSyntaxBlueprint(inp.model, inp);
+            const timing = computeTimeAllocation(inp.waktu, syntax.steps.length);
+
+            const pendStepsRaw = [
                 {
-                    no: '1',
-                    step: 'Membuka Pembelajaran & Salam',
-                    time: `${Math.max(2, Math.round(pendMin * 0.12))} Menit`,
-                    guru: `Memberi salam hangat, menyapa murid, dan memimpin doa pembuka sebelum memulai pelajaran ${inp.mapel}.`,
-                    how: 'Berdiri di depan kelas dengan kontak mata ramah, memberi jeda tenang, dan menunjuk/memimpin doa bersama.',
-                    murid: 'Menjawab salam, berdoa dengan khidmat, dan memusatkan perhatian kepada guru.',
-                    dialog: `<strong>Guru:</strong> "Selamat pagi, anak-anak. Sebelum kita mulai pembelajaran ${escapeHtml(inp.mapel)} hari ini, mari kita berdoa bersama terlebih dahulu."<br><strong>Murid:</strong> "Selamat pagi, Pak/Bu. Berdoa mulai..."`,
-                    response: 'Murid menjawab salam dengan tertib dan mengikuti doa dengan tenang.',
-                    indicator: 'Suasana kelas kondusif dan siap memulai pembelajaran.'
+                    step: 'Orientasi & Salam Pembuka',
+                    guru: `Memberi salam hangat, menyapa murid, dan memimpin doa pembuka sebelum memulai pelajaran ${inp.mapel} di ${inp.sekolah} (${timing.pendDurs[0]} menit; media: papan tulis/daftar hadir).`,
+                    murid: `Menjawab salam, berdoa dengan khidmat, dan memusatkan perhatian. Contoh ucapan guru: "Selamat pagi, mari kita berdoa sebelum memulai ${inp.mapel}." Respons murid: menjawab salam dan berdoa tertib.`
                 },
                 {
-                    no: '2',
                     step: 'Mengondisikan Murid & Kehadiran',
-                    time: `${Math.max(2, Math.round(pendMin * 0.12))} Menit`,
-                    guru: `Mengecek kehadiran murid, kerapian posisi duduk, serta ketertiban lingkungan kelas ${inp.kelas}.`,
-                    how: 'Menyebutkan presensi secara singkat dan meminta murid merapikan meja/alat tulis.',
-                    murid: 'Merespons presensi, merapikan tempat duduk, dan menyiapkan buku/alat tulis.',
-                    dialog: `<strong>Guru:</strong> "Ibu/Bapak cek kehadiran dulu ya. Pastikan meja bersih dari barang yang tidak diperlukan dan alat tulis sudah siap."<br><strong>Murid:</strong> "Hadir, Bu/Pak!"`,
-                    response: 'Murid merapikan perlengkapan belajar dan merespons absensi dengan tertib.',
-                    indicator: 'Kehadiran tercatat dan kondisi kelas tertata rapi.'
+                    guru: `Mengecek kehadiran murid serta kerapian posisi duduk di ${inp.kelas} Semester ${inp.semester} (${timing.pendDurs[1]} menit; media: daftar hadir).`,
+                    murid: `Merespons presensi dan merapikan meja/alat tulis. Contoh instruksi guru: "Pastikan alat tulis siap dan simak presensi." Respons murid: merespons hadir dengan tertib.`
                 },
                 {
-                    no: '3',
                     step: 'Memeriksa Kesiapan Belajar',
-                    time: `${Math.max(2, Math.round(pendMin * 0.13))} Menit`,
-                    guru: 'Memastikan kesiapan psikologis, fokus perhatian, dan perlengkapan belajar murid sebelum masuk materi.',
-                    how: 'Melakukan cek fokus singkat atau ice-breaking ringan 30–60 detik.',
-                    murid: 'Menyatakan kesiapan belajar dan menyesuaikan fokus perhatian.',
-                    dialog: `<strong>Guru:</strong> "Tarik napas sejenak, lepaskan. Apakah semua sudah siap mengikuti pembahasan ${escapeHtml(inp.materi)} hari ini?"<br><strong>Murid:</strong> "Sudah siap!"`,
-                    response: 'Murid menunjukkan perhatian penuh dan kesiapan mengikuti kegiatan.',
-                    indicator: 'Murid berada dalam kondisi siap belajar secara mental dan perlengkapan.'
+                    guru: `Memastikan kesiapan fokus dan kelengkapan LKPD/buku sebelum masuk ke ${inp.materi} (${timing.pendDurs[2]} menit; media: LKPD & buku).`,
+                    murid: `Menyatakan kesiapan belajar dan menyiapkan buku/LKPD. Contoh instruksi guru: "Apakah LKPD dan buku catatan sudah siap?" Respons murid: "Sudah siap, Bu/Pak!"`
                 },
                 {
-                    no: '4',
-                    step: 'Melakukan Apersepsi',
-                    time: `${Math.max(2, Math.round(pendMin * 0.13))} Menit`,
-                    guru: `Mengaitkan pengalaman sehari-hari murid di ${inp.sekolah} atau rumah dengan topik ${inp.materi}.`,
-                    how: 'Mengajukan pertanyaan pengalaman nyata yang akrab bagi murid.',
-                    murid: 'Mengingat pengalaman sehari-hari dan menceritakannya secara singkat.',
-                    dialog: `<strong>Guru:</strong> "Siapa yang pernah mengalami atau melihat situasi sehari-hari yang berhubungan dengan ${escapeHtml(inp.materi)}?"<br><strong>Murid:</strong> "Saya pernah melihatnya saat..."`,
-                    response: 'Murid mengaitkan pengalaman pribadi dengan topik yang akan dipelajari.',
-                    indicator: 'Murid mampu mengaitkan pengalaman nyata dengan topik pembelajaran.'
+                    step: 'Apersepsi',
+                    guru: `Menghubungkan materi sebelumnya dengan materi baru (${inp.materi}) melalui pertanyaan pengalaman sehari-hari (${timing.pendDurs[3]} menit; media: papan tulis).`,
+                    murid: `Menjawab berdasarkan pengalaman dan pengetahuan sebelumnya. Contoh pertanyaan guru: "Pengalaman apa yang kalian ingat terkait ${inp.materi}?" Respons murid: mengaitkan pengalaman nyata secara singkat.`
                 },
                 {
-                    no: '5',
-                    step: 'Menghubungkan Materi Sebelumnya dengan Materi Baru',
-                    time: `${Math.max(2, Math.round(pendMin * 0.13))} Menit`,
-                    guru: `Menghubungkan pengetahuan prasyarat/pertemuan sebelumnya dengan fokus baru pada ${inp.materi}.`,
-                    how: 'Menanyakan kembali konsep dasar sebelumnya lalu menunjukkan jembatan ke materi baru.',
-                    murid: 'Menyebutkan kembali konsep sebelumnya dan menyimak keterkaitannya dengan materi baru.',
-                    dialog: `<strong>Guru:</strong> "Masih ingat konsep dasar yang kita pelajari sebelumnya? Hari ini kita mengembangkannya pada ${escapeHtml(inp.materi)}."<br><strong>Murid:</strong> "Ingat, kaitannya adalah..."`,
-                    response: 'Murid melihat kesinambungan antar-materi secara logis.',
-                    indicator: 'Keterkaitan pengetahuan awal dan materi baru terbangun jelas.'
+                    step: 'Menghubungkan Materi Sebelumnya',
+                    guru: `Mengaitkan konsep prasyarat/pertemuan lalu dengan pokok bahasan ${inp.materi} (${timing.pendDurs[4]} menit; media: bagan/papan tulis).`,
+                    murid: `Menyebutkan kembali konsep prasyarat dan menyimak hubungannya dengan ${inp.materi}. Contoh guru: "Bagaimana kaitan konsep dasar tadi dengan ${inp.materi}?" Respons murid: menjelaskan kaitan awal.`
                 },
                 {
-                    no: '6',
-                    step: 'Memberikan Pertanyaan Pemantik',
-                    time: `${Math.max(2, Math.round(pendMin * 0.14))} Menit`,
-                    guru: `Menampilkan situasi/contoh terkait ${inp.materi} dan mengajukan pertanyaan pemantik yang memicu rasa ingin tahu serta berpikir kritis.`,
-                    how: 'Menampilkan contoh/kasus singkat, memberi waktu berpikir 1 menit, lalu meminta beberapa murid berpendapat.',
-                    murid: 'Mengamati contoh/situasi dan menyampaikan dugaan atau pendapat kritis.',
-                    dialog: `<strong>Guru:</strong> "Perhatikan contoh terkait ${escapeHtml(inp.materi)} ini. Menurut kalian, mengapa hal ini bisa terjadi dan bagaimana cara menilainya?"<br><strong>Murid:</strong> "Menurut saya, hal itu terjadi karena..."`,
-                    response: 'Murid memberikan pendapat awal yang beragam dan beralasan.',
-                    indicator: 'Murid merespons pertanyaan pemantik dengan argumen awal yang relevan.'
+                    step: 'Pertanyaan Pemantik & Motivasi',
+                    guru: `Menampilkan kasus/situasi awal ${inp.materi} dan mengajukan pertanyaan pemantik untuk memicu rasa ingin tahu (${timing.pendDurs[5]} menit; media: gambar/kasus pemantik).`,
+                    murid: `Mengemukakan pendapat dan dugaan awal secara kritis. Contoh pertanyaan guru: "Mengapa kondisi pada contoh ${inp.materi} dapat terjadi dan apa dampaknya?" Respons murid: "Menurut saya, hal itu terjadi karena..."`
                 },
                 {
-                    no: '7',
                     step: 'Menyampaikan Tujuan Pembelajaran',
-                    time: `${Math.max(2, Math.round(pendMin * 0.12))} Menit`,
-                    guru: `Menyampaikan tujuan pembelajaran ${inp.materi} secara jelas agar murid tahu kompetensi yang akan dicapai.`,
-                    how: 'Menuliskan/menampilkan tujuan utama dengan bahasa yang mudah dipahami murid.',
-                    murid: 'Menyimak dan mencatat tujuan pembelajaran yang harus dicapai.',
-                    dialog: `<strong>Guru:</strong> "Tujuan kita hari ini adalah memahami, menganalisis, dan menyimpulkan ${escapeHtml(inp.materi)} agar kalian mampu menerapkannya secara tepat."<br><strong>Murid:</strong> Murid menyimak dan mencatat poin tujuan.`,
-                    response: 'Murid mengetahui target kemampuan yang diharapkan pada akhir pertemuan.',
-                    indicator: 'Murid dapat menyebutkan kembali fokus tujuan belajar hari ini.'
+                    guru: `Menyampaikan tujuan pembelajaran ${inp.materi} secara jelas dan terukur sesuai fase ${inp.jenjang} (${timing.pendDurs[6]} menit; media: papan tulis/slide).`,
+                    murid: `Menyimak dan mencatat target kemampuan yang ingin dicapai. Contoh ucapan guru: "Tujuan kita hari ini adalah memahami, menganalisis, dan menyimpulkan ${inp.materi}." Respons murid: mencatat tujuan belajar.`
                 },
                 {
-                    no: '8',
                     step: 'Menjelaskan Aktivitas & Penilaian',
-                    time: `${Math.max(1, pendMin - 7 * Math.max(2, Math.round(pendMin * 0.12)))} Menit`,
-                    guru: `Menjelaskan alur aktivitas melalui ${inp.model} serta aspek yang dinilai (partisipasi diskusi, ketepatan analisis LKPD, dan pemahaman akhir).`,
-                    how: 'Menyampaikan urutan langkah kegiatan dan kriteria penilaian secara transparan.',
-                    murid: 'Memahami alur kerja dan kriteria penilaian yang berlaku.',
-                    dialog: `<strong>Guru:</strong> "Kita akan bekerja dalam kelompok menggunakan ${escapeHtml(inp.model)}. Penilaian dilihat dari ketepatan analisis, kerja sama, dan simpulan kalian."<br><strong>Murid:</strong> "Baik, Bu/Pak!"`,
-                    response: 'Murid memahami langkah kegiatan dan cara penilaiannya.',
-                    indicator: 'Murid memahami urutan aktivitas dan aspek penilaian pembelajaran.'
+                    guru: `Menjelaskan langkah kegiatan melalui ${inp.model} serta aspek penilaian formatif & sumatif (${timing.pendDurs[7]} menit; media: LKPD & rubrik).`,
+                    murid: `Memahami alur kerja kelompok/individu dan kriteria penilaian. Contoh instruksi guru: "Kita akan bekerja dengan ${inp.model} dan menilai ketepatan analisis LKPD." Respons murid: "Baik, Bu/Pak!"`
                 }
             ];
 
-            const perStepMin = Math.max(5, Math.floor(intiMin / syntax.steps.length));
             const intiRows = syntax.steps.map((st, idx) => {
-                const dur = idx === syntax.steps.length - 1
-                    ? Math.max(5, intiMin - perStepMin * (syntax.steps.length - 1))
-                    : perStepMin;
+                const dur = timing.intiDurs[idx] || 10;
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(st.name)}</strong><br><span style="font-size:9.5pt;">Tujuan: ${escapeHtml(st.goal)}</span></td>
-                        <td><strong>${dur} Menit</strong></td>
+                        <td><strong>${escapeHtml(st.name)}</strong><br><em>(${dur} Menit • Media: ${escapeHtml(st.media)})</em></td>
                         <td>
-                            <strong>Aktivitas Guru:</strong> ${escapeHtml(st.guruDo)}<br>
-                            <strong>Cara Melaksanakan:</strong> ${escapeHtml(st.guruHow)}<br>
-                            <strong>Contoh Ucapan/Instruksi:</strong> <em>${escapeHtml(st.examplePrompt)}</em><br>
-                            <strong>Contoh Kasus/Situasi:</strong> ${escapeHtml(st.caseExample)}<br>
-                            <strong>Media &amp; Sumber:</strong> ${escapeHtml(st.media)}
+                            ${escapeHtml(st.guruDo)} ${escapeHtml(st.guruHow)}<br>
+                            <strong>Contoh Ucapan/Instruksi:</strong> ${escapeHtml(st.examplePrompt)}<br>
+                            <strong>Contoh Kasus/Situasi:</strong> ${escapeHtml(st.caseExample)}
                         </td>
                         <td>
-                            <strong>Aktivitas Murid:</strong> ${escapeHtml(st.muridDo)}<br>
-                            <strong>Contoh Respons/Hasil Murid:</strong> <em>${escapeHtml(st.muridResponse)}</em><br>
-                            <strong>Indikator Keberhasilan:</strong> ${escapeHtml(st.indicator)}
+                            ${escapeHtml(st.muridDo)}<br>
+                            <strong>Contoh Respons/Hasil:</strong> ${escapeHtml(st.muridResponse)}<br>
+                            <strong>Indikator:</strong> ${escapeHtml(st.indicator)}
                         </td>
                     </tr>
                 `;
             }).join('');
 
-            const penutupSteps = [
+            const penutupStepsRaw = [
                 {
-                    no: '1',
-                    step: 'Membimbing Murid Menyimpulkan Pembelajaran',
-                    time: `${Math.max(2, Math.round(penutupMin * 0.18))} Menit`,
-                    guru: `Memandu murid merangkum inti materi ${inp.materi} dan hasil diskusi/penyelidikan yang telah dilakukan.`,
-                    how: 'Mengajukan pertanyaan rangkuman dan meminta 2–3 murid menyusun simpulan dengan bahasa sendiri.',
-                    murid: 'Menyampaikan kesimpulan pokok materi dan hasil pembelajaran.',
-                    dialog: `<strong>Guru:</strong> "Siapa yang bisa menyimpulkan poin utama ${escapeHtml(inp.materi)} yang kita pelajari hari ini?"<br><strong>Murid (Contoh Kesimpulan):</strong> "Intinya, ${escapeHtml(inp.materi)} melibatkan pemahaman konsep, analisis kasus, dan penerapan yang tepat."`,
-                    response: 'Murid menyusun kesimpulan yang selaras dengan tujuan pembelajaran.',
-                    indicator: 'Kesimpulan murid mencakup inti materi dan hasil aktivitas.'
+                    step: 'Menyimpulkan Pembelajaran',
+                    guru: `Membimbing murid merangkum inti ${inp.materi} dan hasil diskusi/penyelidikan (${timing.penutupDurs[0]} menit; media: papan tulis/LKPD).`,
+                    murid: `Menyampaikan kesimpulan pokok materi dengan bahasa sendiri. Contoh guru: "Siapa yang dapat menyimpulkan inti ${inp.materi}?" Contoh kesimpulan murid: "Intinya, ${inp.materi} mencakup konsep dasar, analisis kasus, dan penerapan yang tepat."`
                 },
                 {
-                    no: '2',
-                    step: 'Memberikan Penguatan Materi',
-                    time: `${Math.max(2, Math.round(penutupMin * 0.16))} Menit`,
-                    guru: `Memberikan umpan balik dan penguatan konsep kunci ${inp.materi} agar tidak terjadi miskonsepsi.`,
-                    how: 'Menegaskan kembali istilah/prinsip utama dan mengapresiasi usaha murid.',
-                    murid: 'Menyimak penguatan guru dan meluruskan catatan/pemahaman bila perlu.',
-                    dialog: `<strong>Guru (Contoh Umpan Balik):</strong> "Bagus sekali simpulannya. Sebagai penguatan, pastikan kalian selalu mengaitkan alasan/bukti saat menerapkan ${escapeHtml(inp.materi)}."`,
-                    response: 'Murid memperoleh kepastian pemahaman atas konsep kunci.',
-                    indicator: 'Konsep inti tersampaikan jelas dan miskonsepsi teratasi.'
+                    step: 'Penguatan Materi',
+                    guru: `Memberikan umpan balik dan penguatan konsep kunci ${inp.materi} untuk meluruskan miskonsepsi (${timing.penutupDurs[1]} menit; media: bahan bacaan).`,
+                    murid: `Menyimak penguatan dan meluruskan catatan. Contoh umpan balik guru: "Bagus sekali; pastikan selalu mengaitkan alasan/bukti saat menerapkan ${inp.materi}." Respons murid: menyimak dan melengkapi catatan.`
                 },
                 {
-                    no: '3',
-                    step: 'Melakukan Evaluasi atau Asesmen Akhir',
-                    time: `${Math.max(2, Math.round(penutupMin * 0.16))} Menit`,
-                    guru: 'Memberikan kuis singkat, tiket keluar (exit ticket), atau 1–2 pertanyaan cek pemahaman akhir.',
-                    how: 'Meminta murid menjawab singkat secara mandiri di buku/lembar tugas.',
-                    murid: 'Mengerjakan pertanyaan cek pemahaman akhir secara mandiri dan jujur.',
-                    dialog: `<strong>Guru:</strong> "Sebelum menutup sesi, jawablah satu pertanyaan singkat ini: bagaimana cara menerapkan ${escapeHtml(inp.materi)} pada situasi nyata?"`,
-                    response: 'Murid menuliskan jawaban cek pemahaman akhir.',
-                    indicator: 'Data pemahaman akhir murid terkumpul sebagai bahan tindak lanjut.'
+                    step: 'Evaluasi / Asesmen Akhir',
+                    guru: `Memberikan 1–2 pertanyaan cek pemahaman akhir / exit ticket selaras TP (${timing.penutupDurs[2]} menit; media: lembar tugas).`,
+                    murid: `Menjawab pertanyaan evaluasi singkat secara mandiri. Contoh pertanyaan guru: "Bagaimana cara menerapkan ${inp.materi} pada situasi nyata?" Respons murid: menuliskan jawaban cek pemahaman.`
                 },
                 {
-                    no: '4',
-                    step: 'Mengajak Murid Melakukan Refleksi',
-                    time: `${Math.max(2, Math.round(penutupMin * 0.15))} Menit`,
-                    guru: 'Mengajak murid merefleksikan pengalaman belajar, bagian yang paling dipahami, dan bagian yang masih sulit.',
-                    how: 'Mengajukan pertanyaan refleksi yang sederhana dan ramah murid.',
-                    murid: 'Menuliskan atau menyampaikan refleksi belajarnya.',
-                    dialog: `<strong>Guru (Pertanyaan Refleksi):</strong> "Bagian mana dari ${escapeHtml(inp.materi)} yang paling mudah kalian pahami hari ini, dan bagian mana yang masih perlu latihan?"<br><strong>Murid:</strong> "Saya sudah paham bagian awal, tetapi perlu berlatih lagi pada analisis kasus."`,
-                    response: 'Murid mengenali kekuatan dan kesulitan belajarnya sendiri.',
-                    indicator: 'Refleksi murid mencerminkan kesadaran belajar yang jujur.'
+                    step: 'Refleksi Singkat Murid',
+                    guru: `Mengajak murid merefleksikan bagian yang mudah dipahami dan yang masih sulit (${timing.penutupDurs[3]} menit; media: lembar refleksi).`,
+                    murid: `Menyampaikan refleksi belajar secara jujur. Contoh pertanyaan refleksi guru: "Bagian mana dari ${inp.materi} yang paling kamu pahami dan mana yang perlu latihan?" Respons murid: menyebutkan kekuatan & kesulitan belajarnya.`
                 },
                 {
-                    no: '5',
-                    step: 'Memberikan Tindak Lanjut',
-                    time: `${Math.max(2, Math.round(penutupMin * 0.13))} Menit`,
-                    guru: `Memberikan arahan pengayaan bagi murid yang sudah tuntas dan bimbingan/latihan terarah bagi yang memerlukan pendampingan pada ${inp.materi}.`,
-                    how: 'Menyampaikan tugas tindak lanjut sesuai kebutuhan belajar murid.',
-                    murid: 'Mencatat tugas tindak lanjut yang diberikan guru.',
-                    dialog: `<strong>Guru (Contoh Tindak Lanjut):</strong> "Bagi yang sudah lancar, silakan siapkan contoh kasus lanjutan ${escapeHtml(inp.materi)}. Bagi yang masih butuh latihan, ikuti sesi pendampingan singkat bersama saya."`,
-                    response: 'Murid mengetahui langkah tindak lanjut sesuai kebutuhannya.',
-                    indicator: 'Tindak lanjut terdiferensiasi tersampaikan secara jelas.'
+                    step: 'Tindak Lanjut (Pengayaan & Remedial)',
+                    guru: `Memberikan arahan pengayaan untuk yang tuntas dan pendampingan/latihan bertahap untuk yang belum tuntas (${timing.penutupDurs[4]} menit; media: tugas tindak lanjut).`,
+                    murid: `Mencatat tugas tindak lanjut sesuai kebutuhan. Contoh tindak lanjut guru: "Yang tuntas mengerjakan pengayaan kasus lanjutan; yang belum tuntas mengikuti bimbingan konsep & latihan terarah." Respons murid: mencatat tugasnya.`
                 },
                 {
-                    no: '6',
-                    step: 'Menyampaikan Materi Pertemuan Berikutnya',
-                    time: `${Math.max(1, Math.round(penutupMin * 0.11))} Menit`,
-                    guru: 'Menginformasikan topik atau persiapan untuk pertemuan selanjutnya.',
-                    how: 'Menyebutkan judul topik berikutnya dan persiapan ringan yang perlu dilakukan.',
-                    murid: 'Mencatat informasi pertemuan berikutnya.',
-                    dialog: `<strong>Guru:</strong> "Pada pertemuan berikutnya, kita akan melanjutkan ke bahasan lanjutan yang terkait dengan ${escapeHtml(inp.materi)}. Silakan baca pengantarnya di rumah."`,
-                    response: 'Murid siap menyambut topik pertemuan berikutnya.',
-                    indicator: 'Murid mengetahui agenda pertemuan selanjutnya.'
+                    step: 'Materi Pertemuan Berikutnya',
+                    guru: `Menyampaikan agenda atau persiapan singkat untuk pertemuan berikutnya (${timing.penutupDurs[5]} menit; media: agenda kelas).`,
+                    murid: `Mencatat informasi pertemuan berikutnya. Contoh guru: "Pertemuan berikutnya kita akan membahas lanjutan terkait ${inp.materi}." Respons murid: mencatat persiapan belajar.`
                 },
                 {
-                    no: '7',
-                    step: 'Menutup Pembelajaran',
-                    time: `${Math.max(1, penutupMin - 6 * Math.max(2, Math.round(penutupMin * 0.14)))} Menit`,
-                    guru: 'Mengajak murid berdoa penutup, memberi salam, dan mengakhiri pembelajaran dengan tertib.',
-                    how: 'Memimpin doa penutup dan memberi salam perpisahan.',
-                    murid: 'Berdoa bersama, merapikan perlengkapan, dan menjawab salam.',
-                    dialog: `<strong>Guru:</strong> "Terima kasih atas semangat belajar kalian hari ini. Mari kita tutup dengan doa dan salam."<br><strong>Murid:</strong> "Terima kasih, Pak/Bu. Selamat siang!"`,
-                    response: 'Pembelajaran ditutup dengan tertib dan penuh apresiasi.',
-                    indicator: 'Kegiatan pembelajaran berakhir tertib dan tepat waktu.'
+                    step: 'Penutup Pembelajaran',
+                    guru: `Memimpin doa penutup dan salam perpisahan secara tertib (${timing.penutupDurs[6]} menit; media: doa & salam).`,
+                    murid: `Berdoa bersama, merapikan perlengkapan, dan menjawab salam. Contoh guru: "Terima kasih, mari kita tutup dengan doa dan salam." Respons murid: berdoa dan menjawab salam dengan tertib.`
                 }
             ];
 
             return `
-                <h3>ANALISIS KETERKAITAN KOMPONEN PEMBELAJARAN (PRA-PENYUSUNAN MODUL)</h3>
+                <h3>B.7 LANGKAH-LANGKAH PEMBELAJARAN (${timing.totalMin} MENIT)</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:28%;">Aspek Analisis Pedagogis</th>
-                            <th style="width:72%;">Hasil Analisis &amp; Keterkaitan dengan Pembelajaran</th>
+                            <th style="width:28%;">Bagian Pembelajaran</th>
+                            <th style="width:16%;">Alokasi Waktu</th>
+                            <th style="width:56%;">Uraian &amp; Keselarasan Tujuan</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>1. Karakteristik &amp; Kompleksitas Materi</strong></td><td>Materi <strong>${escapeHtml(inp.materi)}</strong> pada ${escapeHtml(inp.mapel)} (${escapeHtml(inp.kelas)}) menuntut pemahaman konsep dasar sekaligus kemampuan menelaah keterkaitan unsur dan penerapannya pada situasi nyata.</td></tr>
-                        <tr><td><strong>2. Perkembangan &amp; Kebutuhan Murid</strong></td><td>Murid pada ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}) memerlukan penjelasan bertahap, contoh konkret dari kehidupan sehari-hari, serta ruang diskusi yang aman untuk membangun kepercayaan diri.</td></tr>
-                        <tr><td><strong>3. Pengetahuan Awal yang Dibutuhkan</strong></td><td>Pemahaman prasyarat terkait istilah dasar, pengalaman sehari-hari yang relevan, dan keterampilan dasar membaca/berdiskusi kelompok.</td></tr>
-                        <tr><td><strong>4. Keselarasan Model &amp; Aktivitas</strong></td><td><strong>${escapeHtml(syntax.label)}</strong>: ${escapeHtml(syntax.rationale)} Alokasi waktu <strong>${escapeHtml(inp.waktu)}</strong> dibagi proporsional (${pendMin} menit Pendahuluan, ${intiMin} menit Kegiatan Inti, ${penutupMin} menit Penutup).</td></tr>
-                        <tr><td><strong>5. Asesmen, Media &amp; Tindak Lanjut</strong></td><td>Asesmen awal, formatif, dan sumatif disusun selaras dengan Tujuan Pembelajaran serta dilengkapi rubrik indikator terukur, pengayaan, remedial non-repetitif, dan refleksi guru–murid.</td></tr>
+                        <tr><td><strong>Kegiatan Pendahuluan</strong></td><td><strong>${timing.pendMin} Menit</strong></td><td>Orientasi, kehadiran, kesiapan, apersepsi, koneksi materi, pertanyaan pemantik, tujuan TP, dan rencana asesmen.</td></tr>
+                        <tr><td><strong>Kegiatan Inti (${escapeHtml(syntax.label)})</strong></td><td><strong>${timing.intiMin} Menit</strong></td><td>Pelaksanaan sintaks baku ${escapeHtml(syntax.label)} secara berurutan, operasional, dan terhubung langsung dengan LKPD serta TP.</td></tr>
+                        <tr><td><strong>Kegiatan Penutup</strong></td><td><strong>${timing.penutupMin} Menit</strong></td><td>Kesimpulan, penguatan materi, evaluasi akhir, refleksi murid, tindak lanjut, agenda berikutnya, dan doa penutup.</td></tr>
+                        <tr><td><strong>Total Alokasi Waktu</strong></td><td><strong>${timing.totalMin} Menit</strong></td><td>Selaras dengan input alokasi waktu: <strong>${escapeHtml(inp.waktu)}</strong>.</td></tr>
                     </tbody>
                 </table>
 
-                <h3>13. KEGIATAN PENDAHULUAN OPERASIONAL (${pendMin} MENIT — 8 LANGKAH BERURUTAN)</h3>
+                <h4>a. Kegiatan Pendahuluan (${timing.pendMin} Menit)</h4>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:8%;">No</th>
-                            <th style="width:20%;">Langkah</th>
-                            <th style="width:11%;">Waktu</th>
-                            <th style="width:31%;">Aktivitas Guru, Cara &amp; Contoh Dialog</th>
-                            <th style="width:30%;">Aktivitas Murid, Respons &amp; Indikator</th>
+                            <th style="width:24%;">Tahapan/Kegiatan</th>
+                            <th style="width:38%;">Aktivitas Guru</th>
+                            <th style="width:38%;">Aktivitas Peserta Didik</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${pendSteps.map(ps => `
+                        ${pendStepsRaw.map(ps => `
                             <tr>
-                                <td><strong>${ps.no}</strong></td>
                                 <td><strong>${escapeHtml(ps.step)}</strong></td>
-                                <td>${escapeHtml(ps.time)}</td>
-                                <td>
-                                    <strong>Dilakukan Guru:</strong> ${escapeHtml(ps.guru)}<br>
-                                    <strong>Cara Pelaksanaan:</strong> ${escapeHtml(ps.how)}<br>
-                                    <strong>Contoh Ucapan/Instruksi:</strong><br>${ps.dialog}
-                                </td>
-                                <td>
-                                    <strong>Dilakukan Murid:</strong> ${escapeHtml(ps.murid)}<br>
-                                    <strong>Respons Murid:</strong> ${escapeHtml(ps.response)}<br>
-                                    <strong>Indikator Keberhasilan:</strong> ${escapeHtml(ps.indicator)}
-                                </td>
+                                <td>${escapeHtml(ps.guru)}</td>
+                                <td>${ps.murid}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
 
-                <h3>14. KEGIATAN INTI — SINTAKS ${escapeHtml(syntax.label.toUpperCase())} (${intiMin} MENIT)</h3>
+                <h4>b. Kegiatan Inti — Sintaks ${escapeHtml(syntax.label)} (${timing.intiMin} Menit)</h4>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:20%;">Sintaks &amp; Tujuan</th>
-                            <th style="width:10%;">Waktu</th>
-                            <th style="width:36%;">Langkah Guru, Instruksi, Kasus &amp; Media</th>
-                            <th style="width:34%;">Langkah Murid, Contoh Respons &amp; Indikator</th>
+                            <th style="width:24%;">Tahapan/Kegiatan</th>
+                            <th style="width:38%;">Aktivitas Guru</th>
+                            <th style="width:38%;">Aktivitas Peserta Didik</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2573,33 +2617,21 @@
                     </tbody>
                 </table>
 
-                <h3>15. KEGIATAN PENUTUP OPERASIONAL (${penutupMin} MENIT — 7 LANGKAH BERURUTAN)</h3>
+                <h4>c. Kegiatan Penutup (${timing.penutupMin} Menit)</h4>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:8%;">No</th>
-                            <th style="width:20%;">Langkah</th>
-                            <th style="width:11%;">Waktu</th>
-                            <th style="width:31%;">Aktivitas Guru, Umpan Balik &amp; Contoh Dialog</th>
-                            <th style="width:30%;">Aktivitas Murid, Refleksi/Tindak Lanjut &amp; Indikator</th>
+                            <th style="width:24%;">Tahapan/Kegiatan</th>
+                            <th style="width:38%;">Aktivitas Guru</th>
+                            <th style="width:38%;">Aktivitas Peserta Didik</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${penutupSteps.map(pt => `
+                        ${penutupStepsRaw.map(pt => `
                             <tr>
-                                <td><strong>${pt.no}</strong></td>
                                 <td><strong>${escapeHtml(pt.step)}</strong></td>
-                                <td>${escapeHtml(pt.time)}</td>
-                                <td>
-                                    <strong>Dilakukan Guru:</strong> ${escapeHtml(pt.guru)}<br>
-                                    <strong>Cara Pelaksanaan:</strong> ${escapeHtml(pt.how)}<br>
-                                    <strong>Contoh Dialog/Umpan Balik:</strong><br>${pt.dialog}
-                                </td>
-                                <td>
-                                    <strong>Dilakukan Murid:</strong> ${escapeHtml(pt.murid)}<br>
-                                    <strong>Respons Murid:</strong> ${escapeHtml(pt.response)}<br>
-                                    <strong>Indikator Keberhasilan:</strong> ${escapeHtml(pt.indicator)}
-                                </td>
+                                <td>${escapeHtml(pt.guru)}</td>
+                                <td>${pt.murid}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -2609,186 +2641,308 @@
 
         function buildFullModul28Html(inp) {
             const syntax = getModelSyntaxBlueprint(inp.model, inp);
+            const hasCpInput = Boolean(inp.cpInput && inp.cpInput.trim().length > 0);
+            const cpIsi = hasCpInput
+                ? escapeHtml(inp.cpInput)
+                : `Usulan rumusan CP selaras fase ${escapeHtml(inp.jenjang)} untuk ${escapeHtml(inp.mapel)} pada materi ${escapeHtml(inp.materi)}: memahami konsep pokok, keterkaitan antarunsur, dan penerapan secara runtut serta bertanggung jawab.`;
+            const cpContoh = hasCpInput
+                ? `Menjadi landasan penyusunan TP 1–TP 3 pada ${inp.kelas}.`
+                : `Catatan: CP resmi belum dicantumkan pada form; ini merupakan rumusan usulan selaras fase dan perlu disesuaikan dengan dokumen CP resmi satuan pendidikan.`;
+
             return `
                 <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 8pt; margin-bottom: 12pt;">
-                    <h1>MODUL AJAR KURIKULUM MERDEKA — OPERASIONAL &amp; TERPERINCI</h1>
+                    <h1>MODUL AJAR — STANDAR PEDAGOGIS &amp; OPERASIONAL</h1>
                     <h2>${escapeHtml(inp.mapel.toUpperCase())} — ${escapeHtml(inp.materi.toUpperCase())}</h2>
                 </div>
 
+                <h3>A. INFORMASI UMUM</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width:10%;">No</th>
-                            <th style="width:26%;">Komponen Modul Ajar</th>
-                            <th style="width:64%;">Uraian Lengkap &amp; Operasional</th>
+                            <th style="width:24%;">Komponen</th>
+                            <th style="width:40%;">Isi</th>
+                            <th style="width:36%;">Contoh</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>1</strong></td>
                             <td><strong>Identitas Modul</strong></td>
-                            <td>
-                                <strong>Nama Penyusun:</strong> ${escapeHtml(inp.penyusun)} | <strong>Nama Sekolah:</strong> ${escapeHtml(inp.sekolah)}<br>
-                                <strong>Mata Pelajaran:</strong> ${escapeHtml(inp.mapel)} | <strong>Kelas / Fase:</strong> ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)})<br>
-                                <strong>Materi Pokok:</strong> <strong>${escapeHtml(inp.materi)}</strong> | <strong>Alokasi Waktu:</strong> ${escapeHtml(inp.waktu)}<br>
-                                <strong>Model Pembelajaran:</strong> ${escapeHtml(syntax.label)} | <strong>Metode Pembelajaran:</strong> Diskusi kelompok, studi kasus kontekstual, tanya jawab terbimbing, presentasi, dan refleksi.
-                            </td>
+                            <td>Satuan pendidikan, penyusun, mata pelajaran, fase/kelas, semester, materi pokok, dan alokasi waktu pembelajaran.</td>
+                            <td>Satuan: ${escapeHtml(inp.sekolah)} • Penyusun: ${escapeHtml(inp.penyusun)} • Mapel: ${escapeHtml(inp.mapel)} • Fase/Kelas: ${escapeHtml(inp.jenjang)} / ${escapeHtml(inp.kelas)} • Semester: ${escapeHtml(inp.semester)} • Materi: ${escapeHtml(inp.materi)} • Waktu: ${escapeHtml(inp.waktu)}.</td>
                         </tr>
                         <tr>
-                            <td><strong>2</strong></td>
                             <td><strong>Kompetensi Awal</strong></td>
-                            <td>
-                                Sebelum mempelajari <strong>${escapeHtml(inp.materi)}</strong>, murid pada ${escapeHtml(inp.kelas)} diharapkan sudah memiliki pengetahuan dasar tentang konsep/istilah awal yang terkait, keterampilan membaca dan menyimak informasi, serta kemampuan bekerja sama dalam kelompok kecil.<br>
-                                <strong>Contoh Kemampuan Awal Teramati:</strong> Murid mampu menyebutkan contoh pengalaman sehari-hari yang berkaitan dengan topik dan mengutarakan pendapat sederhana saat diskusi kelas.
-                            </td>
+                            <td>Pengetahuan, keterampilan, dan pemahaman awal yang perlu dimiliki peserta didik sebelum mempelajari ${escapeHtml(inp.materi)}.</td>
+                            <td>Peserta didik pada ${escapeHtml(inp.kelas)} sudah mengenal istilah dasar, mampu membaca informasi sederhana, dan menyampaikan pendapat awal terkait ${escapeHtml(inp.materi)}.</td>
                         </tr>
                         <tr>
-                            <td><strong>3</strong></td>
-                            <td><strong>Karakteristik Murid &amp; Dimensi Profil Lulusan</strong></td>
-                            <td>
-                                Murid di ${escapeHtml(inp.sekolah)} (${escapeHtml(inp.kelas)}) memiliki keragaman kesiapan belajar, kecepatan memahami konsep, serta gaya belajar (visual, auditori, kinestetik). Guru menerapkan pendekatan berdiferensiasi melalui contoh konkret, pendampingan bertahap, serta tugas berjenjang.<br>
-                                <strong>Profil Pelajar Pancasila / Dimensi Lulusan:</strong> <em>Bernalar Kritis</em> (menganalisis kasus &amp; bukti), <em>Gotong Royong</em> (berkolaborasi aktif), dan <em>Mandiri</em> (menyelesaikan tugas &amp; merefleksi proses belajar).
-                            </td>
+                            <td><strong>Profil Pelajar Pancasila / Profil Lulusan</strong></td>
+                            <td>Dimensi karakter dan profil lulusan yang dikembangkan melalui aktivitas belajar ${escapeHtml(inp.materi)}.</td>
+                            <td>Bernalar kritis saat menganalisis kasus ${escapeHtml(inp.materi)}, gotong royong saat berdiskusi kelompok, dan mandiri saat menyusun kesimpulan serta refleksi.</td>
                         </tr>
                         <tr>
-                            <td><strong>4</strong></td>
                             <td><strong>Sarana dan Prasarana</strong></td>
-                            <td>Buku teks ${escapeHtml(inp.mapel)} (${escapeHtml(inp.jenjang)}), LKPD cetak/digital berbasis kasus ${escapeHtml(inp.materi)}, papan tulis/spidol, media visual/tayangan kasus, dan alat tulis murid.</td>
+                            <td>Perlengkapan, sumber belajar, dan media pendukung pelaksanaan pembelajaran di kelas.</td>
+                            <td>Buku teks ${escapeHtml(inp.mapel)} (${escapeHtml(inp.jenjang)}), LKPD terintegrasi kegiatan inti ${escapeHtml(inp.materi)}, papan tulis/spidol, serta contoh kasus/tayangan visual.</td>
                         </tr>
                         <tr>
-                            <td><strong>5</strong></td>
-                            <td><strong>Target Murid</strong></td>
-                            <td>Murid reguler/tipikal pada ${escapeHtml(inp.kelas)} di ${escapeHtml(inp.sekolah)}, termasuk murid yang memerlukan pengayaan maupun bimbingan remedial terarah.</td>
+                            <td><strong>Target Peserta Didik</strong></td>
+                            <td>Sasaran peserta didik yang mengikuti pembelajaran sesuai jenjang dan kebutuhan belajarnya.</td>
+                            <td>Peserta didik reguler/tipikal ${escapeHtml(inp.kelas)} (Semester ${escapeHtml(inp.semester)}) di ${escapeHtml(inp.sekolah)}, termasuk yang memerlukan pengayaan maupun remedial.</td>
                         </tr>
                         <tr>
-                            <td><strong>6</strong></td>
                             <td><strong>Model dan Metode Pembelajaran</strong></td>
-                            <td><strong>Model:</strong> ${escapeHtml(syntax.label)} — ${escapeHtml(syntax.rationale)}<br><strong>Metode:</strong> Studi kasus kontekstual, diskusi kelompok terstruktur, tanya jawab pemantik, presentasi hasil, dan refleksi.</td>
+                            <td>Sintaks model pembelajaran baku dan metode belajar yang diterapkan secara konsisten pada kegiatan inti.</td>
+                            <td>Model: <strong>${escapeHtml(syntax.label)}</strong> (${syntax.steps.map((s, i) => `${i + 1}) ${escapeHtml(s.name)}`).join(' • ')}); Metode: diskusi kelompok, studi kasus, tanya jawab &amp; presentasi.</td>
                         </tr>
+                    </tbody>
+                </table>
+
+                <h3>B. KOMPONEN INTI</h3>
+                <table>
+                    <thead>
                         <tr>
-                            <td><strong>7</strong></td>
+                            <th style="width:24%;">Komponen</th>
+                            <th style="width:40%;">Isi</th>
+                            <th style="width:36%;">Contoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
                             <td><strong>Capaian Pembelajaran (CP)</strong></td>
-                            <td>Pada fase (${escapeHtml(inp.jenjang)}), murid memahami konsep, hubungan antarunsur, dan penerapan <strong>${escapeHtml(inp.materi)}</strong> pada mata pelajaran ${escapeHtml(inp.mapel)} serta mengomunikasikan analisis dan solusinya secara runtut dan bertanggung jawab.</td>
+                            <td>${cpIsi}</td>
+                            <td>${cpContoh}</td>
                         </tr>
                         <tr>
-                            <td><strong>8</strong></td>
-                            <td><strong>Tujuan Pembelajaran (TP) &amp; Indikator Ketercapaian</strong></td>
-                            <td>
-                                <strong>TP 1:</strong> Murid mampu menjelaskan pengertian dan konsep inti <strong>${escapeHtml(inp.materi)}</strong> secara tepat. <em>(Indikator: menyebutkan definisi, ciri/unsur utama, dan contoh awal dengan benar).</em><br>
-                                <strong>TP 2:</strong> Murid mampu menganalisis hubungan antarunsur dan studi kasus nyata terkait <strong>${escapeHtml(inp.materi)}</strong>. <em>(Indikator: menguraikan penyebab, dampak, dan bukti pendukung secara logis).</em><br>
-                                <strong>TP 3:</strong> Murid mampu merumuskan dan menyajikan simpulan atau solusi atas permasalahan <strong>${escapeHtml(inp.materi)}</strong>. <em>(Indikator: menyusun simpulan/solusi yang realistis dan sesuai konsep).</em>
-                            </td>
+                            <td><strong>Tujuan Pembelajaran (TP)</strong></td>
+                            <td>Kemampuan spesifik, terukur, dan realistis yang menjadi dasar materi, aktivitas, LKPD, dan asesmen.</td>
+                            <td>TP 1: Menjelaskan konsep &amp; unsur ${escapeHtml(inp.materi)}. TP 2: Menganalisis kasus &amp; hubungan antarunsur ${escapeHtml(inp.materi)}. TP 3: Merumuskan kesimpulan/solusi secara runtut.</td>
                         </tr>
                         <tr>
-                            <td><strong>9</strong></td>
                             <td><strong>Pemahaman Bermakna</strong></td>
-                            <td>Memahami <strong>${escapeHtml(inp.materi)}</strong> membantu murid membuat keputusan yang logis dan bertanggung jawab. Dalam kehidupan keluarga, murid menerapkannya pada kebiasaan/aturan rumah; di sekolah (${escapeHtml(inp.sekolah)}), pada kerja kelompok dan tata tertib; dan di masyarakat, pada kepedulian terhadap lingkungan serta kepentingan bersama.</td>
+                            <td>Makna penting materi ${escapeHtml(inp.materi)} dalam kehidupan sehari-hari.</td>
+                            <td>Menerapkan prinsip ${escapeHtml(inp.materi)} membantu mengambil keputusan secara logis dan bertanggung jawab di rumah, ${escapeHtml(inp.sekolah)}, maupun masyarakat.</td>
                         </tr>
                         <tr>
-                            <td><strong>10</strong></td>
-                            <td><strong>Pertanyaan Pemantik &amp; Tujuannya</strong></td>
-                            <td>
-                                1. <em>"Apa yang terjadi apabila prinsip dalam ${escapeHtml(inp.materi)} diabaikan pada situasi sehari-hari?"</em> — <strong>Tujuan:</strong> memancing kesadaran sebab-akibat.<br>
-                                2. <em>"Mengapa dua situasi yang tampak mirip dapat menghasilkan dampak berbeda terkait ${escapeHtml(inp.materi)}?"</em> — <strong>Tujuan:</strong> melatih analisis kritis dan ketelitian.<br>
-                                3. <em>"Bagaimana cara memilih langkah terbaik saat menghadapi masalah terkait ${escapeHtml(inp.materi)}?"</em> — <strong>Tujuan:</strong> mengarahkan pengambilan keputusan berbasis pertimbangan.
-                            </td>
+                            <td><strong>Pertanyaan Pemantik</strong></td>
+                            <td>Pertanyaan terbuka untuk memantik rasa ingin tahu, analisis kritis, dan koneksi pengalaman nyata.</td>
+                            <td>"Mengapa kondisi pada ${escapeHtml(inp.materi)} bisa terjadi?" dan "Bagaimana cara menentukan langkah paling tepat saat menghadapi masalah terkait ${escapeHtml(inp.materi)}?"</td>
                         </tr>
                         <tr>
-                            <td><strong>11</strong></td>
                             <td><strong>Persiapan Pembelajaran</strong></td>
-                            <td>Menyiapkan asesmen awal singkat, materi ajar &amp; studi kasus ${escapeHtml(inp.materi)}, LKPD kelompok, rubrik observasi, serta memastikan waktu tiap tahap pembelajaran terukur.</td>
+                            <td>Langkah penyiapan perangkat, media, LKPD, dan instrumen sebelum pembelajaran dimulai.</td>
+                            <td>Menyiapkan bahan bacaan &amp; studi kasus ${escapeHtml(inp.materi)}, LKPD sesuai sintaks ${escapeHtml(syntax.label)}, lembar observasi formatif, soal sumatif, dan pembagian waktu ${escapeHtml(inp.waktu)}.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Materi Pembelajaran — ${escapeHtml(inp.materi)}</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:24%;">Aspek Materi</th>
+                            <th style="width:40%;">Uraian Sistematis</th>
+                            <th style="width:36%;">Contoh Penerapan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pengertian &amp; Konsep Utama</strong></td>
+                            <td>Menguraikan definisi dasar, unsur/komponen utama, dan hubungan sebab-akibat pada ${escapeHtml(inp.materi)} sesuai ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}).</td>
+                            <td>Membedakan pengertian dasar ${escapeHtml(inp.materi)}, unsur pembentuknya, dan bagaimana perubahan satu unsur memengaruhi hasil.</td>
                         </tr>
                         <tr>
-                            <td><strong>12</strong></td>
-                            <td><strong>Materi Pembelajaran Lengkap &amp; Mendalam</strong></td>
-                            <td>
-                                <strong>Pengertian Dasar:</strong> <strong>${escapeHtml(inp.materi)}</strong> merupakan pokok bahasan pada ${escapeHtml(inp.mapel)} (${escapeHtml(inp.kelas)}) yang menguraikan konsep pokok, komponen penyusun, dan cara penerapannya.<br>
-                                <strong>Konsep Utama &amp; Submateri:</strong> Mencakup (a) hakikat dan definisi konsep, (b) unsur/komponen utama serta keterkaitan sebab-akibatnya, dan (c) penerapan pada berbagai situasi.<br>
-                                <strong>Contoh Konkret &amp; Ilustrasi Nyata:</strong> Dalam aktivitas belajar maupun kehidupan sehari-hari di ${escapeHtml(inp.sekolah)}, penerapan yang tepat terlihat ketika langkah yang diambil selaras dengan kaidah materi dan mempertimbangkan dampaknya.<br>
-                                <strong>Hubungan Antarkonsep &amp; Kesimpulan:</strong> Penguasaan definisi menjadi dasar menganalisis hubungan antarunsur, yang selanjutnya menentukan ketepatan kesimpulan dan solusi. <strong>Istilah Penting:</strong> <em>${escapeHtml(inp.materi)}</em> (topik utama pembelajaran), <em>Analisis Kasus</em> (penelaahan masalah nyata berdasarkan konsep dan bukti).
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>13–15</strong></td>
-                            <td><strong>Kegiatan Pendahuluan, Inti &amp; Penutup</strong></td>
-                            <td>Diuraikan secara rinci dalam tabel operasional di bawah ini (lengkap dengan langkah guru, cara pelaksanaan, aktivitas murid, contoh dialog/kasus, respons murid, waktu, dan indikator keberhasilan).</td>
-                        </tr>
-                        <tr>
-                            <td><strong>16</strong></td>
-                            <td><strong>Sintaks Model Pembelajaran (${escapeHtml(syntax.label.toUpperCase())})</strong></td>
-                            <td>${syntax.steps.map((s, idx) => `${idx + 1}. <strong>${escapeHtml(s.name)}</strong>: ${escapeHtml(s.goal)}`).join('<br>')}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>17</strong></td>
-                            <td><strong>Asesmen Awal</strong></td>
-                            <td>
-                                <strong>Tujuan:</strong> Memetakan pengetahuan awal dan kesiapan belajar murid sebelum masuk materi inti.<br>
-                                <strong>Bentuk &amp; Pelaksanaan:</strong> Tanya jawab lisan atau kuis singkat 3 pertanyaan di awal sesi (3–5 menit).<br>
-                                <strong>Contoh Pertanyaan:</strong> Apa yang kalian ketahui tentang <em>${escapeHtml(inp.materi)}</em> dan contoh nyatanya?<br>
-                                <strong>Pemanfaatan Hasil:</strong> Mengelompokkan pendampingan dan menyesuaikan contoh pada kegiatan inti.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>18</strong></td>
-                            <td><strong>Asesmen Formatif</strong></td>
-                            <td>
-                                <strong>Tujuan &amp; Teknik:</strong> Memantau proses belajar murid melalui observasi diskusi dan penilaian LKPD selama kegiatan inti.<br>
-                                <strong>Indikator Pengamatan:</strong> Keaktifan berdiskusi, ketepatan analisis kasus, dan ketepatan penggunaan istilah/konsep.<br>
-                                <strong>Contoh Hasil Pengamatan:</strong> Kelompok mampu mengidentifikasi masalah dan menuliskan alasan yang logis di LKPD.<br>
-                                <strong>Interpretasi Hasil:</strong> Murid yang masih keliru pada konsep dasar diberi bimbingan langsung saat diskusi berlangsung.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>19</strong></td>
-                            <td><strong>Asesmen Sumatif</strong></td>
-                            <td>
-                                <strong>Tujuan &amp; Kisi-Kisi:</strong> Mengukur ketercapaian TP 1–TP 3 melalui soal uraian/studi kasus pada akhir unit/pembelajaran.<br>
-                                <strong>Contoh Soal:</strong> Analisislah satu situasi nyata terkait <strong>${escapeHtml(inp.materi)}</strong> di ${escapeHtml(inp.kelas)}, jelaskan penyebab utamanya, dan rumuskan solusi yang tepat.<br>
-                                <strong>Kunci &amp; Pembahasan Acuan:</strong> Jawaban tepat menyebutkan konsep kunci, menguraikan hubungan/penyebab dari kasus, dan memberi solusi beralasan.<br>
-                                <strong>Pedoman Penskoran:</strong> Skor maksimal tiap butir sesuai rubrik; Nilai Akhir = (Total Skor ÷ Skor Maksimal) × 100.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>20–21</strong></td>
-                            <td><strong>Instrumen &amp; Rubrik Penilaian Terukur</strong></td>
-                            <td>
-                                <strong>Aspek Dinilai:</strong> Pemahaman Konsep, Analisis Kasus/Solusi, dan Kolaborasi/Komunikasi.<br>
-                                <strong>Kriteria &amp; Skor (1–4):</strong> <strong>Skor 4 (Sangat Baik)</strong>: konsep tepat, analisis/solusi tajam &amp; berargumen kuat; <strong>Skor 3 (Baik)</strong>: konsep tepat, analisis cukup runtut; <strong>Skor 2 (Cukup)</strong>: konsep/analisis baru sebagian tepat; <strong>Skor 1 (Perlu Bimbingan)</strong>: belum tepat atau belum menjawab. Cara hitung nilai: <em>(Skor Diperoleh ÷ Skor Maksimal) × 100</em>.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>22</strong></td>
-                            <td><strong>Rancangan LKPD</strong></td>
-                            <td>LKPD berisi identitas, tujuan belajar, stimulus kasus <strong>${escapeHtml(inp.materi)}</strong>, langkah kerja kelompok, tabel analisis/pengamatan, ruang kesimpulan, dan refleksi singkat.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>23–24</strong></td>
-                            <td><strong>Pengayaan &amp; Remedial (Non-Repetitif)</strong></td>
-                            <td>
-                                <strong>Pengayaan:</strong> Bagi murid yang sudah mencapai TP — merancang studi kasus/solusi lanjutan atau menyusun rangkuman/panduan penerapan <strong>${escapeHtml(inp.materi)}</strong> untuk teman sebaya. Dievaluasi dari ketajaman gagasan dan ketepatan konsep.<br>
-                                <strong>Remedial:</strong> Bagi murid yang belum mencapai TP — tidak sekadar mengulang soal yang sama, melainkan pendampingan konsep bertahap dengan contoh konkret yang lebih sederhana, latihan terarah, dan tugas analisis baru dengan tingkat kesulitan bertahap.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>25–26</strong></td>
-                            <td><strong>Refleksi Guru &amp; Refleksi Murid</strong></td>
-                            <td>
-                                <strong>Refleksi Guru:</strong> Mengevaluasi ketercapaian TP, ketepatan model <em>${escapeHtml(syntax.label)}</em>, tingkat keterlibatan murid, kendala waktu/materi, dan perbaikan pertemuan berikutnya.<br>
-                                <strong>Refleksi Murid:</strong> Pertanyaan sederhana &amp; sesuai usia, misalnya: <em>"Hal baru apa yang paling mudah kamu pahami hari ini?"</em> dan <em>"Bagian mana yang masih ingin kamu tanyakan?"</em>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>27–28</strong></td>
-                            <td><strong>Glosarium &amp; Daftar Pustaka</strong></td>
-                            <td>
-                                <strong>Glosarium:</strong> <em>${escapeHtml(inp.materi)}</em> (materi pokok pembelajaran); <em>Scaffolding</em> (dukungan belajar bertahap).<br>
-                                <strong>Daftar Pustaka:</strong> Kemendikbudristek. (2024). <em>Capaian Pembelajaran pada Kurikulum Merdeka</em>. Jakarta: Kemendikbudristek; serta Buku Teks Utama <strong>${escapeHtml(inp.mapel)}</strong> (${escapeHtml(inp.jenjang)}).
-                            </td>
+                            <td><strong>Penerapan Kontekstual &amp; Simpulan</strong></td>
+                            <td>Menghubungkan konsep ${escapeHtml(inp.materi)} dengan situasi nyata serta merangkum pokok yang wajib dikuasai murid.</td>
+                            <td>Contoh penerapan di ${escapeHtml(inp.sekolah)} dan lingkungan sekitar yang menunjukkan langkah tepat beserta alasan buktinya.</td>
                         </tr>
                     </tbody>
                 </table>
 
                 ${buildDetailedAlurHtml(inp)}
+
+                <h4>Asesmen Pembelajaran (Diagnostik, Formatif, Sumatif)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:22%;">Jenis Asesmen</th>
+                            <th style="width:26%;">Bentuk Penilaian</th>
+                            <th style="width:52%;">Contoh Instrumen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Diagnostik</strong></td>
+                            <td>Pertanyaan awal / kuis singkat</td>
+                            <td>Apa yang sudah kamu ketahui dan alami terkait <strong>${escapeHtml(inp.materi)}</strong> sebelum pembelajaran dimulai? (Dipakai memetakan kesiapan awal).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Formatif</strong></td>
+                            <td>Observasi diskusi &amp; LKPD</td>
+                            <td>Mengidentifikasi unsur utama, menganalisis kasus pada LKPD sesuai TP 1–TP 2, dan memberikan umpan balik langsung selama proses.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sumatif</strong></td>
+                            <td>Tes tertulis / studi kasus &amp; uraian</td>
+                            <td>Analisislah studi kasus terkait <strong>${escapeHtml(inp.materi)}</strong>, jelaskan hubungan antarunsurnya, dan rumuskan kesimpulan/solusi yang beralasan (TP 1–TP 3).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Pengayaan dan Remedial</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:24%;">Program</th>
+                            <th style="width:40%;">Langkah Pelaksanaan</th>
+                            <th style="width:36%;">Contoh Aktivitas / Tugas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pengayaan</strong></td>
+                            <td>Diberikan kepada peserta didik yang sudah mencapai TP untuk memperluas dan memperdalam analisis.</td>
+                            <td>Menganalisis kasus lanjutan yang lebih kompleks atau merancang contoh penerapan ${escapeHtml(inp.materi)} pada konteks baru di ${escapeHtml(inp.sekolah)}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Remedial</strong></td>
+                            <td>Diberikan kepada peserta didik yang belum mencapai TP tanpa sekadar mengulang soal yang sama.</td>
+                            <td>Pendampingan konsep bertahap dengan contoh konkret yang lebih sederhana, latihan terbimbing, serta soal/kasus baru berjenjang.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Refleksi Guru</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:22%;">Aspek Refleksi</th>
+                            <th style="width:34%;">Pertanyaan Refleksi</th>
+                            <th style="width:44%;">Contoh Refleksi Guru</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Ketercapaian Tujuan</strong></td>
+                            <td>Apakah TP 1–TP 3 tercapai pada ${escapeHtml(inp.kelas)}?</td>
+                            <td>Sebagian besar peserta didik mampu menjelaskan konsep dan menganalisis kasus ${escapeHtml(inp.materi)}, namun beberapa masih perlu latihan pada perumusan alasan simpulan.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Keaktifan</strong></td>
+                            <td>Apakah peserta didik aktif selama pembelajaran?</td>
+                            <td>Diskusi kelompok berjalan cukup aktif, tetapi beberapa peserta didik masih pasif dan perlu diberi peran serta kesempatan berbicara yang lebih terarah.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Strategi Pembelajaran</strong></td>
+                            <td>Apakah ${escapeHtml(inp.model)} dan alokasi waktu ${escapeHtml(inp.waktu)} efektif?</td>
+                            <td>Penggunaan studi kasus dan LKPD membantu peserta didik menghubungkan teori dengan fakta ${escapeHtml(inp.materi)}, meski pengaturan waktu diskusi perlu dijaga lebih ketat.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Perbaikan</strong></td>
+                            <td>Apa yang perlu diperbaiki pada pertemuan berikutnya?</td>
+                            <td>Menyiapkan contoh kasus yang lebih dekat dengan keseharian murid di ${escapeHtml(inp.sekolah)} serta panduan langkah analisis yang lebih bertahap.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Refleksi Peserta Didik</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:22%;">Aspek</th>
+                            <th style="width:34%;">Pertanyaan</th>
+                            <th style="width:44%;">Contoh Jawaban</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pemahaman</strong></td>
+                            <td>Apa yang sudah kamu pelajari tentang ${escapeHtml(inp.materi)} hari ini?</td>
+                            <td>Saya belajar memahami konsep dasar ${escapeHtml(inp.materi)}, menganalisis contoh kasus, dan menyusun kesimpulan.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kesulitan</strong></td>
+                            <td>Bagian mana yang masih sulit dipahami?</td>
+                            <td>Saya masih perlu berlatih membedakan alasan yang paling tepat saat menganalisis kasus ${escapeHtml(inp.materi)}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pengalaman</strong></td>
+                            <td>Kegiatan apa yang paling kamu sukai dan ingin kamu terapkan?</td>
+                            <td>Saya paling menyukai diskusi kelompok membahas contoh nyata dan akan menerapkannya saat belajar bersama teman.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>C. LAMPIRAN</h3>
+                <h4>LKPD — ${escapeHtml(inp.materi)}</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:24%;">Komponen LKPD</th>
+                            <th style="width:76%;">Isi &amp; Contoh Operasional Selaras Kegiatan Inti</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Judul Kegiatan</strong></td><td>Lembar Kerja Peserta Didik (LKPD): Eksplorasi &amp; Analisis ${escapeHtml(inp.materi)}</td></tr>
+                        <tr><td><strong>Identitas Peserta Didik</strong></td><td>Nama / Kelompok: ............................... | Kelas / Fase: ${escapeHtml(inp.kelas)} / ${escapeHtml(inp.jenjang)} | Mata Pelajaran: ${escapeHtml(inp.mapel)}</td></tr>
+                        <tr><td><strong>Tujuan Kegiatan</strong></td><td>Menganalisis permasalahan/contoh terkait ${escapeHtml(inp.materi)} secara runtut dan merumuskan kesimpulan berdasarkan bukti yang relevan.</td></tr>
+                        <tr><td><strong>Petunjuk Pengerjaan</strong></td><td>1. Bacalah stimulus/kasus dengan cermat. 2. Diskusikan bersama anggota kelompok sesuai sintaks ${escapeHtml(syntax.label)}. 3. Tuliskan jawaban dan kesimpulan pada ruang yang tersedia.</td></tr>
+                        <tr><td><strong>Alat dan Bahan</strong></td><td>LKPD, buku teks ${escapeHtml(inp.mapel)}, bahan bacaan/contoh kasus, alat tulis.</td></tr>
+                        <tr><td><strong>Stimulus (Kasus/Teks)</strong></td><td>Pada kegiatan di ${escapeHtml(inp.sekolah)}/sehari-hari, ditemukan situasi yang berkaitan dengan <strong>${escapeHtml(inp.materi)}</strong> di mana dua cara bertindak menghasilkan dampak berbeda sehingga perlu dianalisis berdasarkan konsep dan bukti.</td></tr>
+                        <tr><td><strong>Langkah-Langkah Kegiatan</strong></td><td>1) Amati stimulus dan tandai informasi kunci. 2) Identifikasi masalah/pertanyaan fokus. 3) Analisis keterkaitan unsur &amp; bukti pada tabel/pertanyaan. 4) Rumuskan kesimpulan dan refleksi bersama.</td></tr>
+                        <tr><td><strong>Pertanyaan / Tugas</strong></td><td>1. Apa inti persoalan atau konsep utama yang tampak pada stimulus ${escapeHtml(inp.materi)}? 2. Bagaimana hubungan unsur-unsur pada kasus tersebut memengaruhi hasilnya? 3. Apa langkah/solusi paling tepat yang kalian usulkan dan apa alasannya?</td></tr>
+                        <tr><td><strong>Ruang Jawaban</strong></td><td><em>Jawaban Pertanyaan 1:</em> ........................................................................................................<br><em>Jawaban Pertanyaan 2:</em> ........................................................................................................<br><em>Jawaban Pertanyaan 3:</em> ........................................................................................................</td></tr>
+                        <tr><td><strong>Kesimpulan</strong></td><td><em>Tuliskan simpulan akhir kelompok:</em> ........................................................................................</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Bahan Bacaan, Media, Instrumen, Rubrik &amp; Lampiran Pendukung</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:24%;">Komponen Lampiran</th>
+                            <th style="width:40%;">Isi</th>
+                            <th style="width:36%;">Contoh / Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Bahan Bacaan Guru &amp; Peserta Didik</strong></td>
+                            <td>Ringkasan konsep, alur fasilitasi ${escapeHtml(syntax.label)}, dan catatan miskonsepsi ${escapeHtml(inp.materi)}.</td>
+                            <td>Guru meninjau indikator TP 1–TP 3; murid membaca ringkasan pengertian, unsur, dan contoh ${escapeHtml(inp.materi)}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Media Pembelajaran</strong></td>
+                            <td>Media visual/kasus dan LKPD yang mendukung tercapainya TP.</td>
+                            <td>Kartu/tayangan studi kasus ${escapeHtml(inp.materi)}, bagan alur konsep di papan tulis, dan LKPD.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Instrumen Penilaian</strong></td>
+                            <td>Alat ukur asesmen diagnostik, formatif (observasi &amp; LKPD), dan sumatif.</td>
+                            <td>Daftar cek diskusi kelompok, rubrik isian LKPD, dan soal analisis/uraian ${escapeHtml(inp.materi)}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rubrik Penilaian</strong></td>
+                            <td>Aspek: Pemahaman Konsep, Analisis &amp; Bukti, serta Simpulan/Solusi (Skor 1–4). Rumus Nilai: <em>(Skor Diperoleh ÷ Skor Maksimal) × 100</em>.</td>
+                            <td>Skor 4: Tepat, logis &amp; lengkap; Skor 3: Tepat &amp; cukup rinci; Skor 2: Sebagian tepat; Skor 1: Belum tepat/belum menjawab.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kunci Jawaban</strong></td>
+                            <td>Acuan ketepatan jawaban sesuai TP 1–TP 3 dan data kasus ${escapeHtml(inp.materi)}.</td>
+                            <td>Jawaban yang mengaitkan konsep ${escapeHtml(inp.materi)} dengan bukti kasus dan alasan logis.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Glosarium</strong></td>
+                            <td>Penjelasan istilah penting pada pembelajaran ${escapeHtml(inp.materi)}.</td>
+                            <td><strong>${escapeHtml(inp.materi)}:</strong> Pokok bahasan utama; <strong>Asesmen Formatif:</strong> Penilaian proses belajar; <strong>Scaffolding:</strong> Bimbingan bertahap.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Daftar Pustaka</strong></td>
+                            <td>Rujukan kurikulum dan sumber belajar resmi ${escapeHtml(inp.mapel)}.</td>
+                            <td>Kemendikbudristek (2024), <em>Capaian Pembelajaran</em>; Buku Teks ${escapeHtml(inp.mapel)} (${escapeHtml(inp.jenjang)}).</td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
         }
 
@@ -2801,8 +2955,8 @@
                     <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-5">
                         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-borderCustom pb-4">
                             <div>
-                                <h2 class="text-base font-extrabold theme-heading">AI Specialist Generator Modul Ajar (Terperinci &amp; Operasional)</h2>
-                                <p class="text-xs opacity-70">Menganalisis input pembelajaran, menyusun setiap bagian secara utuh &amp; operasional dengan contoh konkret, serta menyajikan komponen dan tahap pembelajaran dalam <strong>tabel</strong> siap unduh <strong>.DOCX</strong>.</p>
+                                <h2 class="text-base font-extrabold theme-heading">Master Brain Generator Modul Ajar (Terstruktur &amp; Operasional)</h2>
+                                <p class="text-xs opacity-70">Menyusun Modul Ajar sistematis (<strong>A. Informasi Umum</strong>, <strong>B. Komponen Inti</strong>, <strong>C. Lampiran</strong>), sintaks model baku, aktivitas operasional guru–murid berwaktu, asesmen selaras TP, dan tabel siap unduh <strong>.DOCX</strong>.</p>
                             </div>
                             <div class="inline-flex rounded-xl border border-borderCustom p-1" style="background-color: var(--bg-custom);">
                                 <button type="button" onclick="switchModulGeneratorMode('simple')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold ${!isAdv ? 'theme-btn-primary' : ''}">Mode Praktis</button>
@@ -2816,38 +2970,53 @@
                                 <input type="text" id="mod-penyusun" value="${escapeHtml(inp.penyusun)}" oninput="appState.modulTeacherMeta.penyusun = this.value" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">2. Nama Sekolah *</label>
+                                <label class="block text-xs font-bold mb-1">2. Satuan Pendidikan / Sekolah *</label>
                                 <input type="text" id="mod-sekolah" value="${escapeHtml(inp.sekolah)}" oninput="appState.modulTeacherMeta.sekolah = this.value" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">3. Mata Pelajaran *</label>
+                                <label class="block text-xs font-bold mb-1">3. Semester *</label>
+                                <select id="mod-semester" onchange="appState.modulTeacherMeta.semester = this.value" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                                    <option value="Ganjil" ${inp.semester === 'Ganjil' ? 'selected' : ''}>Ganjil</option>
+                                    <option value="Genap" ${inp.semester === 'Genap' ? 'selected' : ''}>Genap</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1">4. Mata Pelajaran *</label>
                                 <input type="text" id="mod-mapel" value="${escapeHtml(inp.mapel)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">4. Jenjang / Fase *</label>
+                                <label class="block text-xs font-bold mb-1">5. Fase / Jenjang *</label>
                                 <input type="text" id="mod-jenjang" value="${escapeHtml(inp.jenjang)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">5. Kelas *</label>
+                                <label class="block text-xs font-bold mb-1">6. Kelas *</label>
                                 <input type="text" id="mod-kelas" value="${escapeHtml(inp.kelas)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold mb-1">6. Materi Pokok *</label>
+                                <label class="block text-xs font-bold mb-1">7. Materi Pokok *</label>
                                 <input type="text" id="mod-materi" value="${escapeHtml(inp.materi)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold mb-1">7. Model Pembelajaran *</label>
-                                <select id="mod-model" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
-                                    <option value="Problem Based Learning (PBL)" ${inp.model.includes('Problem') ? 'selected' : ''}>Problem Based Learning (PBL)</option>
-                                    <option value="Project Based Learning (PjBL)" ${inp.model.includes('Project') ? 'selected' : ''}>Project Based Learning (PjBL)</option>
-                                    <option value="Discovery Learning" ${inp.model.includes('Discovery') ? 'selected' : ''}>Discovery Learning</option>
-                                    <option value="Inquiry Learning" ${inp.model.includes('Inquiry') ? 'selected' : ''}>Inquiry Learning</option>
-                                    <option value="Cooperative Learning (Jigsaw / TPS)" ${inp.model.includes('Cooperative') ? 'selected' : ''}>Cooperative Learning (Jigsaw / TPS)</option>
-                                </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold mb-1">8. Alokasi Waktu *</label>
                                 <input type="text" id="mod-waktu" value="${escapeHtml(inp.waktu)}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold mb-1">9. Model Pembelajaran *</label>
+                                <select id="mod-model" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                                    <option value="Problem Based Learning (PBL)" ${inp.model.includes('Problem') ? 'selected' : ''}>Problem Based Learning (PBL — 5 Sintaks)</option>
+                                    <option value="Project Based Learning (PjBL)" ${inp.model.includes('Project') ? 'selected' : ''}>Project Based Learning (PjBL — 6 Sintaks)</option>
+                                    <option value="Discovery Learning" ${inp.model.includes('Discovery') ? 'selected' : ''}>Discovery Learning (6 Sintaks)</option>
+                                    <option value="Inquiry Learning" ${inp.model.includes('Inquiry') ? 'selected' : ''}>Inquiry Learning (6 Tahapan)</option>
+                                    <option value="Cooperative Learning (Jigsaw / TPS)" ${inp.model.includes('Cooperative') ? 'selected' : ''}>Cooperative Learning (6 Tahapan)</option>
+                                    <option value="Direct Instruction (Pembelajaran Langsung)" ${inp.model.includes('Direct') ? 'selected' : ''}>Direct Instruction (5 Tahapan)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1">10. Capaian Pembelajaran (CP Resmi — Opsional)</label>
+                                <input type="text" id="mod-cp" value="${escapeHtml(inp.cpInput)}" oninput="appState.modulTeacherMeta.cpInput = this.value" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Kosongkan jika belum ada (sistem akan menandai sebagai usulan selaras fase)">
                             </div>
                         </div>
 
@@ -2898,7 +3067,7 @@
                 media: `Media Pembelajaran: Slide ringkasan visual, LKPD studi kasus ${inp.materi}, serta contoh objek/situasi nyata di lingkungan sekitar.`,
                 alur: `Pendahuluan: Salam, doa, apersepsi & contoh dialog pemantik tentang ${inp.materi}.\nInti (${inp.model}): Aktivitas kelompok, diskusi kasus, presentasi & penguatan dengan contoh dialog guru.\nPenutup: Simpulan murid, refleksi singkat & tindak lanjut.`,
                 lkpd: `LKPD ${inp.materi}: Memuat identitas, tujuan, stimulus kasus nyata, langkah diskusi kelompok, tabel analisis, kesimpulan & refleksi.`,
-                asesmen: `Asesmen (Awal, Formatif, Sumatif): Soal analisis kasus ${inp.materi}, kunci jawaban acuan, dan rubrik penilaian skala 1–4.`
+                asesmen: `Asesmen (Diagnostik, Formatif, Sumatif): Soal analisis kasus ${inp.materi}, kunci jawaban acuan, dan rubrik penilaian skala 1–4.`
             };
             const generated = mapText[key] || `Komponen ${key} untuk materi ${inp.materi}.`;
             appState.advancedComponents[key] = generated;
@@ -2921,13 +3090,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>1</strong></td><td><strong>Identitas</strong></td><td>Mata Pelajaran: ${escapeHtml(inp.mapel)} | Kelas/Fase: ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}) | Model: ${escapeHtml(inp.model)} | Waktu: ${escapeHtml(inp.waktu)}</td></tr>
-                        <tr><td><strong>2</strong></td><td><strong>Tujuan Pembelajaran &amp; Indikator</strong></td><td>${escapeHtml(c.tp || '-').replace(/\n/g, '<br>')}</td></tr>
-                        <tr><td><strong>3</strong></td><td><strong>Materi Pembelajaran</strong></td><td>${escapeHtml(c.materi || '-').replace(/\n/g, '<br>')}</td></tr>
-                        <tr><td><strong>4</strong></td><td><strong>Media Pembelajaran</strong></td><td>${escapeHtml(c.media || '-').replace(/\n/g, '<br>')}</td></tr>
-                        <tr><td><strong>5</strong></td><td><strong>Tahap Pembelajaran (Pendahuluan, Inti, Penutup)</strong></td><td>${escapeHtml(c.alur || '-').replace(/\n/g, '<br>')}</td></tr>
-                        <tr><td><strong>6</strong></td><td><strong>LKPD</strong></td><td>${escapeHtml(c.lkpd || '-').replace(/\n/g, '<br>')}</td></tr>
-                        <tr><td><strong>7</strong></td><td><strong>Asesmen &amp; Rubrik</strong></td><td>${escapeHtml(c.asesmen || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>A.1</strong></td><td><strong>Identitas</strong></td><td>Satuan: ${escapeHtml(inp.sekolah)} | Mapel: ${escapeHtml(inp.mapel)} | Fase/Kelas: ${escapeHtml(inp.jenjang)} / ${escapeHtml(inp.kelas)} | Semester: ${escapeHtml(inp.semester)} | Model: ${escapeHtml(inp.model)} | Waktu: ${escapeHtml(inp.waktu)}</td></tr>
+                        <tr><td><strong>B.2</strong></td><td><strong>Tujuan Pembelajaran &amp; Indikator</strong></td><td>${escapeHtml(c.tp || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>B.6</strong></td><td><strong>Materi Pembelajaran</strong></td><td>${escapeHtml(c.materi || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>C.3</strong></td><td><strong>Media Pembelajaran</strong></td><td>${escapeHtml(c.media || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>B.7</strong></td><td><strong>Tahap Pembelajaran (Pendahuluan, Inti, Penutup)</strong></td><td>${escapeHtml(c.alur || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>C.1</strong></td><td><strong>LKPD</strong></td><td>${escapeHtml(c.lkpd || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>B.8 &amp; C.5</strong></td><td><strong>Asesmen &amp; Rubrik</strong></td><td>${escapeHtml(c.asesmen || '-').replace(/\n/g, '<br>')}</td></tr>
                     </tbody>
                 </table>
             `;
@@ -2965,7 +3134,7 @@
                 };
             });
 
-            showToast('Modul Ajar 28 komponen lengkap berhasil dibuat & dibuka di Editor Modul Ajar!', 'success');
+            showToast('Modul Ajar terstruktur (Informasi Umum, Komponen Inti & Lampiran) berhasil dibuat & dibuka di Editor Modul Ajar!', 'success');
             navigate('editor-modul');
         }
 
@@ -4104,556 +4273,556 @@
             const canvas = document.getElementById('document-editor-canvas');
             const contentHtml = canvas ? canvas.innerHTML : (ed.html || '');
             const docTitle = (document.getElementById('editor-doc-title')?.value || ed.title || 'Dokumen_Perangkat_Ajar').trim();
+            const isLandscape = ed.orientation === 'landscape';
             const isDocxFormat = editorKey === 'modul' || (ed.category || '').toLowerCase().includes('modul');
-            const extension = isDocxFormat ? 'docx' : 'doc';
-            const mimeType = isDocxFormat
-                ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8'
-                : 'application/msword;charset=utf-8';
+
+            if (isDocxFormat) {
+                try {
+                    const docxResult = generateValidatedOfficeOpenXmlDocx({
+                        title: docTitle,
+                        html: contentHtml,
+                        isLandscape
+                    });
+                    if (docxResult && docxResult.valid && docxResult.blob) {
+                        const url = URL.createObjectURL(docxResult.blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.docx`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        showToast(`File .DOCX valid terstruktur (${docxResult.summary}) berhasil diunduh.`, 'success');
+                        return;
+                    }
+                    throw new Error((docxResult && docxResult.issues && docxResult.issues.join('; ')) || 'Validasi DOCX gagal.');
+                } catch (err) {
+                    console.warn('DOCX generator fallback:', err);
+                    showToast(`Validasi DOCX menemukan kendala (${err.message}), menggunakan ekspor dokumen alternatif.`, 'warning');
+                }
+            }
+
             const wordHtml = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="utf-8"><title>${escapeHtml(docTitle)}</title></head>
                 <body style="font-family:'Times New Roman',serif;font-size:11.5pt;line-height:1.5;">${contentHtml}</body>
                 </html>
             `;
-            const blob = new Blob(['\ufeff', wordHtml], { type: mimeType });
+            const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.${extension}`;
+            a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.doc`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast(`Dokumen berhasil diunduh dalam format .${extension.toUpperCase()}.`, 'success');
+            showToast('Dokumen berhasil diunduh dalam format .DOC.', 'success');
         }
 
-        function exportEditorToPDF(editorKey) {
-            saveCurrentDocument(editorKey).catch(() => {});
-            showToast('Membuka jendela cetak / simpan sebagai PDF...', 'info');
-            setTimeout(() => window.print(), 180);
+        // =====================================================================
+        // ECMA-376 OFFICE OPEN XML (.DOCX) BUILDER + AUTO-VALIDATION & REPAIR
+        // =====================================================================
+        function escapeXmlText(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
         }
 
-        function renderDedicatedEditorView(container, editorKey) {
-            const ed = appState.editors[editorKey] || appState.editors.modul;
-            const isLandscape = ed.orientation === 'landscape';
-
-            let extraToolbar = '';
-            if (editorKey === 'soal') {
-                extraToolbar = `
-                    <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-borderCustom">
-                        <button type="button" onclick="addManualQuestionItem()" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">+ Tambah Soal</button>
-                        <button type="button" onclick="shuffleQuestionBank()" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Acak Urutan</button>
-                        <button type="button" onclick="exportQuestionsToExcel()" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Ekspor Excel (.csv)</button>
-                        <button type="button" onclick="navigate('gen-soal')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Buat Variasi Baru</button>
-                    </div>
-                `;
-            } else if (editorKey === 'ringkasan') {
-                extraToolbar = `
-                    <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-borderCustom">
-                        <button type="button" onclick="generateRingkasanMateri('normal')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Buat Ulang</button>
-                        <button type="button" onclick="generateRingkasanMateri('shorten')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Perpendek</button>
-                        <button type="button" onclick="generateRingkasanMateri('expand')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Perluas Penjelasan</button>
-                    </div>
-                `;
-            } else if (editorKey === 'refleksi') {
-                const secs = Array.isArray(appState.lastRefleksiSections) ? appState.lastRefleksiSections : [];
-                extraToolbar = `
-                    <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-borderCustom">
-                        <button type="button" onclick="generateRefleksiDocument('expand')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Kembangkan Refleksi</button>
-                        <button type="button" onclick="generateRefleksiDocument('shorten')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Ringkas Refleksi</button>
-                        <button type="button" onclick="generateRefleksiDocument('normal')" class="px-3 py-1.5 rounded-lg border border-borderCustom theme-btn-secondary text-xs font-bold">Perbaiki Tata Bahasa / Formal</button>
-                    </div>
-                    ${secs.length > 0 ? `
-                        <div class="pt-3 border-t border-borderCustom space-y-2">
-                            <p class="text-xs font-extrabold theme-heading">Sunting atau Buat Ulang per Tahapan Refleksi:</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                ${secs.map((s, i) => `
-                                    <div class="p-3 rounded-xl border border-borderCustom space-y-1.5" style="background-color: var(--bg-custom);">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="text-[11px] font-bold">${escapeHtml(s.title)}</span>
-                                            <button type="button" onclick="regenerateSingleRefleksiSection(${i})" class="px-2 py-0.5 rounded bg-black text-white text-[10px] font-bold">Buat Ulang Bagian</button>
-                                        </div>
-                                        <textarea rows="2" oninput="updateSingleRefleksiSectionText(${i}, this.value)" class="w-full p-2 text-xs border border-borderCustom rounded-lg theme-card">${escapeHtml(s.content)}</textarea>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                `;
-            }
-
-            container.innerHTML = `
-                <div class="max-w-6xl mx-auto space-y-4">
-                    <div class="theme-card p-4 sm:p-5 rounded-2xl border border-borderCustom shadow-sm space-y-3">
-                        <div class="flex flex-wrap items-center justify-between gap-3">
-                            <div class="flex-1 min-w-[220px]">
-                                <label class="block text-[10px] font-bold uppercase opacity-60 mb-1">Judul Dokumen (${escapeHtml(ed.category)})</label>
-                                <input type="text" id="editor-doc-title" value="${escapeHtml(ed.title)}" oninput="appState.editors['${editorKey}'].title = this.value"
-                                    class="w-full px-3.5 py-2 text-xs font-bold border border-borderCustom rounded-xl theme-card">
-                            </div>
-
-                            <div class="flex flex-wrap items-center gap-1.5">
-                                <button type="button" onclick="changeEditorPaperOrientation('${editorKey}', 'portrait')" class="px-2.5 py-2 rounded-xl border border-borderCustom text-xs font-bold ${!isLandscape ? 'theme-btn-primary' : 'theme-btn-secondary'}">Portrait</button>
-                                <button type="button" onclick="changeEditorPaperOrientation('${editorKey}', 'landscape')" class="px-2.5 py-2 rounded-xl border border-borderCustom text-xs font-bold ${isLandscape ? 'theme-btn-primary' : 'theme-btn-secondary'}">Landscape</button>
-                                <button type="button" onclick="copyEditorPlainText()" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">Salin Teks</button>
-                                <button type="button" onclick="exportEditorToWord('${editorKey}')" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">${editorKey === 'modul' ? 'Unduh .DOCX' : 'Unduh Word'}</button>
-                                <button type="button" onclick="exportEditorToPDF('${editorKey}')" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">PDF / Cetak</button>
-                                <button type="button" onclick="saveCurrentDocument('${editorKey}')" class="px-4 py-2 rounded-xl theme-btn-primary text-xs font-extrabold shadow">Simpan ke Dokumen Saya</button>
-                            </div>
-                        </div>
-                        ${extraToolbar}
-                    </div>
-
-                    <div id="editor-progress-panel" class="hidden"></div>
-
-                    <div class="paper-workspace overflow-x-auto">
-                        <div id="document-editor-canvas" contenteditable="true"
-                            oninput="appState.editors['${editorKey}'].html = this.innerHTML"
-                            class="${isLandscape ? 'paper-landscape' : 'paper-portrait'}">${ed.html || ''}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderDocumentsArchiveView(container) {
-            const uid = appState.currentUser?.uid;
-            const filter = appState.docFilter || { search: '', category: 'Semua', folder: 'Semua', date: '', sort: 'newest' };
-            const categories = ['Semua', 'Modul Ajar', 'Soal dan Asesmen', 'LKPD', 'Presentasi', 'Materi Ajar', 'Ringkasan Materi', 'Refleksi Pembelajaran', 'Infografis', 'Ilustrasi', 'Naskah Video'];
-
-            let list = appState.documents.filter(d => d.ownerId === uid);
-            if (filter.search) {
-                const q = filter.search.toLowerCase();
-                list = list.filter(d =>
-                    (d.title || '').toLowerCase().includes(q) ||
-                    (d.mapel || '').toLowerCase().includes(q) ||
-                    (d.category || '').toLowerCase().includes(q)
-                );
-            }
-            if (filter.category && filter.category !== 'Semua') {
-                list = list.filter(d => d.category === filter.category);
-            }
-            if (filter.folder && filter.folder !== 'Semua') {
-                list = list.filter(d => (d.folder || 'Umum') === filter.folder);
-            }
-            list.sort((a, b) => filter.sort === 'oldest' ? (a.updatedTs || 0) - (b.updatedTs || 0) : (b.updatedTs || 0) - (a.updatedTs || 0));
-
-            container.innerHTML = `
-                <div class="max-w-6xl mx-auto space-y-6">
-                    <div class="theme-card p-5 rounded-2xl border border-borderCustom shadow-sm space-y-4">
-                        <div class="flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                                <h2 class="text-base font-extrabold theme-heading">Arsip Dokumen Saya (${list.length})</h2>
-                                <p class="text-xs opacity-70">Kelola, buka di editor mandiri, pindahkan ke folder, ganti nama, gandakan, atau hapus dokumen Anda.</p>
-                            </div>
-                            <button type="button" onclick="promptNewFolder()" class="px-3.5 py-2 rounded-xl theme-btn-primary text-xs font-bold">+ Folder Baru</button>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                            <input type="text" value="${escapeHtml(filter.search)}"
-                                oninput="appState.docFilter.search = this.value; renderDocumentsArchiveView(document.getElementById('main-content'))"
-                                class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Cari judul atau mapel...">
-
-                            <select onchange="appState.docFilter.category = this.value; renderDocumentsArchiveView(document.getElementById('main-content'))"
-                                class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card">
-                                ${categories.map(c => `<option value="${escapeHtml(c)}" ${filter.category === c ? 'selected' : ''}>Kategori: ${escapeHtml(c)}</option>`).join('')}
-                            </select>
-
-                            <select onchange="appState.docFilter.folder = this.value; renderDocumentsArchiveView(document.getElementById('main-content'))"
-                                class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card">
-                                <option value="Semua" ${filter.folder === 'Semua' ? 'selected' : ''}>Folder: Semua</option>
-                                ${appState.folders.map(f => `<option value="${escapeHtml(f)}" ${filter.folder === f ? 'selected' : ''}>Folder: ${escapeHtml(f)}</option>`).join('')}
-                            </select>
-
-                            <select onchange="appState.docFilter.sort = this.value; renderDocumentsArchiveView(document.getElementById('main-content'))"
-                                class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card">
-                                <option value="newest" ${filter.sort === 'newest' ? 'selected' : ''}>Urutan: Terbaru</option>
-                                <option value="oldest" ${filter.sort === 'oldest' ? 'selected' : ''}>Urutan: Terlama</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    ${list.length === 0 ? `
-                        <div class="theme-card p-10 rounded-2xl border border-borderCustom text-center space-y-2">
-                            <p class="text-sm font-bold theme-heading">Belum ada dokumen yang cocok</p>
-                            <p class="text-xs opacity-70">Silakan buat dokumen baru melalui menu Generator pada bilah navigasi samping.</p>
-                        </div>
-                    ` : `
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${list.map(docItem => `
-                                <div class="theme-card p-5 rounded-2xl border border-borderCustom shadow-sm flex flex-col justify-between gap-4">
-                                    <div class="space-y-1.5">
-                                        <div class="flex items-center justify-between gap-2 text-[10.5px] font-bold opacity-70">
-                                            <span class="px-2 py-0.5 rounded-full border border-borderCustom">${escapeHtml(docItem.category || 'Dokumen')}</span>
-                                            <span>${escapeHtml(docItem.folder || 'Umum')}</span>
-                                        </div>
-                                        <h3 class="text-sm font-extrabold theme-heading leading-snug">${escapeHtml(docItem.title)}</h3>
-                                        <p class="text-[11px] opacity-70">${escapeHtml(docItem.mapel || '-')} • ${escapeHtml(docItem.kelas || '-')} • ${escapeHtml(docItem.updatedAt || '')}</p>
-                                    </div>
-
-                                    <div class="space-y-2 pt-2 border-t border-borderCustom">
-                                        <div class="flex items-center gap-1.5">
-                                            <button type="button" onclick="openDocumentInEditor('${escapeHtml(docItem.id)}')" class="flex-1 px-3 py-2 rounded-xl theme-btn-primary text-xs font-bold">Buka &amp; Edit</button>
-                                            <button type="button" onclick="duplicateDocumentRecord('${escapeHtml(docItem.id)}')" class="px-2.5 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold" title="Gandakan">Salin</button>
-                                            <button type="button" onclick="renameDocumentPrompt('${escapeHtml(docItem.id)}')" class="px-2.5 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold" title="Ganti Nama">Ubah Nama</button>
-                                            <button type="button" onclick="confirmDeleteDocument('${escapeHtml(docItem.id)}')" class="px-2.5 py-2 rounded-xl bg-red-600 text-white text-xs font-bold" title="Hapus">Hapus</button>
-                                        </div>
-                                        <select onchange="moveDocumentToFolder('${escapeHtml(docItem.id)}', this.value)" class="w-full px-2.5 py-1.5 text-[11px] border border-borderCustom rounded-lg theme-card">
-                                            ${appState.folders.map(f => `<option value="${escapeHtml(f)}" ${(docItem.folder || 'Umum') === f ? 'selected' : ''}>Pindah ke Folder: ${escapeHtml(f)}</option>`).join('')}
-                                        </select>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `}
-                </div>
-            `;
-        }
-
-        function mapCategoryToEditorRoute(cat) {
-            const c = (cat || '').toLowerCase();
-            if (c.includes('soal') || c.includes('asesmen')) return { key: 'soal', route: 'editor-soal' };
-            if (c.includes('lkpd')) return { key: 'lkpd', route: 'editor-lkpd' };
-            if (c.includes('presentasi')) return { key: 'presentasi', route: 'editor-presentasi' };
-            if (c.includes('materi ajar')) return { key: 'materiAjar', route: 'editor-materi-ajar' };
-            if (c.includes('ringkasan')) return { key: 'ringkasan', route: 'editor-ringkasan' };
-            if (c.includes('refleksi')) return { key: 'refleksi', route: 'editor-refleksi' };
-            if (c.includes('infografis') || c.includes('ilustrasi') || c.includes('video') || c.includes('media')) {
-                return { key: 'media', route: 'editor-media' };
-            }
-            return { key: 'modul', route: 'editor-modul' };
-        }
-
-        function openDocumentInEditor(docId) {
-            const found = appState.documents.find(d => d.id === docId && d.ownerId === appState.currentUser?.uid);
-            if (!found) {
-                showToast('Dokumen tidak ditemukan.', 'error');
-                return;
-            }
-            const target = mapCategoryToEditorRoute(found.category);
-            appState.editors[target.key] = {
-                title: found.title,
-                category: found.category,
-                mapel: found.mapel || 'Umum',
-                kelas: found.kelas || 'Fase D',
-                orientation: target.key === 'media' || target.key === 'presentasi' ? 'landscape' : 'portrait',
-                docId: found.id,
-                html: found.html || ''
-            };
-            navigate(target.route);
-        }
-
-        async function duplicateDocumentRecord(docId) {
-            const found = appState.documents.find(d => d.id === docId);
-            if (!found) return;
-            await persistDocumentRecord({
-                title: `${found.title} (Salinan)`,
-                category: found.category,
-                mapel: found.mapel,
-                kelas: found.kelas,
-                folder: found.folder || 'Umum',
-                html: found.html
-            });
-            renderDocumentsArchiveView(document.getElementById('main-content'));
-            showToast('Dokumen berhasil digandakan.', 'success');
-        }
-
-        async function moveDocumentToFolder(docId, folderName) {
-            const found = appState.documents.find(d => d.id === docId);
-            if (!found) return;
-            found.folder = folderName;
-            await persistDocumentRecord({
-                id: found.id,
-                title: found.title,
-                category: found.category,
-                mapel: found.mapel,
-                kelas: found.kelas,
-                folder: folderName,
-                html: found.html
-            });
-            showToast(`Dokumen dipindahkan ke folder "${folderName}".`, 'success');
-        }
-
-        function renameDocumentPrompt(docId) {
-            const found = appState.documents.find(d => d.id === docId);
-            if (!found) return;
-            openCustomModal(
-                'Ganti Nama Dokumen',
-                `<input type="text" id="rename-doc-input" value="${escapeHtml(found.title)}" class="w-full px-3 py-2 text-xs border border-borderCustom rounded-xl theme-card">`,
-                `
-                    <button type="button" onclick="closeCustomModal()" class="px-3.5 py-2 border border-borderCustom theme-btn-secondary rounded-xl text-xs font-bold">Batal</button>
-                    <button type="button" onclick="submitRenameDocument('${escapeHtml(docId)}')" class="px-4 py-2 theme-btn-primary rounded-xl text-xs font-bold">Simpan Nama</button>
-                `
-            );
-        }
-
-        async function submitRenameDocument(docId) {
-            const newTitle = (document.getElementById('rename-doc-input')?.value || '').trim();
-            if (!newTitle) return;
-            const found = appState.documents.find(d => d.id === docId);
-            if (!found) return;
-            found.title = newTitle;
-            await persistDocumentRecord({
-                id: found.id,
-                title: newTitle,
-                category: found.category,
-                mapel: found.mapel,
-                kelas: found.kelas,
-                folder: found.folder || 'Umum',
-                html: found.html
-            });
-            closeCustomModal();
-            renderDocumentsArchiveView(document.getElementById('main-content'));
-            showToast('Nama dokumen berhasil diperbarui.', 'success');
-        }
-
-        function confirmDeleteDocument(docId) {
-            openCustomModal(
-                'Hapus Dokumen',
-                '<p>Apakah Anda yakin ingin menghapus dokumen ini secara permanen?</p>',
-                `
-                    <button type="button" onclick="closeCustomModal()" class="px-3.5 py-2 border border-borderCustom theme-btn-secondary rounded-xl text-xs font-bold">Batal</button>
-                    <button type="button" onclick="executeDeleteDocument('${escapeHtml(docId)}')" class="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold">Hapus</button>
-                `
-            );
-        }
-
-        async function executeDeleteDocument(docId) {
-            appState.documents = appState.documents.filter(d => d.id !== docId);
-            if (fbDb) {
-                try {
-                    await ensureFirebaseAuthSession();
-                    await deleteDoc(doc(fbDb, 'artifacts', appId, 'public', 'data', 'documents', docId));
-                } catch (e) {}
-            }
-            updateHeaderDocCount();
-            closeCustomModal();
-            renderDocumentsArchiveView(document.getElementById('main-content'));
-            showToast('Dokumen telah dihapus.', 'info');
-        }
-
-        function promptNewFolder() {
-            openCustomModal(
-                'Buat Folder Baru',
-                `<input type="text" id="new-folder-name" class="w-full px-3 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Nama folder, misal: Kelas IX A">`,
-                `
-                    <button type="button" onclick="closeCustomModal()" class="px-3.5 py-2 border border-borderCustom theme-btn-secondary rounded-xl text-xs font-bold">Batal</button>
-                    <button type="button" onclick="submitNewFolder()" class="px-4 py-2 theme-btn-primary rounded-xl text-xs font-bold">Tambah Folder</button>
-                `
-            );
-        }
-
-        function submitNewFolder() {
-            const name = (document.getElementById('new-folder-name')?.value || '').trim();
-            if (!name) return;
-            if (!appState.folders.includes(name)) {
-                appState.folders.push(name);
-            }
-            closeCustomModal();
-            renderDocumentsArchiveView(document.getElementById('main-content'));
-            showToast(`Folder "${name}" ditambahkan.`, 'success');
-        }
-
-        function renderGuruTutorialView(container) {
-            container.innerHTML = `
-                <div class="max-w-4xl mx-auto theme-card p-6 sm:p-8 rounded-2xl border border-borderCustom shadow-sm">
-                    <div class="prose max-w-none text-xs sm:text-sm leading-relaxed">${appState.tutorialHtml}</div>
-                </div>
-            `;
-        }
-
-        function renderAdminTutorialView(container) {
-            container.innerHTML = `
-                <div class="max-w-5xl mx-auto theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-4">
-                    <div>
-                        <h2 class="text-base font-extrabold theme-heading">Editor Panduan Penggunaan untuk Guru</h2>
-                        <p class="text-xs opacity-70">Teks panduan ini ditampilkan pada menu <strong>Panduan Penggunaan Web</strong> di seluruh akun Guru.</p>
-                    </div>
-                    <textarea id="admin-tutorial-editor" rows="16" class="w-full p-4 text-xs font-mono border border-borderCustom rounded-xl theme-card">${escapeHtml(appState.tutorialHtml.trim())}</textarea>
-                    <div class="flex justify-end">
-                        <button type="button" onclick="saveAdminTutorialGuide()" class="px-5 py-2.5 rounded-xl theme-btn-primary text-xs font-bold">Simpan Panduan Guru</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function saveAdminTutorialGuide() {
-            const htmlVal = document.getElementById('admin-tutorial-editor')?.value || '';
-            appState.tutorialHtml = htmlVal;
-            const ok = await writeFirestoreSafe(
-                doc(fbDb, 'artifacts', appId, 'public', 'data', 'system_settings', 'tutorial_guide'),
-                { html: htmlVal, updatedAt: Date.now() },
-                'Panduan Guru'
-            );
-            if (ok) showToast('Panduan penggunaan guru berhasil disimpan ke Firebase Firestore.', 'success');
-        }
-
-        function renderAdminUsersView(container) {
-            const guruUsers = appState.users.filter(u => u.role === 'guru');
-            container.innerHTML = `
-                <div class="max-w-5xl mx-auto space-y-6">
-                    <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-4">
-                        <h2 class="text-base font-extrabold theme-heading">Buat Akun Guru Baru</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                            <input type="text" id="new-guru-name" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Nama Lengkap Guru">
-                            <input type="text" id="new-guru-user" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Username">
-                            <input type="email" id="new-guru-email" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="email.guru@sekolah.sch.id">
-                            <input type="text" id="new-guru-pass" class="px-3.5 py-2 text-xs border border-borderCustom rounded-xl theme-card" placeholder="Kata sandi awal">
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="button" onclick="createNewGuruAccount()" class="px-5 py-2.5 rounded-xl theme-btn-primary text-xs font-bold">+ Tambah Akun Guru</button>
-                        </div>
-                    </div>
-
-                    <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-3">
-                        <h3 class="text-sm font-extrabold theme-heading">Daftar Akun Guru (${guruUsers.length})</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-xs border-collapse">
-                                <thead>
-                                    <tr class="border-b border-borderCustom text-left">
-                                        <th class="py-2 pr-3">Nama</th>
-                                        <th class="py-2 pr-3">Email</th>
-                                        <th class="py-2 pr-3">Sandi</th>
-                                        <th class="py-2 pr-3">Status</th>
-                                        <th class="py-2 text-right">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${guruUsers.map(g => `
-                                        <tr class="border-b border-borderCustom">
-                                            <td class="py-2.5 pr-3 font-bold">${escapeHtml(g.name)}</td>
-                                            <td class="py-2.5 pr-3">${escapeHtml(g.email)}</td>
-                                            <td class="py-2.5 pr-3 font-mono">${escapeHtml(g.password)}</td>
-                                            <td class="py-2.5 pr-3">${escapeHtml(g.status)}</td>
-                                            <td class="py-2.5 text-right space-x-1">
-                                                <button type="button" onclick="toggleGuruStatus('${escapeHtml(g.uid)}')" class="px-2.5 py-1 rounded-lg border border-borderCustom theme-btn-secondary text-[11px] font-bold">Ubah Status</button>
-                                                <button type="button" onclick="deleteGuruAccount('${escapeHtml(g.uid)}')" class="px-2.5 py-1 rounded-lg bg-red-600 text-white text-[11px] font-bold">Hapus</button>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function createNewGuruAccount() {
-            const name = (document.getElementById('new-guru-name')?.value || '').trim();
-            const username = (document.getElementById('new-guru-user')?.value || '').trim();
-            const email = (document.getElementById('new-guru-email')?.value || '').trim();
-            const password = (document.getElementById('new-guru-pass')?.value || '').trim();
-            if (!name || !email || !password) {
-                showToast('Harap lengkapi nama, email, dan kata sandi guru.', 'error');
-                return;
-            }
-            const newUser = {
-                uid: 'guru-' + Date.now(),
-                name,
-                username: username || email.split('@')[0],
-                email,
-                password,
-                role: 'guru',
-                status: 'Aktif'
-            };
-            appState.users.push(newUser);
-            const ok = await writeFirestoreSafe(
-                doc(fbDb, 'artifacts', appId, 'public', 'data', 'users', newUser.uid),
-                newUser,
-                'Akun Guru'
-            );
-            renderAdminUsersView(document.getElementById('main-content'));
-            if (ok) showToast(`Akun guru "${name}" berhasil ditambahkan & disimpan ke Firebase Firestore.`, 'success');
-        }
-
-        function toggleGuruStatus(uid) {
-            const u = appState.users.find(item => item.uid === uid);
-            if (!u) return;
-            u.status = u.status === 'Aktif' ? 'Nonaktif' : 'Aktif';
-            renderAdminUsersView(document.getElementById('main-content'));
-            showToast(`Status akun ${u.name} menjadi ${u.status}.`, 'info');
-        }
-
-        function deleteGuruAccount(uid) {
-            appState.users = appState.users.filter(item => item.uid !== uid);
-            renderAdminUsersView(document.getElementById('main-content'));
-            showToast('Akun guru dihapus.', 'info');
-        }
-
-        function updateSingleThemeColor(key, value) {
-            appState.theme[key] = value;
-            applyThemeVariables(appState.theme);
-        }
-
-        function updateGridConfigField(field, value) {
-            appState.theme[field] = value;
-            applyGridAndHeaderButton(appState.theme);
-        }
-
-        function updateHeaderButtonConfig(field, value) {
-            appState.theme[field] = value;
-            applyGridAndHeaderButton(appState.theme);
-        }
-
-        function updateWebIdentityField(field, value) {
-            appState.theme[field] = value;
-            applyWebIdentityAndLayout(appState.theme);
-        }
-
-        function resetThemeToMonochromeDefault() {
-            appState.theme = { ...DEFAULT_THEME };
-            applyThemeVariables(appState.theme);
-            renderAdminThemeView(document.getElementById('main-content'));
-            showToast('Identitas & tema dikembalikan ke default Hitam & Putih.', 'info');
-        }
-
-        function applyThemePreset(presetNameOrIndex) {
-            const presets = {
-                0: { ...DEFAULT_THEME },
-                monochrome: { ...DEFAULT_THEME },
-                classic_slate: {
-                    ...DEFAULT_THEME,
-                    primary: '#1e293b',
-                    hover: '#334155',
-                    icon: '#1e293b',
-                    link: '#0f172a',
-                    heading: '#0f172a',
-                    bg: '#f8fafc',
-                    card: '#ffffff',
-                    line: '#cbd5e1',
-                    headerBg: '#ffffff',
-                    headerText: '#0f172a',
-                    footerBg: '#1e293b',
-                    footerText: '#ffffff',
-                    gridColor: '#1e293b'
-                },
-                forest_sage: {
-                    ...DEFAULT_THEME,
-                    primary: '#14532d',
-                    hover: '#166534',
-                    icon: '#14532d',
-                    link: '#14532d',
-                    heading: '#052e16',
-                    bg: '#f0fdf4',
-                    card: '#ffffff',
-                    line: '#bbf7d0',
-                    headerBg: '#ffffff',
-                    headerText: '#052e16',
-                    footerBg: '#14532d',
-                    footerText: '#ffffff',
-                    gridColor: '#14532d'
+        const CRC32_TABLE = (() => {
+            const tbl = new Uint32Array(256);
+            for (let n = 0; n < 256; n++) {
+                let c = n;
+                for (let k = 0; k < 8; k++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
                 }
+                tbl[n] = c >>> 0;
+            }
+            return tbl;
+        })();
+
+        function computeCrc32(uint8Arr) {
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < uint8Arr.length; i++) {
+                crc = CRC32_TABLE[(crc ^ uint8Arr[i]) & 0xFF] ^ (crc >>> 8);
+            }
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+
+        function buildStoredZipArchive(entries) {
+            const encoder = new TextEncoder();
+            const localParts = [];
+            const centralParts = [];
+            let offset = 0;
+
+            for (const entry of entries) {
+                const nameBytes = encoder.encode(entry.name);
+                const dataBytes = entry.data instanceof Uint8Array ? entry.data : encoder.encode(String(entry.data || ''));
+                const crc = computeCrc32(dataBytes);
+                const size = dataBytes.length;
+
+                // Local file header (30 bytes + name + data)
+                const localHeader = new Uint8Array(30 + nameBytes.length);
+                const lv = new DataView(localHeader.buffer);
+                lv.setUint32(0, 0x04034b50, true); // Local file header signature
+                lv.setUint16(4, 20, true);         // Version needed to extract (2.0)
+                lv.setUint16(6, 0x0800, true);     // UTF-8 filename flag
+                lv.setUint16(8, 0, true);          // Compression method: 0 (STORE)
+                lv.setUint16(10, 0, true);         // Mod time
+                lv.setUint16(12, 0x0021, true);    // Mod date (1980-01-01)
+                lv.setUint32(14, crc, true);
+                lv.setUint32(18, size, true);
+                lv.setUint32(22, size, true);
+                lv.setUint16(26, nameBytes.length, true);
+                lv.setUint16(28, 0, true);         // Extra field length
+                localHeader.set(nameBytes, 30);
+
+                localParts.push(localHeader, dataBytes);
+
+                // Central directory header (46 bytes + name)
+                const centralHeader = new Uint8Array(46 + nameBytes.length);
+                const cv = new DataView(centralHeader.buffer);
+                cv.setUint32(0, 0x02014b50, true); // Central file header signature
+                cv.setUint16(4, 20, true);         // Version made by
+                cv.setUint16(6, 20, true);         // Version needed
+                cv.setUint16(8, 0x0800, true);     // UTF-8 flag
+                cv.setUint16(10, 0, true);         // Store
+                cv.setUint16(12, 0, true);
+                cv.setUint16(14, 0x0021, true);
+                cv.setUint32(16, crc, true);
+                cv.setUint32(20, size, true);
+                cv.setUint32(24, size, true);
+                cv.setUint16(28, nameBytes.length, true);
+                cv.setUint16(30, 0, true);         // Extra len
+                cv.setUint16(32, 0, true);         // Comment len
+                cv.setUint16(34, 0, true);         // Disk number start
+                cv.setUint16(36, 0, true);         // Internal file attrs
+                cv.setUint32(38, 0, true);         // External file attrs
+                cv.setUint32(42, offset, true);    // Relative offset of local header
+                centralHeader.set(nameBytes, 46);
+
+                centralParts.push(centralHeader);
+                offset += localHeader.length + dataBytes.length;
+            }
+
+            let centralSize = 0;
+            for (const part of centralParts) centralSize += part.length;
+
+            // End of central directory record (22 bytes)
+            const eocd = new Uint8Array(22);
+            const ev = new DataView(eocd.buffer);
+            ev.setUint32(0, 0x06054b50, true);      // EOCD signature
+            ev.setUint16(4, 0, true);
+            ev.setUint16(6, 0, true);
+            ev.setUint16(8, entries.length, true);
+            ev.setUint16(10, entries.length, true);
+            ev.setUint32(12, centralSize, true);
+            ev.setUint32(16, offset, true);
+            ev.setUint16(20, 0, true);
+
+            return new Uint8Array([...localParts.flatMap(p => Array.from(p)), ...centralParts.flatMap(p => Array.from(p)), ...Array.from(eocd)]);
+        }
+
+        function extractInlineRunsXml(node, baseStyle = {}) {
+            if (!node) return '';
+            if (node.nodeType === Node.TEXT_NODE) {
+                const rawText = (node.nodeValue || '').replace(/\s+/g, ' ');
+                if (!rawText) return '';
+                const rPrParts = [];
+                if (baseStyle.bold) rPrParts.push('<w:b/>');
+                if (baseStyle.italic) rPrParts.push('<w:i/>');
+                const rPr = rPrParts.length ? `<w:rPr>${rPrParts.join('')}</w:rPr>` : '';
+                return `<w:r>${rPr}<w:t xml:space="preserve">${escapeXmlText(rawText)}</w:t></w:r>`;
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+            const tag = node.tagName.toLowerCase();
+            if (tag === 'br') {
+                return '<w:r><w:br/></w:r>';
+            }
+
+            const nextStyle = {
+                bold: baseStyle.bold || tag === 'strong' || tag === 'b',
+                italic: baseStyle.italic || tag === 'em' || tag === 'i'
             };
 
-            const chosen = presets[presetNameOrIndex] || presets[0];
-            appState.theme = {
-                ...appState.theme,
-                ...chosen,
-                gridEnabled: appState.theme.gridEnabled,
-                gridSize: appState.theme.gridSize,
-                gridOpacity: appState.theme.gridOpacity,
-                headerButtonText: appState.theme.headerButtonText,
-                headerButtonLink: appState.theme.headerButtonLink
+            let out = '';
+            for (const child of Array.from(node.childNodes)) {
+                out += extractInlineRunsXml(child, nextStyle);
+            }
+            return out;
+        }
+
+        function buildWordParagraphXml(runsXml, { align = 'left', keepNext = false, spaceBefore = 60, spaceAfter = 100, lineRule = 276, shadingFill = null, borderBottom = false } = {}) {
+            const safeRuns = runsXml && runsXml.trim() ? runsXml : '<w:r><w:t xml:space="preserve"></w:t></w:r>';
+            const pPr = [
+                `<w:spacing w:before="${spaceBefore}" w:after="${spaceAfter}" w:line="${lineRule}" w:lineRule="auto"/>`,
+                align !== 'left' ? `<w:jc w:val="${align}"/>` : '',
+                keepNext ? '<w:keepNext/>' : '',
+                shadingFill ? `<w:shd w:val="clear" w:color="auto" w:fill="${shadingFill}"/>` : '',
+                borderBottom ? '<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="2" w:color="111111"/></w:pBdr>' : ''
+            ].filter(Boolean).join('');
+            return `<w:p><w:pPr>${pPr}</w:pPr>${safeRuns}</w:p>`;
+        }
+
+        function convertTableElementToWordXml(tableEl, availableWidthTwips) {
+            const allRows = Array.from(tableEl.querySelectorAll('tr'));
+            if (allRows.length === 0) return '';
+
+            let maxCols = 1;
+            const parsedRows = allRows.map(tr => {
+                const cells = Array.from(tr.children).filter(el => {
+                    const t = el.tagName.toLowerCase();
+                    return t === 'th' || t === 'td';
+                });
+                if (cells.length > maxCols) maxCols = cells.length;
+                const isHeaderRow = cells.length > 0 && cells.every(c => c.tagName.toLowerCase() === 'th');
+                return { cells, isHeaderRow };
+            });
+
+            maxCols = Math.max(1, maxCols);
+            const colWidthTwips = Math.floor(availableWidthTwips / maxCols);
+            const gridColsXml = Array.from({ length: maxCols }, () => `<w:gridCol w:w="${colWidthTwips}"/>`).join('');
+
+            const rowsXml = parsedRows.map(({ cells, isHeaderRow }) => {
+                const trPrParts = ['<w:cantSplit/>'];
+                if (isHeaderRow) {
+                    trPrParts.push('<w:tblHeader/>');
+                }
+                const trPr = `<w:trPr>${trPrParts.join('')}</w:trPr>`;
+
+                const cellsXml = Array.from({ length: maxCols }, (_, colIdx) => {
+                    const cellEl = cells[colIdx];
+                    const cellRuns = cellEl ? extractInlineRunsXml(cellEl, { bold: isHeaderRow }) : '';
+                    const cellPara = buildWordParagraphXml(cellRuns, {
+                        align: 'left',
+                        keepNext: false,
+                        spaceBefore: 40,
+                        spaceAfter: 40,
+                        lineRule: 252
+                    });
+                    const shdXml = isHeaderRow ? '<w:shd w:val="clear" w:color="auto" w:fill="F4F4F5"/>' : '';
+                    return `
+                        <w:tc>
+                            <w:tcPr>
+                                <w:tcW w:w="${colWidthTwips}" w:type="dxa"/>
+                                <w:vAlign w:val="top"/>
+                                ${shdXml}
+                            </w:tcPr>
+                            ${cellPara}
+                        </w:tc>
+                    `;
+                }).join('');
+
+                return `<w:tr>${trPr}${cellsXml}</w:tr>`;
+            }).join('');
+
+            return `
+                <w:tbl>
+                    <w:tblPr>
+                        <w:tblW w:w="${availableWidthTwips}" w:type="dxa"/>
+                        <w:tblLayout w:type="fixed"/>
+                        <w:tblBorders>
+                            <w:top w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                            <w:bottom w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                            <w:left w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                            <w:right w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                            <w:insideH w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                            <w:insideV w:val="single" w:sz="4" w:space="0" w:color="262626"/>
+                        </w:tblBorders>
+                        <w:tblCellMar>
+                            <w:top w:w="80" w:type="dxa"/>
+                            <w:bottom w:w="80" w:type="dxa"/>
+                            <w:left w:w="120" w:type="dxa"/>
+                            <w:right w:w="120" w:type="dxa"/>
+                        </w:tblCellMar>
+                    </w:tblPr>
+                    <w:tblGrid>${gridColsXml}</w:tblGrid>
+                    ${rowsXml}
+                </w:tbl>
+                ${buildWordParagraphXml('', { spaceBefore: 0, spaceAfter: 80 })}
+            `;
+        }
+
+        function convertHtmlNodesToWordBodyXml(containerEl, availableWidthTwips) {
+            let bodyXml = '';
+            const children = Array.from(containerEl.childNodes);
+
+            for (const node of children) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const txt = (node.nodeValue || '').trim();
+                    if (txt) {
+                        bodyXml += buildWordParagraphXml(`<w:r><w:t xml:space="preserve">${escapeXmlText(txt)}</w:t></w:r>`);
+                    }
+                    continue;
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) continue;
+
+                const tag = node.tagName.toLowerCase();
+                if (tag === 'table') {
+                    bodyXml += convertTableElementToWordXml(node, availableWidthTwips);
+                } else if (tag === 'h1') {
+                    const runs = extractInlineRunsXml(node, { bold: true });
+                    bodyXml += buildWordParagraphXml(
+                        `<w:r><w:rPr><w:b/><w:sz w:val="30"/><w:szCs w:val="30"/><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
+                        { align: 'center', keepNext: true, spaceBefore: 60, spaceAfter: 80 }
+                    );
+                } else if (tag === 'h2') {
+                    bodyXml += buildWordParagraphXml(
+                        `<w:r><w:rPr><w:b/><w:sz w:val="26"/><w:szCs w:val="26"/><w:color w:val="111111"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
+                        { align: 'center', keepNext: true, spaceBefore: 40, spaceAfter: 140, borderBottom: true }
+                    );
+                } else if (tag === 'h3') {
+                    bodyXml += buildWordParagraphXml(
+                        `<w:r><w:rPr><w:b/><w:sz w:val="24"/><w:szCs w:val="24"/><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
+                        { align: 'left', keepNext: true, spaceBefore: 200, spaceAfter: 80, borderBottom: true }
+                    );
+                } else if (tag === 'h4') {
+                    bodyXml += buildWordParagraphXml(
+                        `<w:r><w:rPr><w:b/><w:sz w:val="22"/><w:szCs w:val="22"/><w:color w:val="1F1F1F"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(node.textContent || '')}</w:t></w:r>`,
+                        { align: 'left', keepNext: true, spaceBefore: 140, spaceAfter: 60 }
+                    );
+                } else if (tag === 'p') {
+                    const runs = extractInlineRunsXml(node);
+                    bodyXml += buildWordParagraphXml(runs, { align: 'left', spaceBefore: 40, spaceAfter: 90 });
+                } else if (tag === 'ul' || tag === 'ol') {
+                    const isOrdered = tag === 'ol';
+                    const items = Array.from(node.querySelectorAll(':scope > li'));
+                    items.forEach((li, idx) => {
+                        const prefix = isOrdered ? `${idx + 1}. ` : '• ';
+                        const itemRuns = `<w:r><w:t xml:space="preserve">${escapeXmlText(prefix)}</w:t></w:r>${extractInlineRunsXml(li)}`;
+                        bodyXml += buildWordParagraphXml(itemRuns, { align: 'left', spaceBefore: 20, spaceAfter: 60 });
+                    });
+                } else if (tag === 'div') {
+                    // Check if div contains a table directly or nested blocks
+                    const nestedTables = Array.from(node.querySelectorAll(':scope > table'));
+                    if (nestedTables.length > 0 && node.children.length === nestedTables.length) {
+                        nestedTables.forEach(t => {
+                            bodyXml += convertTableElementToWordXml(t, availableWidthTwips);
+                        });
+                    } else {
+                        const innerXml = convertHtmlNodesToWordBodyXml(node, availableWidthTwips);
+                        if (innerXml) {
+                            bodyXml += innerXml;
+                        } else {
+                            const txt = (node.textContent || '').trim();
+                            if (txt) {
+                                bodyXml += buildWordParagraphXml(`<w:r><w:t xml:space="preserve">${escapeXmlText(txt)}</w:t></w:r>`);
+                            }
+                        }
+                    }
+                } else {
+                    const runs = extractInlineRunsXml(node);
+                    if (runs.trim()) {
+                        bodyXml += buildWordParagraphXml(runs, { align: 'left', spaceBefore: 40, spaceAfter: 80 });
+                    }
+                }
+            }
+
+            return bodyXml;
+        }
+
+        function repairWordDocumentXml(docXml, fallbackTitle) {
+            let fixed = String(docXml || '');
+            if (!fixed.includes('<w:document')) {
+                fixed = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${buildWordParagraphXml(`<w:r><w:t>${escapeXmlText(fallbackTitle)}</w:t></w:r>`)}</w:body></w:document>`;
+            }
+            if (!fixed.includes('<w:body')) {
+                fixed = fixed.replace('</w:document>', `<w:body>${buildWordParagraphXml(`<w:r><w:t>${escapeXmlText(fallbackTitle)}</w:t></w:r>`)}</w:body></w:document>`);
+            }
+            if (!fixed.includes('<w:sectPr')) {
+                fixed = fixed.replace('</w:body>', '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body>');
+            }
+            // Strip any stray control characters outside valid XML 1.0
+            fixed = fixed.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+            return fixed;
+        }
+
+        function validateDocxPackage(zipBytes, documentXml, expectedPlainText, expectedTableCount) {
+            const issues = [];
+            if (!(zipBytes instanceof Uint8Array) || zipBytes.length < 22) {
+                issues.push('Ukuran berkas arsip ZIP DOCX tidak valid');
+                return { valid: false, issues };
+            }
+            // Verify ZIP local header signature PK\x03\x04
+            if (zipBytes[0] !== 0x50 || zipBytes[1] !== 0x4B || zipBytes[2] !== 0x03 || zipBytes[3] !== 0x04) {
+                issues.push('Header arsip ZIP DOCX tidak valid');
+            }
+
+            // Parse word/document.xml using DOMParser to guarantee well-formed XML
+            try {
+                const parser = new DOMParser();
+                const parsed = parser.parseFromString(documentXml, 'application/xml');
+                const parserErr = parsed.getElementsByTagName('parsererror');
+                if (parserErr && parserErr.length > 0) {
+                    issues.push('Struktur XML word/document.xml tidak valid');
+                }
+            } catch (e) {
+                issues.push('Gagal memparsing XML word/document.xml');
+            }
+
+            // Extract text from <w:t> elements in documentXml
+            const wTextMatches = Array.from(documentXml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)).map(m => m[1]
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&apos;/g, "'")
+            );
+            const extractedText = wTextMatches.join(' ').replace(/\s+/g, ' ').trim();
+            if (!extractedText) {
+                issues.push('Isi teks dokumen kosong');
+            }
+
+            // Verify no truncated words if source had substantial text
+            const sourceTokens = (expectedPlainText || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+            const extractedTokens = extractedText.split(' ').filter(Boolean);
+            if (sourceTokens.length > 10 && extractedTokens.length < Math.floor(sourceTokens.length * 0.7)) {
+                issues.push('Sebagian isi teks terpotong saat konversi ke DOCX');
+            }
+
+            const tblCount = (documentXml.match(/<w:tbl\b/g) || []).length;
+            if (expectedTableCount > 0 && tblCount < expectedTableCount) {
+                issues.push(`Jumlah tabel Word (${tblCount}) lebih sedikit dari tabel sumber (${expectedTableCount})`);
+            }
+
+            return {
+                valid: issues.length === 0,
+                issues,
+                tableCount: tblCount,
+                wordCount: extractedTokens.length
             };
-            applyThemeVariables(appState.theme);
+        }
+
+        function generateValidatedOfficeOpenXmlDocx({ title, html, isLandscape = false }) {
+            const safeTitle = (title || 'Modul_Ajar').trim();
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = html || '';
+            const expectedPlainText = (tempContainer.innerText || tempContainer.textContent || '').trim();
+            const expectedTableCount = tempContainer.querySelectorAll('table').length;
+
+            // A4 dimensions in twips (1 inch = 1440 twips; A4 = 210mm x 297mm = 11906 x 16838 twips)
+            const pgWidth = isLandscape ? 16838 : 11906;
+            const pgHeight = isLandscape ? 11906 : 16838;
+            const marginTop = 1134;    // ~2.0 cm
+            const marginBottom = 1134; // ~2.0 cm
+            const marginLeft = 1247;   // ~2.2 cm
+            const marginRight = 1247;  // ~2.2 cm
+            const availableWidthTwips = pgWidth - marginLeft - marginRight;
+
+            const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+  <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+</Types>`;
+
+            const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+            const docRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
+</Relationships>`;
+
+            const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault>
+      <w:rPr>
+        <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>
+        <w:sz w:val="22"/>
+        <w:szCs w:val="22"/>
+        <w:color w:val="111111"/>
+      </w:rPr>
+    </w:rPrDefault>
+  </w:docDefaults>
+</w:styles>`;
+
+            const headerXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:p>
+    <w:pPr><w:jc w:val="right"/></w:pPr>
+    <w:r><w:rPr><w:i/><w:sz w:val="18"/><w:color w:val="555555"/></w:rPr><w:t xml:space="preserve">${escapeXmlText(safeTitle)}</w:t></w:r>
+  </w:p>
+</w:hdr>`;
+
+            const footerXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:p>
+    <w:pPr><w:jc w:val="center"/></w:pPr>
+    <w:r><w:rPr><w:sz w:val="18"/><w:color w:val="555555"/></w:rPr><w:t xml:space="preserve">Halaman </w:t></w:r>
+    <w:fldSimple w:instr="PAGE"/>
+    <w:r><w:rPr><w:sz w:val="18"/><w:color w:val="555555"/></w:rPr><w:t xml:space="preserve"> dari </w:t></w:r>
+    <w:fldSimple w:instr="NUMPAGES"/>
+  </w:p>
+</w:ftr>`;
+
+            let bodyContentXml = convertHtmlNodesToWordBodyXml(tempContainer, availableWidthTwips);
+            const orientAttr = isLandscape ? ' w:orient="landscape"' : '';
+            const sectPrXml = `
+                <w:sectPr>
+                    <w:headerReference w:type="default" r:id="rId2"/>
+                    <w:footerReference w:type="default" r:id="rId3"/>
+                    <w:pgSz w:w="${pgWidth}" w:h="${pgHeight}"${orientAttr}/>
+                    <w:pgMar w:top="${marginTop}" w:right="${marginRight}" w:bottom="${marginBottom}" w:left="${marginLeft}" w:header="708" w:footer="708" w:gutter="0"/>
+                </w:sectPr>
+            `;
+
+            let documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body>
+    ${bodyContentXml}
+    ${sectPrXml}
+  </w:body>
+</w:document>`;
+
+            let zipBytes = buildStoredZipArchive([
+                { name: '[Content_Types].xml', data: contentTypesXml },
+                { name: '_rels/.rels', data: rootRelsXml },
+                { name: 'word/_rels/document.xml.rels', data: docRelsXml },
+                { name: 'word/styles.xml', data: stylesXml },
+                { name: 'word/header1.xml', data: headerXml },
+                { name: 'word/footer1.xml', data: footerXml },
+                { name: 'word/document.xml', data: documentXml }
+            ]);
+
+            let validation = validateDocxPackage(zipBytes, documentXml, expectedPlainText, expectedTableCount);
+            if (!validation.valid) {
+                documentXml = repairWordDocumentXml(documentXml, safeTitle);
+                zipBytes = buildStoredZipArchive([
+                    { name: '[Content_Types].xml', data: contentTypesXml },
+                    { name: '_rels/.rels', data: rootRelsXml },
+                    { name: 'word/_rels/document.xml.rels', data: docRelsXml },
+                    { name: 'word/styles.xml', data: stylesXml },
+                    { name: 'word/header1.xml', data: headerXml },
+                    { name: 'word/footer1.xml', data: footerXml },
+                    { name: 'word/document.xml', data: documentXml }
+                ]);
+                validation = validateDocxPackage(zipBytes, documentXml, expectedPlainText, expectedTableCount);
+            }
+
+            const blob = new Blob([zipBytes], {
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            });
+
+            return {
+                valid: validation.valid,
+                issues: validation.issues,
+                blob,
+                summary: `${validation.tableCount} tabel Word, ${validation.wordCount} kata, A4`
+            };
+        }
+
+        function changeEditorPaperOrientation(editorKey, orientation) {
             if (appState.currentRoute === 'admin-theme') {
                 renderAdminThemeView(document.getElementById('main-content'));
             }
