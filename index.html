@@ -1976,7 +1976,7 @@ service cloud.firestore {
   ====================================================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const PLATFORM_CONFIG = {
@@ -2444,7 +2444,7 @@ service cloud.firestore {
       projectId: "p-c410f",
       storageBucket: "p-c410f.firebasestorage.app",
       messagingSenderId: "41031214989",
-      appId: "1:41031214989:web:5d9c9db7cc97168eafffc4"
+      appId: "1:41031214989:web:8c02b04f8d65878bafffc4"
     };
 
     async function connectToFirebaseApp(configObj, appInstanceName = "aksa-main-app") {
@@ -2457,6 +2457,18 @@ service cloud.firestore {
       appState.firebaseConfigObj = configObj;
       appState.auth = auth;
       appState.db = db;
+
+      // Sync persistent Firebase Email/Password admin session across reloads
+      onAuthStateChanged(auth, (fbUser) => {
+        if (fbUser && !fbUser.isAnonymous && fbUser.email) {
+          appState.user = {
+            name: fbUser.displayName || fbUser.email.split("@")[0] || "Admin Platform",
+            email: fbUser.email,
+            uid: fbUser.uid
+          };
+          syncAuthNavState();
+        }
+      });
 
       // RULE 3: Authenticate before Firestore queries (with fallback if Anonymous Auth is disabled in console)
       try {
@@ -4239,17 +4251,44 @@ service cloud.firestore {
     /* =======================================================================
        ADMIN AUTHENTICATION & MOBILE MENU CONTROLS
     ======================================================================== */
+    function showAdminAuthError(message) {
+      let box = document.getElementById("admin-auth-error-box");
+      if (!box) {
+        const form = document.getElementById("auth-form");
+        if (!form) return;
+        box = document.createElement("div");
+        box.id = "admin-auth-error-box";
+        box.className = "p-3.5 rounded-xl border border-black bg-neutral-100 text-xs text-black leading-relaxed";
+        form.prepend(box);
+      }
+      box.innerHTML = message;
+      box.classList.remove("hidden");
+    }
+
     window.handleAuthSubmit = async function (e) {
       e.preventDefault();
       const email = document.getElementById("auth-email").value.trim();
       const password = document.getElementById("auth-password").value;
+      const submitBtn = document.getElementById("auth-submit-btn");
+      const errBox = document.getElementById("admin-auth-error-box");
+      if (errBox) errBox.classList.add("hidden");
 
       if (!appState.auth) {
-        showToast("Firebase Authentication belum terhubung.");
+        showAdminAuthError("<strong>Koneksi Firebase belum siap.</strong> Muat ulang halaman lalu coba kembali.");
         return;
       }
 
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Memverifikasi ke Firebase...";
+      }
+
       try {
+        // Ensure any anonymous session is cleared cleanly before signing in with Email/Password
+        if (appState.auth.currentUser && appState.auth.currentUser.isAnonymous) {
+          await signOut(appState.auth);
+        }
+
         const cred = await signInWithEmailAndPassword(appState.auth, email, password);
         appState.user = {
           name: cred.user.displayName || email.split("@")[0] || "Admin Platform",
@@ -4261,12 +4300,25 @@ service cloud.firestore {
         showToast(`Selamat datang, ${appState.user.name}!`);
         navigateTo("/dashboard");
       } catch (authErr) {
-        if (authErr.code === "auth/wrong-password" || authErr.code === "auth/user-not-found" || authErr.code === "auth/invalid-credential") {
-          showToast("Email atau kata sandi admin tidak sesuai dengan data di Firebase.");
-        } else if (authErr.code === "auth/too-many-requests") {
-          showToast("Terlalu banyak percobaan login. Silakan coba beberapa saat lagi.");
-        } else {
-          showToast(`Gagal masuk: ${authErr.message}`);
+        const code = authErr.code || "unknown";
+        let detail = `Gagal masuk (${escapeHTML(code)}): ${escapeHTML(authErr.message)}`;
+
+        if (code === "auth/operation-not-allowed") {
+          detail = "<strong>Metode Email/Password belum diaktifkan:</strong> Buka Firebase Console → <em>Authentication → Sign-in method</em> → aktifkan <strong>Email/Password</strong> lalu klik Save.";
+        } else if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+          detail = "<strong>Email atau Password tidak cocok:</strong> Pastikan user sudah dibuat di tab <em>Authentication → Users</em> pada project <code>p-c410f</code> dan tidak ada spasi berlebih.";
+        } else if (code === "auth/unauthorized-domain") {
+          detail = "<strong>Domain belum diizinkan:</strong> Tambahkan domain website Anda di Firebase Console → <em>Authentication → Settings → Authorized domains</em>.";
+        } else if (code === "auth/too-many-requests") {
+          detail = "<strong>Terlalu banyak percobaan gagal:</strong> Tunggu beberapa menit atau reset password user di Firebase Console.";
+        }
+
+        showAdminAuthError(detail);
+        showToast("Login admin gagal. Periksa pesan detail pada form.");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Masuk ke Dashboard Admin";
         }
       }
     };
