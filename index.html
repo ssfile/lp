@@ -1137,8 +1137,8 @@
         <h1 id="auth-heading" class="font-display text-2xl font-bold text-black">Masuk ke Dashboard Admin</h1>
         <p id="auth-subheading" class="text-sm text-neutral-600 mt-1">
           Kelola seluruh konten landing page, katalog fitur, data pelanggan, kode referral, dan pengaturan Firebase.
-        </p>
-      </div>
+      <!-- Admin Login Error Diagnostic Box -->
+      <div id="admin-auth-error-box" class="hidden mb-4 p-3.5 rounded-xl border border-black bg-neutral-100 text-xs text-black leading-relaxed space-y-1"></div>
 
       <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
         <div>
@@ -1927,6 +1927,10 @@
                   <input id="fb-projectId" type="text" required placeholder="project-id" class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
                 </div>
                 <div>
+                  <label for="fb-databaseURL" class="block text-xs font-semibold text-black mb-1">Database URL (databaseURL)</label>
+                  <input id="fb-databaseURL" type="text" placeholder="https://project-id-default-rtdb.firebaseio.com" class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                </div>
+                <div>
                   <label for="fb-storageBucket" class="block text-xs font-semibold text-black mb-1">Storage Bucket (storageBucket)</label>
                   <input id="fb-storageBucket" type="text" placeholder="project-id.appspot.com" class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
                 </div>
@@ -2441,10 +2445,11 @@ service cloud.firestore {
     const EMBEDDED_FIREBASE_CONFIG = {
       apiKey: "AIzaSyALys9RlMEKT4zbviTLKiOgh41VwO7bN1k",
       authDomain: "p-c410f.firebaseapp.com",
+      databaseURL: "https://p-c410f-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "p-c410f",
       storageBucket: "p-c410f.firebasestorage.app",
       messagingSenderId: "41031214989",
-      appId: "1:41031214989:web:8c02b04f8d65878bafffc4"
+      appId: "1:41031214989:web:5d9c9db7cc97168eafffc4"
     };
 
     async function connectToFirebaseApp(configObj, appInstanceName = "aksa-main-app") {
@@ -2460,7 +2465,7 @@ service cloud.firestore {
 
       // Sync persistent Firebase Email/Password admin session across reloads
       onAuthStateChanged(auth, (fbUser) => {
-        if (fbUser && !fbUser.isAnonymous && fbUser.email) {
+        if (fbUser && fbUser.email) {
           appState.user = {
             name: fbUser.displayName || fbUser.email.split("@")[0] || "Admin Platform",
             email: fbUser.email,
@@ -2469,17 +2474,6 @@ service cloud.firestore {
           syncAuthNavState();
         }
       });
-
-      // RULE 3: Authenticate before Firestore queries (with fallback if Anonymous Auth is disabled in console)
-      try {
-        if (typeof window.__initial_auth_token !== "undefined" && window.__initial_auth_token && appInstanceName === "aksa-main-app") {
-          await signInWithCustomToken(auth, window.__initial_auth_token);
-        } else if (!auth.currentUser) {
-          await signInAnonymously(auth);
-        }
-      } catch (authErr) {
-        console.warn("Firebase Anonymous Auth info:", authErr.code || authErr.message);
-      }
 
       appState.firebaseReady = true;
 
@@ -2557,128 +2551,151 @@ service cloud.firestore {
 
     async function initFirebaseIntegration() {
       try {
-        let firebaseConfig = EMBEDDED_FIREBASE_CONFIG;
-        if (typeof window.__firebase_config !== "undefined" && window.__firebase_config) {
-          firebaseConfig = typeof window.__firebase_config === "string"
-            ? JSON.parse(window.__firebase_config)
-            : window.__firebase_config;
-        }
-
-        const ok = await connectToFirebaseApp(firebaseConfig, "aksa-main-app");
-        if (ok) {
-          refreshAllRenderedViews();
-        }
+        await connectToFirebaseApp(EMBEDDED_FIREBASE_CONFIG, "aksa-embedded-app");
       } catch (err) {
-        console.warn("Running in local session mode:", err.message);
+        console.warn("Firebase init warning:", err);
       }
     }
 
-    async function persistFeatureToFirestore(featureObj) {
-      if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "features", featureObj.id);
-      await setDoc(ref, {
-        ...featureObj,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+    function showAdminAuthError(htmlMessage) {
+      const box = document.getElementById("admin-auth-error-box");
+      if (!box) return;
+      box.innerHTML = htmlMessage;
+      box.classList.remove("hidden");
     }
 
-    async function deleteFeatureFromFirestore(featureId) {
+    function hideAdminAuthError() {
+      const box = document.getElementById("admin-auth-error-box");
+      if (!box) return;
+      box.classList.add("hidden");
+      box.innerHTML = "";
+    }
+
+    /* =======================================================================
+       FIRESTORE PERSISTENCE HELPERS
+    ======================================================================== */
+    async function persistFeatureToFirestore(featureObj) {
       if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "features", featureId);
-      await deleteDoc(ref);
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "features", featureObj.id);
+        await setDoc(ref, { ...featureObj, updatedAt: new Date().toISOString() }, { merge: true });
+      } catch (e) {
+        console.warn("Sync feature error:", e.message);
+      }
+    }
+
+    async function removeFeatureFromFirestore(featureId) {
+      if (!appState.firebaseReady || !appState.db) return;
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "features", featureId);
+        await deleteDoc(ref);
+      } catch (e) {
+        console.warn("Delete feature error:", e.message);
+      }
+    }
+
+    async function persistPricingToFirestore() {
+      if (!appState.firebaseReady || !appState.db) return;
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "pricing", "active-package");
+        await setDoc(ref, { ...appState.pricing, updatedAt: new Date().toISOString() }, { merge: true });
+      } catch (e) {
+        console.warn("Sync pricing error:", e.message);
+      }
+    }
+
+    async function persistSiteSettingsToFirestore() {
+      if (!appState.firebaseReady || !appState.db) return;
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "siteSettings", "main");
+        await setDoc(ref, { ...appState.siteSettings, faqs: appState.faqs, updatedAt: new Date().toISOString() }, { merge: true });
+      } catch (e) {
+        console.warn("Sync settings error:", e.message);
+      }
     }
 
     async function persistCustomerToFirestore(customerObj) {
       if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "customers", customerObj.id);
-      await setDoc(ref, {
-        ...customerObj,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "customers", customerObj.id);
+        await setDoc(ref, { ...customerObj, updatedAt: new Date().toISOString() }, { merge: true });
+      } catch (e) {
+        console.warn("Sync customer error:", e.message);
+      }
     }
 
-    async function deleteCustomerFromFirestore(customerId) {
+    async function removeCustomerFromFirestore(customerId) {
       if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "customers", customerId);
-      await deleteDoc(ref);
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "customers", customerId);
+        await deleteDoc(ref);
+      } catch (e) {
+        console.warn("Delete customer error:", e.message);
+      }
     }
 
     async function persistReferralToFirestore(refObj) {
       if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "referrals", refObj.id);
-      await setDoc(ref, {
-        ...refObj,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "referrals", refObj.id);
+        await setDoc(ref, { ...refObj, updatedAt: new Date().toISOString() }, { merge: true });
+      } catch (e) {
+        console.warn("Sync referral error:", e.message);
+      }
     }
 
-    async function deleteReferralFromFirestore(refId) {
+    async function removeReferralFromFirestore(refId) {
       if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "referrals", refId);
-      await deleteDoc(ref);
-    }
-
-    async function persistPricingToFirestore(pricingObj) {
-      if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "pricing", "active-package");
-      await setDoc(ref, {
-        ...pricingObj,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-    }
-
-    async function persistSiteSettingsToFirestore(settingsObj, faqsArray) {
-      if (!appState.firebaseReady || !appState.db) return;
-      const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "siteSettings", "main");
-      await setDoc(ref, {
-        ...settingsObj,
-        faqs: faqsArray,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+      try {
+        const ref = doc(appState.db, "artifacts", appState.appId, "public", "data", "referrals", refId);
+        await deleteDoc(ref);
+      } catch (e) {
+        console.warn("Delete referral error:", e.message);
+      }
     }
 
     /* =======================================================================
-       ICONS & GLOBAL THEME SYNC ENGINE
+       ICON & GLOBAL THEME ENGINE
     ======================================================================== */
-    function getBrandLogoSVG(iconKey, sizeClass = "w-5 h-5") {
+    function getFeatureIconSVG(iconKey, sizeClass = "w-5 h-5") {
       const icons = {
+        document: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>`,
+        layers: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+        "check-square": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`,
+        brain: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M8 14s1.5 2 4 2 4-2 4-2"/></svg>`,
+        briefcase: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>`,
+        book: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+        monitor: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+        presentation: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v5M8 21h8"/></svg>`,
+        refresh: `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`,
+        "plus-grid": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg>`
+      };
+      return icons[iconKey] || icons.document;
+    }
+
+    function getBrandLogoSVG(iconType, sizeClass = "w-5 h-5") {
+      const brandIcons = {
         "grid-node": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5" fill="currentColor"/></svg>`,
-        "spark-cube": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>`,
-        "hexagon-core": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`,
+        "spark-cube": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/><line x1="12" y1="22" x2="12" y2="12"/><polyline points="21 7 12 12 3 7"/></svg>`,
+        "hexagon-core": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 20 6.5 20 17.5 12 22 4 17.5 4 6.5 12 2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>`,
         "orbit-atom": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)"/></svg>`,
-        "layers-stack": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>`,
-        "terminal-ai": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><polyline points="7 9 10 12 7 15"/><line x1="12" y1="15" x2="17" y2="15"/></svg>`
+        "layers-stack": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 3 2 8 12 13 22 8 12 3"/><polyline points="2 13 12 18 22 13"/><polyline points="2 18 12 23 22 18"/></svg>`,
+        "terminal-ai": `<svg class="${sizeClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><polyline points="7 10 10 13 7 16"/><line x1="12" y1="16" x2="17" y2="16"/></svg>`
       };
-      return icons[iconKey] || icons["grid-node"];
+      return brandIcons[iconType] || brandIcons["grid-node"];
     }
 
-    function getFeatureIconSVG(iconKey) {
-      const map = {
-        "document": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-        "layers": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>`,
-        "check-square": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`,
-        "brain": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>`,
-        "briefcase": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
-        "book": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
-        "monitor": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
-        "presentation": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>`,
-        "refresh": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`,
-        "plus-grid": `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg>`
-      };
-      return map[iconKey] || map["document"];
-    }
-
-    function hexToRgba(hex, alphaPercent) {
+    function hexToRgba(hex, alphaFloat) {
       const clean = (hex || "#A3A3A3").replace("#", "");
-      const num = parseInt(clean.length === 3 ? clean.split("").map(c => c + c).join("") : clean, 16);
-      if (Number.isNaN(num)) return `rgba(163, 163, 163, ${(alphaPercent || 30) / 100})`;
-      const r = (num >> 16) & 255;
-      const g = (num >> 8) & 255;
-      const b = num & 255;
-      return `rgba(${r}, ${g}, ${b}, ${(Number(alphaPercent) || 0) / 100})`;
+      if (clean.length !== 6) return `rgba(163, 163, 163, ${alphaFloat})`;
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alphaFloat})`;
     }
 
-    function applyGlobalTheme(s) {
+    function applyGlobalThemeAndBrand() {
+      const s = appState.siteSettings;
       const root = document.documentElement;
       root.style.setProperty("--bg-primary", s.themeBgPrimary || "#FFFFFF");
       root.style.setProperty("--bg-secondary", s.themeBgSecondary || "#FAFAFA");
@@ -2688,267 +2705,150 @@ service cloud.firestore {
       root.style.setProperty("--accent-text", s.themeAccentText || "#FFFFFF");
       root.style.setProperty("--border-subtle", s.themeBorderSubtle || "#E5E5E5");
       root.style.setProperty("--border-strong", s.themeBorderStrong || "#000000");
-      root.style.setProperty("--grid-line-color", s.gridEnabled === false ? "transparent" : hexToRgba(s.gridColor || "#A3A3A3", s.gridOpacity ?? 30));
-      root.style.setProperty("--grid-size", `${Number(s.gridSize) || 36}px`);
+
+      const opacityVal = s.gridEnabled === false ? 0 : Math.max(0, Math.min(100, Number(s.gridOpacity ?? 30))) / 100;
+      root.style.setProperty("--grid-line-color", hexToRgba(s.gridColor || "#A3A3A3", opacityVal));
+      root.style.setProperty("--grid-size", `${Math.max(16, Number(s.gridSize) || 36)}px`);
 
       const isCustom =
-        (s.themeBgPrimary || "#FFFFFF").toUpperCase() !== "#FFFFFF" ||
-        (s.themeAccentPrimary || "#000000").toUpperCase() !== "#000000" ||
-        (s.themeTextPrimary || "#000000").toUpperCase() !== "#000000";
-      document.body.classList.toggle("theme-customized", isCustom);
-
-      const logoIds = ["brand-logo-nav", "brand-logo-footer", "brand-logo-detail", "brand-logo-member", "brand-logo-admin"];
-      logoIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = getBrandLogoSVG(s.brandIcon || "grid-node", id === "brand-logo-nav" ? "w-5 h-5" : "w-4 h-4");
-      });
-    }
-
-    /* =======================================================================
-       ROUTING & NAVIGATION
-    ======================================================================== */
-    window.navigateTo = function (route) {
-      appState.currentRoute = route;
-      const views = ["view-landing", "view-feature-detail", "view-member-login", "view-member", "view-auth", "view-dashboard"];
-      views.forEach(v => document.getElementById(v)?.classList.add("hidden"));
-
-      if (route === "/" || route === "") {
-        document.getElementById("view-landing")?.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route.startsWith("/fitur/")) {
-        const featureId = route.replace("/fitur/", "");
-        appState.selectedDetailFeatureId = featureId;
-        document.getElementById("view-feature-detail")?.classList.remove("hidden");
-        renderFeatureDetailView(featureId);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route === "/member-login") {
-        if (appState.memberSession) {
-          navigateTo("/member");
-          return;
-        }
-        document.getElementById("view-member-login")?.classList.remove("hidden");
-        const targetInfo = document.getElementById("member-login-target-info");
-        const targetName = document.getElementById("member-login-feature-name");
-        if (appState.pendingMemberFeatureId && targetInfo && targetName) {
-          const f = appState.features.find(x => x.id === appState.pendingMemberFeatureId);
-          if (f) {
-            targetName.textContent = f.name;
-            targetInfo.classList.remove("hidden");
-          }
-        } else if (targetInfo) {
-          targetInfo.classList.add("hidden");
-        }
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route === "/member") {
-        if (!appState.memberSession) {
-          navigateTo("/member-login");
-          return;
-        }
-        document.getElementById("view-member")?.classList.remove("hidden");
-        renderMemberDashboard();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route === "/login" || route === "/register") {
-        if (appState.user) {
-          navigateTo("/dashboard");
-          return;
-        }
-        appState.authMode = "login";
-        document.getElementById("view-auth")?.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else if (route.startsWith("/dashboard")) {
-        if (!appState.user) {
-          navigateTo("/login");
-          return;
-        }
-        document.getElementById("view-dashboard")?.classList.remove("hidden");
-        renderDashboardRoute(route);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-      try {
-        window.history.replaceState(null, "", route === "/" ? "#" : `#${route}`);
-      } catch (_) {}
-    };
-
-    function updateAuthFormUI() {
-      const isReg = appState.authMode === "register";
-      document.getElementById("auth-name-group")?.classList.toggle("hidden", !isReg);
-      const heading = document.getElementById("auth-heading");
-      const btn = document.getElementById("auth-submit-btn");
-      const swText = document.getElementById("auth-switch-text");
-      const swBtn = document.getElementById("auth-switch-btn");
-      if (heading) heading.textContent = isReg ? "Daftar Akun Admin Baru" : "Masuk ke Dashboard Admin";
-      if (btn) btn.textContent = isReg ? "Buat Akun & Masuk" : "Masuk ke Dashboard Admin";
-      if (swText) swText.textContent = isReg ? "Sudah memiliki akun admin?" : "Belum memiliki akun admin?";
-      if (swBtn) swBtn.textContent = isReg ? "Masuk" : "Daftar Admin";
-    }
-
-    window.toggleAuthMode = function () {
-      appState.authMode = appState.authMode === "login" ? "register" : "login";
-      updateAuthFormUI();
-    };
-
-    function syncAuthNavState() {
-      const desk = document.getElementById("nav-auth-desktop");
-      const mob = document.getElementById("nav-auth-mobile");
-      const dashLabel = document.getElementById("dash-user-label");
-      if (dashLabel && appState.user) dashLabel.textContent = appState.user.name;
-
-      if (appState.user && desk) {
-        desk.innerHTML = `
-          <button type="button" onclick="navigateTo('/member-login')" class="px-4 py-2.5 text-sm font-semibold text-black border border-neutral-300 hover:border-black rounded-lg transition-colors">
-            Masuk Member
-          </button>
-          <button type="button" onclick="navigateTo('/dashboard')" class="px-5 py-2.5 text-sm font-semibold bg-black text-white border border-black rounded-lg hover:bg-white hover:text-black transition-colors">
-            Dashboard Admin
-          </button>
-        `;
-      }
-      if (appState.user && mob) {
-        mob.innerHTML = `
-          <button type="button" onclick="closeMobileMenu(); navigateTo('/dashboard')" class="w-full py-3 px-4 text-sm font-semibold bg-black text-white border border-black rounded-lg">
-            Buka Dashboard Admin
-          </button>
-        `;
-      }
-    }
-
-    /* =======================================================================
-       WHATSAPP SALES REDIRECT
-    ======================================================================== */
-    function buildWhatsAppUrl() {
-      const s = appState.siteSettings;
-      const cleanNumber = String(s.whatsappNumber || "").replace(/[^0-9]/g, "");
-      let msg = s.whatsappMessage || `Halo, saya tertarik untuk berlangganan ${appState.pricing.packageName}.`;
-      if (appState.activeReferralInput) {
-        msg += `\n\nKode Referral: ${appState.activeReferralInput}`;
-      }
-      return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(msg)}`;
-    }
-
-    window.handleWhatsAppRedirect = function () {
-      const s = appState.siteSettings;
-      if (s.whatsappEnabled === false) {
-        showToast("Pemesanan WhatsApp sedang dinonaktifkan oleh admin.");
-        return;
-      }
-      const cleanNumber = String(s.whatsappNumber || "").replace(/[^0-9]/g, "");
-      if (!cleanNumber) {
-        showToast("Nomor WhatsApp admin belum diatur.");
-        return;
-      }
-      window.open(buildWhatsAppUrl(), "_blank", "noopener,noreferrer");
-    };
-
-    /* =======================================================================
-       LANDING PAGE RENDERERS (SECTIONS, CATALOG, PRICING, TESTIMONIALS, FAQ)
-    ======================================================================== */
-    function applySiteSettingsToDOM() {
-      const s = appState.siteSettings;
-      applyGlobalTheme(s);
+        (s.themeBgPrimary && s.themeBgPrimary.toUpperCase() !== "#FFFFFF") ||
+        (s.themeAccentPrimary && s.themeAccentPrimary.toUpperCase() !== "#000000") ||
+        (s.themeTextPrimary && s.themeTextPrimary.toUpperCase() !== "#000000");
+      document.body.classList.toggle("theme-customized", Boolean(isCustom));
 
       const brand = s.brandName || "AKSA.AI";
-      document.title = `${brand} — ${s.heroTitle || "Semua Kebutuhan Produktivitas AI, Dalam Satu Platform"}`;
+      const tagline = s.brandTagline || "Unified AI Platform";
+      document.title = `${brand} — ${s.heroTitle || "Platform Produktivitas AI"}`;
 
-      const textBindings = {
-        "brand-name-nav": brand,
-        "brand-tagline-nav": s.brandTagline || "Unified AI Platform",
-        "brand-name-footer": brand,
-        "brand-name-copy": brand,
-        "detail-nav-brand": brand,
-        "detail-footer-brand": brand,
-        "member-login-brand": brand,
-        "member-dash-brand": brand,
-        "admin-dash-brand": brand,
-        "hero-badge-display": s.heroBadge,
-        "hero-title-display": s.heroTitle,
-        "hero-desc-display": s.heroDescription,
-        "hero-cta-text-display": s.ctaText,
-        "hero-secondary-cta-display": s.secondaryCtaText,
-        "hero-stat1-val": s.stat1Value,
-        "hero-stat1-lbl": s.stat1Label,
-        "hero-stat2-lbl": s.stat2Label,
-        "hero-stat3-val": s.stat3Value,
-        "hero-stat3-lbl": s.stat3Label,
-        "trust-label-display": s.trustLabel,
-        "trust-title-display": s.trustTitle,
-        "platform-desc-display": s.platformDescription,
-        "pillar1-title-display": s.pillar1Title,
-        "pillar1-desc-display": s.pillar1Desc,
-        "pillar2-title-display": s.pillar2Title,
-        "pillar2-desc-display": s.pillar2Desc,
-        "pillar3-title-display": s.pillar3Title,
-        "pillar3-desc-display": s.pillar3Desc,
-        "catalog-title-display": s.catalogTitle,
-        "catalog-desc-display": s.catalogDesc,
-        "benefits-title-display": s.benefitsTitle,
-        "benefit1-title-display": s.benefit1Title,
-        "benefit1-desc-display": s.benefit1Desc,
-        "benefit2-title-display": s.benefit2Title,
-        "benefit2-desc-display": s.benefit2Desc,
-        "steps-title-display": s.stepsTitle,
-        "steps-desc-display": s.stepsDesc,
-        "step1-title-display": s.step1Title,
-        "step1-desc-display": s.step1Desc,
-        "step2-title-display": s.step2Title,
-        "step2-desc-display": s.step2Desc,
-        "step3-title-display": s.step3Title,
-        "step3-desc-display": s.step3Desc,
-        "preview-title-display": s.previewTitle,
-        "preview-desc-display": s.previewDesc,
-        "pricing-title-display": s.pricingTitle,
-        "pricing-desc-display": s.pricingDesc,
-        "final-cta-badge-display": s.finalCtaBadge,
-        "final-cta-title-display": s.finalCtaTitle,
-        "final-cta-desc-display": s.finalCtaDesc,
-        "footer-desc-display": s.footerDescription,
-        "footer-tagline-display": s.footerTagline
+      ["brand-name-nav", "brand-name-footer", "brand-name-copy", "detail-nav-brand", "detail-footer-brand", "member-login-brand", "member-dash-brand", "admin-dash-brand"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = brand;
+      });
+      const tagNav = document.getElementById("brand-tagline-nav");
+      if (tagNav) tagNav.textContent = tagline;
+
+      const navLogo = document.getElementById("brand-logo-nav");
+      if (navLogo) navLogo.innerHTML = getBrandLogoSVG(s.brandIcon, "w-5 h-5");
+      ["brand-logo-footer", "brand-logo-detail", "brand-logo-member", "brand-logo-admin"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = getBrandLogoSVG(s.brandIcon, "w-4 h-4");
+      });
+    }
+
+    /* =======================================================================
+       LANDING PAGE & CATALOG RENDERERS
+    ======================================================================== */
+    function renderLandingTexts() {
+      const s = appState.siteSettings;
+      const pkg = appState.pricing;
+      const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null) el.textContent = val;
       };
 
-      Object.entries(textBindings).forEach(([id, val]) => {
-        const el = document.getElementById(id);
-        if (el && val !== undefined && val !== null) {
-          el.textContent = val;
-        }
-      });
+      setText("hero-badge-display", s.heroBadge);
+      setText("hero-title-display", s.heroTitle);
+      setText("hero-desc-display", s.heroDescription);
+      setText("hero-cta-text-display", s.ctaText);
+      setText("hero-secondary-cta-display", s.secondaryCtaText);
+      setText("hero-stat1-val", s.stat1Value);
+      setText("hero-stat1-lbl", s.stat1Label);
+      setText("hero-stat2-lbl", s.stat2Label);
+      setText("hero-stat3-val", s.stat3Value);
+      setText("hero-stat3-lbl", s.stat3Label);
+      setText("hero-card-pkg-name", pkg.packageName);
 
-      const emailLink = document.getElementById("footer-email-link");
-      if (emailLink && s.contactEmail) {
-        emailLink.textContent = s.contactEmail;
-        emailLink.href = `mailto:${s.contactEmail}`;
+      const activeFeaturesCount = appState.features.filter(f => f.isActive !== false).length;
+      setText("hero-feature-count", `${activeFeaturesCount} Tools`);
+
+      setText("trust-label-display", s.trustLabel);
+      setText("trust-title-display", s.trustTitle);
+      setText("platform-desc-display", s.platformDescription);
+      setText("pillar1-title-display", s.pillar1Title);
+      setText("pillar1-desc-display", s.pillar1Desc);
+      setText("pillar2-title-display", s.pillar2Title);
+      setText("pillar2-desc-display", s.pillar2Desc);
+      setText("pillar3-title-display", s.pillar3Title);
+      setText("pillar3-desc-display", s.pillar3Desc);
+
+      setText("catalog-title-display", s.catalogTitle);
+      setText("catalog-desc-display", s.catalogDesc);
+
+      setText("benefits-title-display", s.benefitsTitle);
+      setText("benefit1-title-display", s.benefit1Title);
+      setText("benefit1-desc-display", s.benefit1Desc);
+      setText("benefit2-title-display", s.benefit2Title);
+      setText("benefit2-desc-display", s.benefit2Desc);
+
+      setText("steps-title-display", s.stepsTitle);
+      setText("steps-desc-display", s.stepsDesc);
+      setText("step1-title-display", s.step1Title);
+      setText("step1-desc-display", s.step1Desc);
+      setText("step2-title-display", s.step2Title);
+      setText("step2-desc-display", s.step2Desc);
+      setText("step3-title-display", s.step3Title);
+      setText("step3-desc-display", s.step3Desc);
+
+      setText("preview-title-display", s.previewTitle);
+      setText("preview-desc-display", s.previewDesc);
+      setText("pricing-title-display", s.pricingTitle);
+      setText("pricing-desc-display", s.pricingDesc);
+
+      setText("final-cta-badge-display", s.finalCtaBadge);
+      setText("final-cta-title-display", s.finalCtaTitle);
+      setText("final-cta-desc-display", s.finalCtaDesc);
+      setText("final-cta-wa-btn", pkg.buttonText || "Berlangganan Sekarang");
+
+      setText("footer-desc-display", s.footerDescription);
+      setText("footer-tagline-display", s.footerTagline);
+      const emailEl = document.getElementById("footer-email-link");
+      if (emailEl && s.contactEmail) {
+        emailEl.textContent = s.contactEmail;
+        emailEl.href = `mailto:${s.contactEmail}`;
       }
     }
 
-    window.setCatalogCategory = function (cat) {
+    window.selectCatalogCategory = function (cat) {
       appState.selectedCategory = cat;
-      renderFeatureCatalog();
+      renderCatalogSection();
     };
 
-    function renderFeatureCatalog() {
-      const activeFeatures = [...appState.features]
+    function renderCatalogSection() {
+      const filtersEl = document.getElementById("feature-filters");
+      const gridEl = document.getElementById("features-grid");
+      const countEl = document.getElementById("visible-feature-count");
+      const footerListEl = document.getElementById("footer-features-list");
+      const previewListEl = document.getElementById("preview-tools-list");
+      const prevBadgeEl = document.getElementById("prev-tools-badge");
+
+      const activeFeatures = appState.features
         .filter(f => f.isActive !== false)
         .sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999));
 
-      const heroCount = document.getElementById("hero-feature-count");
-      if (heroCount) heroCount.textContent = `${activeFeatures.length} Tools`;
-      const prevBadge = document.getElementById("prev-tools-badge");
-      if (prevBadge) prevBadge.textContent = String(activeFeatures.length);
+      if (prevBadgeEl) prevBadgeEl.textContent = activeFeatures.length;
 
-      const filterContainer = document.getElementById("feature-filters");
-      if (filterContainer) {
-        const categories = ["Semua", ...new Set(activeFeatures.map(f => f.category).filter(Boolean))];
-        if (!categories.includes(appState.selectedCategory)) {
-          appState.selectedCategory = "Semua";
-        }
-        filterContainer.innerHTML = categories.map(cat => {
+      if (footerListEl) {
+        footerListEl.innerHTML = activeFeatures.slice(0, 6).map(f => `
+          <li><button type="button" onclick="navigateTo('/fitur/${escapeHTML(f.id)}')" class="hover:text-black transition-colors text-left">${escapeHTML(f.name)}</button></li>
+        `).join("");
+      }
+
+      if (previewListEl) {
+        previewListEl.innerHTML = activeFeatures.map(f => `
+          <div class="p-3.5 rounded-xl border border-neutral-200 bg-neutral-50/70">
+            <div class="text-[10px] font-semibold uppercase text-neutral-500">${escapeHTML(f.category)}</div>
+            <div class="text-xs font-bold text-black mt-0.5">${escapeHTML(f.name)}</div>
+          </div>
+        `).join("");
+      }
+
+      const categories = ["Semua", ...FEATURE_CATEGORIES];
+      if (filtersEl) {
+        filtersEl.innerHTML = categories.map(cat => {
           const isSelected = appState.selectedCategory === cat;
           return `
-            <button type="button" onclick="setCatalogCategory('${escapeHTML(cat)}')"
-              class="px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
-                isSelected
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-neutral-700 border-neutral-300 hover:border-black hover:text-black"
-              }">
+            <button type="button" onclick="selectCatalogCategory('${escapeHTML(cat)}')"
+              class="px-4 py-2 rounded-xl text-xs font-semibold border transition-colors ${isSelected ? "bg-black text-white border-black" : "bg-white text-neutral-700 border-neutral-300 hover:border-black"}">
               ${escapeHTML(cat)}
             </button>
           `;
@@ -2959,110 +2859,101 @@ service cloud.firestore {
         ? activeFeatures
         : activeFeatures.filter(f => f.category === appState.selectedCategory);
 
-      const visCount = document.getElementById("visible-feature-count");
-      if (visCount) visCount.textContent = String(filtered.length);
+      if (countEl) countEl.textContent = filtered.length;
 
-      const grid = document.getElementById("features-grid");
-      if (grid) {
-        if (filtered.length === 0) {
-          grid.innerHTML = `
-            <div class="col-span-full p-10 rounded-2xl border border-dashed border-neutral-300 bg-white text-center text-sm text-neutral-500">
-              Belum ada fitur aktif pada kategori ini.
-            </div>
-          `;
-        } else {
-          grid.innerHTML = filtered.map(f => `
-            <article class="group bg-white border border-neutral-200 hover:border-black rounded-2xl p-6 flex flex-col justify-between transition-all hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)]">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-5">
-                  <div class="w-11 h-11 rounded-xl bg-neutral-100 group-hover:bg-black group-hover:text-white text-black flex items-center justify-center transition-colors">
-                    ${getFeatureIconSVG(f.icon)}
-                  </div>
-                  ${f.isIncludedInPackage !== false
-                    ? `<span class="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded border border-neutral-200 bg-neutral-50 text-neutral-700">Termasuk Paket</span>`
-                    : ""}
-                </div>
+      if (!gridEl) return;
+      if (filtered.length === 0) {
+        gridEl.innerHTML = `<div class="col-span-full p-10 text-center bg-white border border-neutral-200 rounded-2xl text-sm text-neutral-500">Belum ada fitur aktif pada kategori ini.</div>`;
+        return;
+      }
 
-                <div class="text-[11px] font-medium text-neutral-500 mb-1">${escapeHTML(f.category || "Tools AI")}</div>
-                <h3 class="font-display text-lg font-bold text-black leading-snug mb-2">${escapeHTML(f.name)}</h3>
-                <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-6">${escapeHTML(f.description)}</p>
+      gridEl.innerHTML = filtered.map(f => `
+        <article class="bg-white border border-neutral-200 hover:border-black rounded-2xl p-6 flex flex-col justify-between transition-all hover:-translate-y-0.5 shadow-sm">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <div class="w-11 h-11 rounded-xl bg-black text-white flex items-center justify-center shrink-0">
+                ${getFeatureIconSVG(f.icon, "w-5 h-5")}
               </div>
-
-              <button type="button" onclick="navigateTo('/fitur/${escapeHTML(f.id)}')"
-                class="w-full py-3 px-4 rounded-xl text-xs font-semibold border border-black bg-white text-black group-hover:bg-black group-hover:text-white transition-colors flex items-center justify-center gap-2">
-                <span>Lihat Fitur</span>
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </article>
-          `).join("");
-        }
-      }
-
-      const footerList = document.getElementById("footer-features-list");
-      if (footerList) {
-        footerList.innerHTML = activeFeatures.slice(0, 6).map(f => `
-          <li>
-            <button type="button" onclick="navigateTo('/fitur/${escapeHTML(f.id)}')" class="hover:text-black transition-colors text-left">
-              ${escapeHTML(f.name)}
-            </button>
-          </li>
-        `).join("");
-      }
-
-      const prevToolsList = document.getElementById("preview-tools-list");
-      if (prevToolsList) {
-        prevToolsList.innerHTML = activeFeatures.map(f => `
-          <div class="p-3.5 rounded-xl border border-neutral-200 bg-neutral-50/70 flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
-              ${getFeatureIconSVG(f.icon)}
+              ${f.isIncludedInPackage !== false ? `<span class="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border border-neutral-300 bg-neutral-50 text-neutral-800">Termasuk Paket</span>` : ""}
             </div>
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-black truncate">${escapeHTML(f.name)}</div>
-              <div class="text-[11px] text-neutral-500 line-clamp-1">${escapeHTML(f.description)}</div>
-            </div>
+            <div class="text-[11px] font-medium text-neutral-500 mb-1">${escapeHTML(f.category)}</div>
+            <h3 class="font-display font-bold text-base sm:text-lg text-black leading-snug mb-2">${escapeHTML(f.name)}</h3>
+            <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-5">${escapeHTML(f.description)}</p>
           </div>
-        `).join("");
-      }
+          <div class="pt-4 border-t border-neutral-100">
+            <button type="button" onclick="navigateTo('/fitur/${escapeHTML(f.id)}')" class="w-full py-2.5 px-4 bg-black text-white text-xs font-semibold rounded-xl border border-black hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2">
+              <span>Lihat Fitur</span>
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </article>
+      `).join("");
     }
 
-    function renderPricingSection() {
-      const p = appState.pricing;
-      const section = document.getElementById("harga");
-      const container = document.getElementById("single-pricing-container");
-      const heroCardName = document.getElementById("hero-card-pkg-name");
-      if (heroCardName) heroCardName.textContent = p.packageName;
+    /* =======================================================================
+       WHATSAPP CHECKOUT & SINGLE PRICING SECTION
+    ======================================================================== */
+    function buildWhatsAppURL() {
+      const s = appState.siteSettings;
+      const pkg = appState.pricing;
+      const cleanPhone = String(s.whatsappNumber || "6281234567890").replace(/\D/g, "");
+      let msg = String(s.whatsappMessage || `Halo, saya tertarik untuk berlangganan ${pkg.packageName}.`);
+      const refCode = (appState.activeReferralInput || "").trim().toUpperCase();
+      if (refCode) {
+        msg += `\n\nKode Referral: ${refCode}`;
+      }
+      return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+    }
 
+    window.handleWhatsAppRedirect = function () {
+      const s = appState.siteSettings;
+      if (s.whatsappEnabled === false) {
+        showToast("Pemesanan WhatsApp sedang dinonaktifkan sementara oleh admin.");
+        return;
+      }
+      const url = buildWhatsAppURL();
+      window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    window.updateReferralInputState = function (val) {
+      appState.activeReferralInput = val;
+    };
+
+    function renderPricingSection() {
+      const container = document.getElementById("single-pricing-container");
+      const section = document.getElementById("harga");
+      const pkg = appState.pricing;
       if (!container) return;
-      if (p.isActive === false) {
+
+      if (pkg.isActive === false) {
         if (section) section.classList.add("hidden");
         return;
       }
       if (section) section.classList.remove("hidden");
 
-      const bullets = Array.isArray(p.includedFeatures) ? p.includedFeatures : [];
+      const bullets = Array.isArray(pkg.includedFeatures) ? pkg.includedFeatures : [];
       container.innerHTML = `
-        <div class="bg-white border-2 border-black rounded-3xl p-7 sm:p-10 shadow-[0_24px_60px_rgba(0,0,0,0.08)] space-y-7">
-          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-neutral-200 pb-6">
+        <div class="bg-white border-2 border-black rounded-3xl p-7 sm:p-10 shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-neutral-200">
             <div>
               <span class="inline-block text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-black text-white mb-3">
                 Paket Berlangganan Resmi
               </span>
-              <h3 class="font-display text-2xl sm:text-3xl font-extrabold text-black tracking-tight">${escapeHTML(p.packageName)}</h3>
-              <p class="text-xs sm:text-sm text-neutral-600 mt-1.5 max-w-lg">${escapeHTML(p.description)}</p>
-            </div>
-            <div class="text-left sm:text-right">
-              <div class="font-display text-3xl sm:text-4xl font-extrabold text-black">${escapeHTML(p.price)}</div>
-              <div class="text-xs font-medium text-neutral-500 mt-0.5">${escapeHTML(p.billingPeriod)}</div>
+              <h3 class="font-display text-2xl sm:text-3xl font-extrabold text-black tracking-tight">${escapeHTML(pkg.packageName)}</h3>
+              <p class="text-sm text-neutral-600 mt-1.5">${escapeHTML(pkg.description)}</p>
             </div>
           </div>
 
-          <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-black mb-4">Yang Anda Dapatkan dalam Paket:</div>
+          <div class="py-6 border-b border-neutral-200 flex items-baseline gap-2">
+            <span class="font-display text-3xl sm:text-5xl font-extrabold text-black tracking-tight">${escapeHTML(pkg.price)}</span>
+            <span class="text-sm sm:text-base font-medium text-neutral-500">${escapeHTML(pkg.billingPeriod || "")}</span>
+          </div>
+
+          <div class="py-6 space-y-3">
+            <div class="text-xs font-bold uppercase tracking-wider text-neutral-500">Yang Anda Dapatkan dalam Paket:</div>
             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               ${bullets.map(item => `
-                <li class="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-800">
+                <li class="flex items-start gap-2.5 text-sm text-neutral-800">
                   <span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center shrink-0 mt-0.5 text-[11px] font-bold">✓</span>
                   <span>${escapeHTML(item)}</span>
                 </li>
@@ -3070,57 +2961,19 @@ service cloud.firestore {
             </ul>
           </div>
 
-          <div class="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
-            <label for="pricing-referral-input" class="block text-xs font-semibold text-black">
-              Punya Kode Referral? (Opsional)
-            </label>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <input id="pricing-referral-input" type="text" value="${escapeHTML(appState.activeReferralInput)}"
-                oninput="appState.activeReferralInput = this.value.trim().toUpperCase()"
-                placeholder="Masukkan kode referral mitra (contoh: AKSA10)"
-                class="flex-1 px-3.5 py-2.5 text-xs sm:text-sm font-mono uppercase bg-white border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
-              <button type="button" onclick="verifyReferralCodeInput()"
-                class="px-4 py-2.5 text-xs font-semibold border border-black bg-white text-black rounded-xl hover:bg-black hover:text-white transition-colors">
-                Cek Kode
-              </button>
-            </div>
-            <div id="referral-status-msg" class="text-[11px] text-neutral-500"></div>
+          <div class="pt-4 pb-6 border-t border-neutral-100">
+            <label for="pricing-referral-input" class="block text-xs font-semibold text-black mb-1.5">Punya Kode Referral? (Opsional)</label>
+            <input id="pricing-referral-input" type="text" value="${escapeHTML(appState.activeReferralInput)}" oninput="updateReferralInputState(this.value)" placeholder="Masukkan kode referral mitra / promo" class="w-full px-3.5 py-2.5 text-sm uppercase font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
           </div>
 
-          <div class="space-y-3 pt-1">
-            <button type="button" onclick="handleWhatsAppRedirect()"
-              class="w-full py-4 px-6 bg-black text-white text-sm sm:text-base font-bold rounded-2xl border border-black hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2.5">
-              <span>${escapeHTML(p.buttonText || "BERLANGGANAN SEKARANG")}</span>
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <p class="text-center text-[11px] text-neutral-500">
-              Pemesanan &amp; aktivasi akun diproses langsung melalui WhatsApp admin resmi.
-            </p>
-          </div>
+          <button type="button" onclick="handleWhatsAppRedirect()" class="w-full py-4 px-6 bg-black text-white text-sm sm:text-base font-bold rounded-2xl border border-black hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2.5 shadow-sm">
+            <span>${escapeHTML(pkg.buttonText || "BERLANGGANAN SEKARANG")}</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="text-center text-xs text-neutral-500 mt-3">Anda akan diarahkan ke WhatsApp admin resmi untuk konfirmasi dan aktivasi akun.</p>
         </div>
       `;
     }
-
-    window.verifyReferralCodeInput = function () {
-      const inputEl = document.getElementById("pricing-referral-input");
-      const msgEl = document.getElementById("referral-status-msg");
-      if (!inputEl || !msgEl) return;
-      const code = inputEl.value.trim().toUpperCase();
-      appState.activeReferralInput = code;
-      if (!code) {
-        msgEl.textContent = "Silakan masukkan kode referral jika ada.";
-        return;
-      }
-      const found = appState.referrals.find(r => r.isActive !== false && String(r.code).toUpperCase() === code);
-      if (found) {
-        msgEl.innerHTML = `<strong class="text-black">✓ Kode valid (${escapeHTML(found.code)}):</strong> ${escapeHTML(found.benefit || "Terdaftar dalam program referral")} — otomatis disertakan di pesan WhatsApp.`;
-        showToast(`Kode referral ${found.code} berhasil diterapkan!`);
-      } else {
-        msgEl.textContent = "Kode referral tidak ditemukan dalam daftar aktif, namun tetap dapat dikirim ke admin.";
-      }
-    };
 
     function renderTestimonialsSection() {
       const section = document.getElementById("testimoni");
@@ -3131,23 +2984,26 @@ service cloud.firestore {
         return;
       }
       section.classList.remove("hidden");
+      container.innerHTML = TESTIMONIALS_DATA.map(t => `
+        <div class="p-6 rounded-2xl border border-neutral-200 bg-white">
+          <p class="text-sm text-neutral-700">"${escapeHTML(t.quote)}"</p>
+          <div class="mt-3 text-xs font-bold text-black">${escapeHTML(t.author)}</div>
+        </div>
+      `).join("");
     }
 
     function renderFAQSection() {
-      const container = document.getElementById("faq-list");
-      if (!container) return;
-      container.innerHTML = appState.faqs.map((item, idx) => `
+      const listEl = document.getElementById("faq-list");
+      if (!listEl) return;
+      listEl.innerHTML = appState.faqs.map((item, idx) => `
         <div class="accordion-item bg-white border border-neutral-200 rounded-2xl overflow-hidden" data-open="${idx === 0 ? "true" : "false"}">
-          <button type="button" onclick="toggleAccordion(this)" aria-expanded="${idx === 0 ? "true" : "false"}"
-            class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-neutral-50 transition-colors">
-            <span class="font-display text-sm sm:text-base font-bold text-black">${escapeHTML(item.question)}</span>
+          <button type="button" onclick="toggleAccordion(this)" aria-expanded="${idx === 0 ? "true" : "false"}" class="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-neutral-50 transition-colors">
+            <span class="font-display font-bold text-sm sm:text-base text-black">${escapeHTML(item.question)}</span>
             <span class="accordion-icon w-7 h-7 rounded-lg border border-neutral-300 flex items-center justify-center text-sm font-bold shrink-0">+</span>
           </button>
           <div class="accordion-content">
-            <div class="accordion-inner">
-              <div class="px-6 pb-5 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100 pt-3">
-                ${escapeHTML(item.answer)}
-              </div>
+            <div class="accordion-inner px-6 pb-5 text-xs sm:text-sm text-neutral-600 leading-relaxed">
+              ${escapeHTML(item.answer)}
             </div>
           </div>
         </div>
@@ -3155,99 +3011,77 @@ service cloud.firestore {
     }
 
     /* =======================================================================
-       FEATURE DETAIL VIEW ("/fitur/{id}") & PROTECTED MEMBER DASHBOARD
+       FEATURE DETAIL VIEW ("/fitur/{id}") & PROTECTED MEMBER FLOW
     ======================================================================== */
     function renderFeatureDetailView(featureId) {
       const container = document.getElementById("feature-detail-content");
       if (!container) return;
       const feature = appState.features.find(f => f.id === featureId) || appState.features[0];
-      if (!feature) {
-        container.innerHTML = `<div class="p-8 bg-white border border-neutral-200 rounded-2xl text-center">Fitur tidak ditemukan.</div>`;
-        return;
-      }
+      if (!feature) return;
 
       const highlights = Array.isArray(feature.highlights) && feature.highlights.length > 0
         ? feature.highlights
         : [
-            "Terintegrasi dalam satu ekosistem platform AI",
-            "Output terstruktur dan mudah disesuaikan",
+            "Output terstruktur dan siap disesuaikan",
+            "Termasuk dalam paket berlangganan All-in-One",
             "Dapat diakses langsung melalui Dashboard Member"
           ];
 
       container.innerHTML = `
-        <div class="bg-white border border-black rounded-3xl p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.06)] space-y-8">
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-6">
-            <div class="flex items-center gap-4">
+        <div class="bg-white border border-black rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
+          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-neutral-200 pb-6">
+            <div class="flex items-start gap-4">
               <div class="w-14 h-14 rounded-2xl bg-black text-white flex items-center justify-center shrink-0">
-                ${getFeatureIconSVG(feature.icon)}
+                ${getFeatureIconSVG(feature.icon, "w-7 h-7")}
               </div>
               <div>
-                <span class="inline-block text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded border border-neutral-300 bg-neutral-50 text-neutral-700">
-                  ${escapeHTML(feature.category || "Produk AI")}
+                <span class="inline-block text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded border border-neutral-300 bg-neutral-50 text-neutral-700 mb-2">
+                  ${escapeHTML(feature.category)}
                 </span>
-                <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-black mt-1.5">${escapeHTML(feature.name)}</h1>
+                <h1 class="font-display text-2xl sm:text-4xl font-extrabold text-black tracking-tight">${escapeHTML(feature.name)}</h1>
               </div>
             </div>
-            <span class="text-xs font-semibold px-3 py-1.5 rounded-full bg-neutral-100 border border-neutral-200 text-black">
-              Termasuk dalam ${escapeHTML(appState.pricing.packageName)}
-            </span>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-7 space-y-5">
-              <div>
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-neutral-500 mb-2">Deskripsi Lengkap Fitur</h2>
-                <p class="text-sm sm:text-base text-neutral-700 leading-relaxed">
-                  ${escapeHTML(feature.longDescription || feature.description)}
-                </p>
-              </div>
+          <div class="space-y-4">
+            <h2 class="font-display text-sm font-bold uppercase tracking-wider text-neutral-500">Deskripsi Lengkap Fitur</h2>
+            <p class="text-sm sm:text-base text-neutral-700 leading-relaxed">
+              ${escapeHTML(feature.longDescription || feature.description)}
+            </p>
+          </div>
 
-              <div>
-                <h2 class="font-display text-sm font-bold uppercase tracking-wider text-neutral-500 mb-3">Keunggulan &amp; Manfaat Utama</h2>
-                <ul class="space-y-3">
-                  ${highlights.map(h => `
-                    <li class="flex items-start gap-3 text-xs sm:text-sm text-neutral-800">
-                      <span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center shrink-0 mt-0.5 text-xs">✓</span>
-                      <span>${escapeHTML(h)}</span>
-                    </li>
-                  `).join("")}
-                </ul>
-              </div>
+          <div class="p-5 sm:p-6 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-3">
+            <h3 class="font-display text-xs font-bold uppercase tracking-wider text-black">Keunggulan &amp; Manfaat Utama</h3>
+            <ul class="space-y-2.5">
+              ${highlights.map(h => `
+                <li class="flex items-start gap-2.5 text-sm text-neutral-800">
+                  <span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">✓</span>
+                  <span>${escapeHTML(h)}</span>
+                </li>
+              `).join("")}
+            </ul>
+          </div>
+
+          <div class="pt-4 border-t border-neutral-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div class="text-xs text-neutral-500">
+              Akses fitur berada di <strong>Dashboard Member</strong> yang dilindungi oleh Email dan Password pelanggan.
             </div>
-
-            <div class="lg:col-span-5">
-              <div class="p-6 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-5">
-                <div>
-                  <span class="text-[11px] font-bold uppercase tracking-wider text-black">Akses Workspace Fitur</span>
-                  <h3 class="font-display text-lg font-bold text-black mt-1">Gunakan Fitur di Dashboard</h3>
-                  <p class="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                    Dashboard pengguna dilindungi oleh <strong>Email</strong> dan <strong>Password</strong> pelanggan aktif yang terdaftar pada sistem.
-                  </p>
-                </div>
-
-                <div class="space-y-2.5">
-                  <button type="button" onclick="openDashboardForFeature('${escapeHTML(feature.id)}')"
-                    class="w-full py-3.5 px-5 bg-black text-white text-xs sm:text-sm font-bold rounded-xl border border-black hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2">
-                    <span>Masuk ke Dashboard</span>
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                      <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-
-                  <button type="button" onclick="handleWhatsAppRedirect()"
-                    class="w-full py-3 px-5 bg-white text-black text-xs font-semibold rounded-xl border border-neutral-300 hover:border-black transition-colors">
-                    Belum Punya Akun? Berlangganan via WhatsApp
-                  </button>
-                </div>
-              </div>
+            <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+              <button type="button" onclick="handleWhatsAppRedirect()" class="px-5 py-3.5 bg-white text-black text-xs sm:text-sm font-semibold rounded-xl border border-black hover:bg-neutral-100 transition-colors">
+                Berlangganan Paket
+              </button>
+              <button type="button" onclick="proceedToMemberDashboard('${escapeHTML(feature.id)}')" class="px-6 py-3.5 bg-black text-white text-xs sm:text-sm font-bold rounded-xl border border-black hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2">
+                <span>Masuk ke Dashboard</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
             </div>
           </div>
         </div>
       `;
     }
 
-    window.openDashboardForFeature = function (featureId) {
-      appState.pendingMemberFeatureId = featureId;
+    window.proceedToMemberDashboard = function (featureId) {
+      appState.pendingMemberFeatureId = featureId || null;
       if (appState.memberSession) {
         navigateTo("/member");
       } else {
@@ -3257,26 +3091,24 @@ service cloud.firestore {
 
     window.handleMemberLoginSubmit = function (e) {
       e.preventDefault();
-      const email = document.getElementById("member-email").value.trim().toLowerCase();
-      const password = document.getElementById("member-password").value;
+      const email = (document.getElementById("member-email")?.value || "").trim().toLowerCase();
+      const password = document.getElementById("member-password")?.value || "";
 
-      const customer = appState.customers.find(c =>
-        String(c.email || "").trim().toLowerCase() === email &&
-        String(c.password || "") === password
+      const matched = appState.customers.find(
+        c => (c.email || "").trim().toLowerCase() === email && c.password === password
       );
 
-      if (!customer) {
-        showToast("Email atau password pelanggan tidak cocok. Hubungi admin untuk aktivasi akun.");
+      if (!matched) {
+        showToast("Email atau password pelanggan tidak cocok. Hubungi admin jika belum terdaftar.");
+        return;
+      }
+      if (matched.isActive === false) {
+        showToast("Akun berlangganan Anda sedang nonaktif. Silakan hubungi admin.");
         return;
       }
 
-      if (customer.isActive === false) {
-        showToast("Status langganan akun Anda sedang nonaktif. Silakan hubungi admin.");
-        return;
-      }
-
-      appState.memberSession = customer;
-      showToast(`Selamat datang, ${customer.name}!`);
+      appState.memberSession = matched;
+      showToast(`Selamat datang, ${matched.name}!`);
       navigateTo("/member");
     };
 
@@ -3287,293 +3119,169 @@ service cloud.firestore {
       navigateTo("/");
     };
 
-    function renderMemberDashboard() {
-      const member = appState.memberSession;
-      if (!member) return;
-
-      const profileCard = document.getElementById("member-profile-card");
-      if (profileCard) {
-        profileCard.innerHTML = `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div class="flex flex-wrap items-center gap-2 mb-2">
-                <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-black text-white">Member Aktif</span>
-                <span class="text-xs font-mono px-2.5 py-0.5 rounded border border-neutral-300 bg-neutral-50 text-black">Kode: ${escapeHTML(member.customerCode || "-")}</span>
-              </div>
-              <h1 class="font-display text-2xl sm:text-3xl font-bold text-black">Halo, ${escapeHTML(member.name)}</h1>
-              <p class="text-xs sm:text-sm text-neutral-600 mt-1">
-                Email: <strong>${escapeHTML(member.email)}</strong> • Mulai Berlangganan: <strong>${escapeHTML(member.subscriptionStartDate || "-")}</strong>
-              </p>
-            </div>
-            <div class="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 text-left sm:text-right shrink-0">
-              <div class="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Kode Referral Anda</div>
-              <div class="font-mono text-base font-extrabold text-black mt-0.5">${escapeHTML(member.referralCode || "Belum diatur")}</div>
-            </div>
-          </div>
-        `;
-      }
-
-      const activeFeatures = [...appState.features]
-        .filter(f => f.isActive !== false)
-        .sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999));
-
-      const countBadge = document.getElementById("member-tools-count");
-      if (countBadge) countBadge.textContent = `${activeFeatures.length} Fitur Aktif`;
-
-      const grid = document.getElementById("member-features-grid");
-      if (grid) {
-        grid.innerHTML = activeFeatures.map(f => `
-          <div class="bg-white border border-neutral-200 hover:border-black rounded-2xl p-6 flex flex-col justify-between transition-all">
-            <div>
-              <div class="w-11 h-11 rounded-xl bg-black text-white flex items-center justify-center mb-4">
-                ${getFeatureIconSVG(f.icon)}
-              </div>
-              <div class="text-[11px] font-medium text-neutral-500 mb-1">${escapeHTML(f.category || "Tools AI")}</div>
-              <h3 class="font-display text-lg font-bold text-black mb-2">${escapeHTML(f.name)}</h3>
-              <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-6">${escapeHTML(f.description)}</p>
-            </div>
-            <button type="button" onclick="launchMemberFeature('${escapeHTML(f.id)}')"
-              class="w-full py-3 px-4 bg-black text-white text-xs font-semibold rounded-xl border border-black hover:bg-white hover:text-black transition-colors">
-              Buka &amp; Gunakan Fitur →
-            </button>
-          </div>
-        `).join("");
-      }
-
-      if (appState.pendingMemberFeatureId) {
-        const pendingId = appState.pendingMemberFeatureId;
-        appState.pendingMemberFeatureId = null;
-        launchMemberFeature(pendingId);
-      }
-    }
-
-    window.launchMemberFeature = function (featureId) {
-      const f = appState.features.find(x => x.id === featureId);
-      if (!f) return;
-
-      const rawUrl = String(f.targetUrl || "").trim();
-      if (!rawUrl || rawUrl === "#") {
-        showToast("Link eksternal untuk fitur ini belum diisi oleh admin.");
+    window.openMemberExternalFeature = function (featureId) {
+      const feature = appState.features.find(f => f.id === featureId);
+      if (!feature) return;
+      const url = (feature.targetUrl || "").trim();
+      if (!url || url === "#") {
+        showToast(`Tautan eksternal untuk "${feature.name}" belum diatur oleh admin.`);
         return;
       }
-
-      window.open(rawUrl, "_blank", "noopener,noreferrer");
+      window.open(url, "_blank", "noopener,noreferrer");
     };
 
     window.closeMemberToolWorkspace = function () {
       document.getElementById("member-tool-workspace")?.classList.add("hidden");
     };
 
-    /* =======================================================================
-       ADMIN DASHBOARD SUB-VIEWS & CRUD HANDLERS
-    ======================================================================== */
-    function renderDashboardRoute(route) {
-      const subviews = [
-        "dash-subview-overview",
-        "dash-subview-admin-customers",
-        "dash-subview-admin-features",
-        "dash-subview-admin-pricing",
-        "dash-subview-admin-whatsapp",
-        "dash-subview-admin-landing",
-        "dash-subview-admin-appearance",
-        "dash-subview-admin-firebase"
-      ];
-      subviews.forEach(id => document.getElementById(id)?.classList.add("hidden"));
+    function renderMemberDashboard() {
+      const member = appState.memberSession || (appState.user ? {
+        code: "ADMIN-PREVIEW",
+        name: appState.user.name,
+        email: appState.user.email,
+        subscriptionStart: new Date().toISOString().slice(0, 10),
+        referralCode: "-",
+        isActive: true
+      } : null);
 
-      document.querySelectorAll(".dash-nav-btn").forEach(btn => {
-        btn.className = "dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors text-neutral-700 hover:bg-neutral-100";
-      });
-
-      const routeMap = {
-        "/dashboard": { view: "dash-subview-overview", nav: "dash-nav-home", title: "Dashboard Utama" },
-        "/dashboard/admin-customers": { view: "dash-subview-admin-customers", nav: "dash-nav-admin-customers", title: "Pelanggan & Referral" },
-        "/dashboard/admin-features": { view: "dash-subview-admin-features", nav: "dash-nav-admin-features", title: "Pengaturan Link & Detail Fitur" },
-        "/dashboard/admin-pricing": { view: "dash-subview-admin-pricing", nav: "dash-nav-admin-pricing", title: "Pengaturan Pricing" },
-        "/dashboard/admin-whatsapp": { view: "dash-subview-admin-whatsapp", nav: "dash-nav-admin-whatsapp", title: "Pengaturan WhatsApp" },
-        "/dashboard/admin-landing": { view: "dash-subview-admin-landing", nav: "dash-nav-admin-landing", title: "Edit Seluruh Landing Page" },
-        "/dashboard/admin-appearance": { view: "dash-subview-admin-appearance", nav: "dash-nav-admin-appearance", title: "Warna, Ikon & Tema Global" },
-        "/dashboard/admin-firebase": { view: "dash-subview-admin-firebase", nav: "dash-nav-admin-firebase", title: "Pengaturan Firebase" }
-      };
-
-      const active = routeMap[route] || routeMap["/dashboard"];
-      document.getElementById(active.view)?.classList.remove("hidden");
-      const activeNav = document.getElementById(active.nav);
-      if (activeNav) {
-        activeNav.className = "dash-nav-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors bg-black text-white";
+      if (!member) {
+        navigateTo("/member-login");
+        return;
       }
-      const crumb = document.getElementById("dash-breadcrumb");
-      if (crumb) crumb.textContent = active.title;
 
-      populateAdminFormsAndLists();
+      const profileCard = document.getElementById("member-profile-card");
+      if (profileCard) {
+        profileCard.innerHTML = `
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded bg-black text-white text-[11px] font-semibold uppercase tracking-wider mb-2">
+                <span>Status Langganan: Aktif</span>
+              </div>
+              <h1 class="font-display text-2xl font-bold text-black">Halo, ${escapeHTML(member.name)}</h1>
+              <p class="text-xs sm:text-sm text-neutral-600 mt-1">
+                Kode Pelanggan: <strong class="font-mono text-black">${escapeHTML(member.code || "-")}</strong> •
+                Email: <strong class="text-black">${escapeHTML(member.email)}</strong>
+              </p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-neutral-50 border border-neutral-200">
+                <div class="text-neutral-500">Mulai Berlangganan</div>
+                <div class="font-bold text-black mt-0.5">${escapeHTML(member.subscriptionStart || "-")}</div>
+              </div>
+              <div class="p-3 rounded-xl bg-neutral-50 border border-neutral-200">
+                <div class="text-neutral-500">Kode Referral</div>
+                <div class="font-mono font-bold text-black mt-0.5">${escapeHTML(member.referralCode || "-")}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const activeFeatures = appState.features
+        .filter(f => f.isActive !== false)
+        .sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999));
+
+      const countBadge = document.getElementById("member-tools-count");
+      if (countBadge) countBadge.textContent = `${activeFeatures.length} Fitur Aktif`;
+
+      const gridEl = document.getElementById("member-features-grid");
+      if (gridEl) {
+        gridEl.innerHTML = activeFeatures.map(f => {
+          const hasUrl = Boolean((f.targetUrl || "").trim() && f.targetUrl.trim() !== "#");
+          return `
+            <div class="bg-white border border-neutral-200 hover:border-black rounded-2xl p-6 flex flex-col justify-between transition-all shadow-sm">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <div class="w-11 h-11 rounded-xl bg-black text-white flex items-center justify-center">
+                    ${getFeatureIconSVG(f.icon, "w-5 h-5")}
+                  </div>
+                  <span class="text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full border ${hasUrl ? "border-black bg-black text-white" : "border-neutral-300 bg-neutral-50 text-neutral-600"}">
+                    ${hasUrl ? "Siap Digunakan" : "Link Belum Diisi"}
+                  </span>
+                </div>
+                <div class="text-[11px] text-neutral-500 mb-1">${escapeHTML(f.category)}</div>
+                <h3 class="font-display font-bold text-base text-black mb-2">${escapeHTML(f.name)}</h3>
+                <p class="text-xs text-neutral-600 leading-relaxed mb-5">${escapeHTML(f.description)}</p>
+              </div>
+              <div class="pt-4 border-t border-neutral-100">
+                <button type="button" onclick="openMemberExternalFeature('${escapeHTML(f.id)}')" class="w-full py-2.5 px-4 bg-black text-white text-xs font-semibold rounded-xl border border-black hover:bg-white hover:text-black transition-colors">
+                  Buka &amp; Gunakan Fitur →
+                </button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
     }
 
-    function populateAdminFormsAndLists() {
-      // Update Overview & Sidebar Badges
+    /* =======================================================================
+       ADMIN DASHBOARD RENDERERS & CRUD HANDLERS
+    ======================================================================== */
+    function renderAdminOverviewStats() {
+      const custStat = document.getElementById("dash-stat-customers");
+      if (custStat) custStat.textContent = `${appState.customers.length} Akun`;
       const custBadge = document.getElementById("sidebar-customer-badge");
-      if (custBadge) custBadge.textContent = String(appState.customers.length);
+      if (custBadge) custBadge.textContent = appState.customers.length;
+
+      const featStat = document.getElementById("dash-stat-features");
+      if (featStat) featStat.textContent = `${appState.features.length} Fitur`;
       const featBadge = document.getElementById("sidebar-feature-badge");
-      if (featBadge) featBadge.textContent = String(appState.features.length);
+      if (featBadge) featBadge.textContent = appState.features.length;
 
-      const statCust = document.getElementById("dash-stat-customers");
-      if (statCust) statCust.textContent = `${appState.customers.length} Akun`;
-      const statFeat = document.getElementById("dash-stat-features");
-      if (statFeat) statFeat.textContent = `${appState.features.length} Fitur`;
-      const statPrice = document.getElementById("dash-stat-price");
-      if (statPrice) statPrice.textContent = appState.pricing.price;
-      const statFb = document.getElementById("dash-stat-firebase");
-      if (statFb) statFb.textContent = appState.firebaseReady ? (appState.firebaseConfigObj?.projectId || "Terhubung") : "Mode Lokal";
-      const quickWa = document.getElementById("dash-quick-wa-number");
-      if (quickWa) quickWa.textContent = appState.siteSettings.whatsappNumber || "-";
+      const priceStat = document.getElementById("dash-stat-price");
+      if (priceStat) priceStat.textContent = appState.pricing.price || "Rp 149.000";
 
-      renderAdminCustomersList();
-      renderAdminReferralsList();
-      renderAdminFeaturesList();
-      renderAdminFAQList();
+      const fbStat = document.getElementById("dash-stat-firebase");
+      if (fbStat) {
+        fbStat.textContent = appState.firebaseReady && appState.firebaseConfigObj?.projectId
+          ? appState.firebaseConfigObj.projectId
+          : "Mode Lokal";
+      }
 
-      // Pricing Form
-      const p = appState.pricing;
-      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ""; };
-      const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = Boolean(val); };
-
-      setVal("cfg-pkg-name", p.packageName);
-      setVal("cfg-pkg-price", p.price);
-      setVal("cfg-pkg-period", p.billingPeriod);
-      setVal("cfg-pkg-btn", p.buttonText);
-      setVal("cfg-pkg-desc", p.description);
-      setVal("cfg-pkg-features", Array.isArray(p.includedFeatures) ? p.includedFeatures.join("\n") : "");
-      setChk("cfg-pkg-active", p.isActive !== false);
-
-      // WhatsApp Form
-      const s = appState.siteSettings;
-      setVal("cfg-wa-number", s.whatsappNumber);
-      setVal("cfg-wa-message", s.whatsappMessage);
-      setChk("cfg-wa-active", s.whatsappEnabled !== false);
-      updateWhatsAppPreviewBox();
-
-      // Landing Page Form
-      setVal("cfg-brand-name", s.brandName);
-      setVal("cfg-hero-badge", s.heroBadge);
-      setVal("cfg-hero-title", s.heroTitle);
-      setVal("cfg-hero-desc", s.heroDescription);
-      setVal("cfg-cta-text", s.ctaText);
-      setVal("cfg-sec-cta-text", s.secondaryCtaText);
-      setVal("cfg-stat1-val", s.stat1Value);
-      setVal("cfg-stat1-lbl", s.stat1Label);
-      setVal("cfg-stat2-lbl", s.stat2Label);
-      setVal("cfg-stat3-val", s.stat3Value);
-      setVal("cfg-stat3-lbl", s.stat3Label);
-      setVal("cfg-trust-label", s.trustLabel);
-      setVal("cfg-trust-title", s.trustTitle);
-      setVal("cfg-platform-desc", s.platformDescription);
-      setVal("cfg-p1-title", s.pillar1Title);
-      setVal("cfg-p1-desc", s.pillar1Desc);
-      setVal("cfg-p2-title", s.pillar2Title);
-      setVal("cfg-p2-desc", s.pillar2Desc);
-      setVal("cfg-p3-title", s.pillar3Title);
-      setVal("cfg-p3-desc", s.pillar3Desc);
-      setVal("cfg-catalog-title", s.catalogTitle);
-      setVal("cfg-catalog-desc", s.catalogDesc);
-      setVal("cfg-benefits-title", s.benefitsTitle);
-      setVal("cfg-benefit1-title", s.benefit1Title);
-      setVal("cfg-benefit1-desc", s.benefit1Desc);
-      setVal("cfg-benefit2-title", s.benefit2Title);
-      setVal("cfg-benefit2-desc", s.benefit2Desc);
-      setVal("cfg-steps-title", s.stepsTitle);
-      setVal("cfg-steps-desc", s.stepsDesc);
-      setVal("cfg-s1-title", s.step1Title);
-      setVal("cfg-s1-desc", s.step1Desc);
-      setVal("cfg-s2-title", s.step2Title);
-      setVal("cfg-s2-desc", s.step2Desc);
-      setVal("cfg-s3-title", s.step3Title);
-      setVal("cfg-s3-desc", s.step3Desc);
-      setVal("cfg-preview-title", s.previewTitle);
-      setVal("cfg-preview-desc", s.previewDesc);
-      setVal("cfg-pricing-title", s.pricingTitle);
-      setVal("cfg-pricing-desc", s.pricingDesc);
-      setVal("cfg-final-badge", s.finalCtaBadge);
-      setVal("cfg-final-title", s.finalCtaTitle);
-      setVal("cfg-final-desc", s.finalCtaDesc);
-      setVal("cfg-contact-email", s.contactEmail);
-      setVal("cfg-footer-tagline", s.footerTagline);
-      setVal("cfg-footer-desc", s.footerDescription);
-
-      // Appearance Form
-      setVal("app-bg-primary", s.themeBgPrimary || "#FFFFFF");
-      setVal("app-bg-primary-hex", s.themeBgPrimary || "#FFFFFF");
-      setVal("app-bg-secondary", s.themeBgSecondary || "#FAFAFA");
-      setVal("app-bg-secondary-hex", s.themeBgSecondary || "#FAFAFA");
-      setVal("app-text-primary", s.themeTextPrimary || "#000000");
-      setVal("app-text-primary-hex", s.themeTextPrimary || "#000000");
-      setVal("app-text-secondary", s.themeTextSecondary || "#525252");
-      setVal("app-text-secondary-hex", s.themeTextSecondary || "#525252");
-      setVal("app-accent-primary", s.themeAccentPrimary || "#000000");
-      setVal("app-accent-primary-hex", s.themeAccentPrimary || "#000000");
-      setVal("app-accent-text", s.themeAccentText || "#FFFFFF");
-      setVal("app-accent-text-hex", s.themeAccentText || "#FFFFFF");
-      setVal("app-brand-icon", s.brandIcon || "grid-node");
-      setVal("app-brand-tagline", s.brandTagline || "Unified AI Platform");
-      setVal("app-grid-color", s.gridColor || "#A3A3A3");
-      setVal("app-grid-color-hex", s.gridColor || "#A3A3A3");
-      setVal("app-grid-opacity", s.gridOpacity ?? 30);
-      setVal("app-grid-size", s.gridSize || 36);
-      setChk("app-grid-enabled", s.gridEnabled !== false);
-
-      // Firebase Form
-      const fb = appState.firebaseConfigObj || EMBEDDED_FIREBASE_CONFIG;
-      setVal("fb-apiKey", fb.apiKey);
-      setVal("fb-authDomain", fb.authDomain);
-      setVal("fb-projectId", fb.projectId);
-      setVal("fb-storageBucket", fb.storageBucket);
-      setVal("fb-messagingSenderId", fb.messagingSenderId);
-      setVal("fb-appId", fb.appId);
+      const waQuick = document.getElementById("dash-quick-wa-number");
+      if (waQuick) waQuick.textContent = appState.siteSettings.whatsappNumber || "-";
     }
 
-    /* --- 1. Admin Customers & Referrals --- */
     window.renderAdminCustomersList = function () {
       const listEl = document.getElementById("admin-customers-list");
       if (!listEl) return;
-      const q = (document.getElementById("admin-customer-search")?.value || "").trim().toLowerCase();
-      const filtered = appState.customers.filter(c =>
-        !q ||
-        String(c.customerCode || "").toLowerCase().includes(q) ||
-        String(c.name || "").toLowerCase().includes(q) ||
-        String(c.email || "").toLowerCase().includes(q) ||
-        String(c.referralCode || "").toLowerCase().includes(q)
-      );
+      const query = (document.getElementById("admin-customer-search")?.value || "").trim().toLowerCase();
+
+      const filtered = appState.customers.filter(c => {
+        if (!query) return true;
+        return (
+          (c.code || "").toLowerCase().includes(query) ||
+          (c.name || "").toLowerCase().includes(query) ||
+          (c.email || "").toLowerCase().includes(query) ||
+          (c.referralCode || "").toLowerCase().includes(query)
+        );
+      });
 
       if (filtered.length === 0) {
-        listEl.innerHTML = `
-          <div class="p-8 rounded-2xl border border-dashed border-neutral-300 text-center text-xs sm:text-sm text-neutral-500">
-            Belum ada data pelanggan. Klik <strong>"+ Tambah Pelanggan"</strong> untuk membuat akun login member.
-          </div>
-        `;
+        listEl.innerHTML = `<div class="p-6 text-center border border-dashed border-neutral-300 rounded-xl text-xs text-neutral-500">Belum ada data pelanggan. Klik <strong>+ Tambah Pelanggan</strong> untuk membuat akun login member.</div>`;
         return;
       }
 
       listEl.innerHTML = filtered.map(c => `
-        <div class="p-4 rounded-2xl border border-neutral-200 bg-neutral-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div class="space-y-1 min-w-0">
+        <div class="p-4 rounded-xl border border-neutral-200 bg-neutral-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-black text-white">${escapeHTML(c.customerCode || "CUST")}</span>
-              <span class="text-sm font-bold text-black">${escapeHTML(c.name)}</span>
-              <span class="text-[10px] font-semibold px-2 py-0.5 rounded border ${c.isActive !== false ? "border-black text-black bg-white" : "border-neutral-300 text-neutral-500"}">
+              <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-black text-white">${escapeHTML(c.code || "CUST")}</span>
+              <span class="font-bold text-sm text-black">${escapeHTML(c.name)}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded border ${c.isActive !== false ? "border-black text-black bg-white" : "border-neutral-300 text-neutral-500"}">
                 ${c.isActive !== false ? "Aktif" : "Nonaktif"}
               </span>
             </div>
             <div class="text-xs text-neutral-600">
-              Email: <strong class="text-black">${escapeHTML(c.email)}</strong> • Password: <code class="px-1.5 py-0.5 rounded bg-white border border-neutral-200 text-black">${escapeHTML(c.password)}</code>
+              Email: <strong>${escapeHTML(c.email)}</strong> • Password: <code class="bg-white px-1.5 py-0.5 rounded border border-neutral-200">${escapeHTML(c.password)}</code>
             </div>
             <div class="text-[11px] text-neutral-500">
-              Mulai Berlangganan: <strong>${escapeHTML(c.subscriptionStartDate || "-")}</strong> • Referral: <strong>${escapeHTML(c.referralCode || "-")}</strong>
+              Mulai Berlangganan: <strong>${escapeHTML(c.subscriptionStart || "-")}</strong> • Referral: <strong class="font-mono">${escapeHTML(c.referralCode || "-")}</strong>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="openCustomerEditorModal('${escapeHTML(c.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-black rounded-lg bg-white text-black hover:bg-black hover:text-white transition-colors">
-              Edit
-            </button>
-            <button type="button" onclick="deleteCustomerAccount('${escapeHTML(c.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-neutral-300 rounded-lg bg-white text-neutral-700 hover:border-black hover:text-black transition-colors">
-              Hapus
-            </button>
+            <button type="button" onclick="openCustomerEditorModal('${escapeHTML(c.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-black bg-white text-black rounded-lg hover:bg-black hover:text-white transition-colors">Edit</button>
+            <button type="button" onclick="deleteCustomerItem('${escapeHTML(c.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-neutral-300 text-neutral-700 rounded-lg hover:border-black hover:text-black">Hapus</button>
           </div>
         </div>
       `).join("");
@@ -3581,105 +3289,106 @@ service cloud.firestore {
 
     window.openCustomerEditorModal = function (customerId = null) {
       const existing = customerId ? appState.customers.find(c => c.id === customerId) : null;
-      const defaultCode = existing?.customerCode || `PLG-${String(appState.customers.length + 1).padStart(3, "0")}`;
-      const todayStr = existing?.subscriptionStartDate || new Date().toISOString().slice(0, 10);
+      const defaultCode = existing?.code || `CUST-${String(appState.customers.length + 1).padStart(3, "0")}`;
+      const defaultDate = existing?.subscriptionStart || new Date().toISOString().slice(0, 10);
 
       openModal({
         badge: existing ? "Edit Pelanggan" : "Tambah Pelanggan Baru",
-        title: existing ? `Edit Akun: ${existing.name}` : "Input Akun Pelanggan Member",
+        title: existing ? `Edit Akun: ${existing.name}` : "Input Data Pelanggan Berlangganan",
         bodyHTML: `
           <form id="customer-editor-form" onsubmit="saveCustomerFromModal(event, '${existing ? escapeHTML(existing.id) : ""}')" class="space-y-3 text-left">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-black mb-1">Kode Pelanggan *</label>
-                <input id="cust-code" type="text" required value="${escapeHTML(defaultCode)}" class="w-full px-3 py-2 text-xs sm:text-sm font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                <input id="cust-code" type="text" required value="${escapeHTML(defaultCode)}" class="w-full px-3 py-2 text-xs font-mono border border-neutral-300 rounded-lg" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-black mb-1">Tanggal Mulai Berlangganan *</label>
-                <input id="cust-date" type="date" required value="${escapeHTML(todayStr)}" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                <label class="block text-xs font-semibold text-black mb-1">Mulai Berlangganan *</label>
+                <input id="cust-start" type="date" required value="${escapeHTML(defaultDate)}" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
               </div>
             </div>
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Nama Lengkap Pelanggan *</label>
-              <input id="cust-name" type="text" required value="${escapeHTML(existing?.name || "")}" placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <input id="cust-name" type="text" required value="${escapeHTML(existing?.name || "")}" placeholder="Nama pelanggan" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-black mb-1">Email Login Member *</label>
-                <input id="cust-email" type="email" required value="${escapeHTML(existing?.email || "")}" placeholder="member@email.com" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                <input id="cust-email" type="email" required value="${escapeHTML(existing?.email || "")}" placeholder="email@pelanggan.com" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
               </div>
               <div>
                 <label class="block text-xs font-semibold text-black mb-1">Password Login Member *</label>
-                <input id="cust-pass" type="text" required value="${escapeHTML(existing?.password || "")}" placeholder="Minimal 6 karakter" class="w-full px-3 py-2 text-xs sm:text-sm font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+                <input id="cust-password" type="text" required value="${escapeHTML(existing?.password || "")}" placeholder="Minimal 6 karakter" class="w-full px-3 py-2 text-xs font-mono border border-neutral-300 rounded-lg" />
               </div>
             </div>
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Kode Referral (Opsional)</label>
-              <input id="cust-ref" type="text" value="${escapeHTML(existing?.referralCode || "")}" placeholder="Contoh: AKSA10" class="w-full px-3 py-2 text-xs sm:text-sm font-mono uppercase border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <input id="cust-referral" type="text" value="${escapeHTML(existing?.referralCode || "")}" placeholder="Contoh: AKSA10" class="w-full px-3 py-2 text-xs font-mono uppercase border border-neutral-300 rounded-lg" />
             </div>
-            <label class="inline-flex items-center gap-2 text-xs font-semibold text-black cursor-pointer pt-1">
+            <label class="inline-flex items-center gap-2 text-xs font-semibold text-black pt-1 cursor-pointer">
               <input id="cust-active" type="checkbox" ${existing?.isActive !== false ? "checked" : ""} class="w-4 h-4 accent-black" />
-              <span>Status Langganan Aktif (Dapat Masuk Dashboard Member)</span>
+              <span>Status Langganan Aktif (Dapat masuk ke Dashboard Member)</span>
             </label>
+            <div class="pt-3 flex justify-end gap-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
+              <button type="submit" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan Pelanggan</button>
+            </div>
           </form>
         `,
-        actionsHTML: `
-          <button type="button" onclick="closeModal()" class="px-4 py-2.5 text-xs font-semibold border border-neutral-300 rounded-xl">Batal</button>
-          <button type="submit" form="customer-editor-form" class="px-5 py-2.5 bg-black text-white text-xs font-semibold rounded-xl">Simpan Pelanggan</button>
-        `
+        actionsHTML: `<span></span>`
       });
     };
 
     window.saveCustomerFromModal = async function (e, existingId) {
       e.preventDefault();
+      const id = existingId || `cust-${Date.now()}`;
       const customerObj = {
-        id: existingId || `cust-${Date.now()}`,
-        customerCode: document.getElementById("cust-code").value.trim().toUpperCase(),
-        subscriptionStartDate: document.getElementById("cust-date").value,
+        id,
+        code: document.getElementById("cust-code").value.trim(),
         name: document.getElementById("cust-name").value.trim(),
         email: document.getElementById("cust-email").value.trim().toLowerCase(),
-        password: document.getElementById("cust-pass").value,
-        referralCode: document.getElementById("cust-ref").value.trim().toUpperCase(),
+        password: document.getElementById("cust-password").value.trim(),
+        subscriptionStart: document.getElementById("cust-start").value,
+        referralCode: document.getElementById("cust-referral").value.trim().toUpperCase(),
         isActive: document.getElementById("cust-active").checked
       };
 
-      const idx = appState.customers.findIndex(c => c.id === customerObj.id);
+      const idx = appState.customers.findIndex(c => c.id === id);
       if (idx >= 0) appState.customers[idx] = customerObj;
-      else appState.customers.unshift(customerObj);
+      else appState.customers.push(customerObj);
 
       await persistCustomerToFirestore(customerObj);
       closeModal();
       refreshAllRenderedViews();
-      showToast(`Data pelanggan ${customerObj.name} berhasil disimpan.`);
+      showToast(`Data pelanggan "${customerObj.name}" berhasil disimpan.`);
     };
 
-    window.deleteCustomerAccount = async function (customerId) {
+    window.deleteCustomerItem = async function (customerId) {
       appState.customers = appState.customers.filter(c => c.id !== customerId);
-      await deleteCustomerFromFirestore(customerId);
+      await removeCustomerFromFirestore(customerId);
       refreshAllRenderedViews();
-      showToast("Akun pelanggan berhasil dihapus.");
+      showToast("Data pelanggan telah dihapus.");
     };
 
     function renderAdminReferralsList() {
       const listEl = document.getElementById("admin-referrals-list");
       if (!listEl) return;
       if (appState.referrals.length === 0) {
-        listEl.innerHTML = `<div class="p-6 rounded-xl border border-dashed border-neutral-300 text-center text-xs text-neutral-500">Belum ada kode referral.</div>`;
+        listEl.innerHTML = `<div class="p-4 text-center border border-dashed border-neutral-300 rounded-xl text-xs text-neutral-500">Belum ada kode referral.</div>`;
         return;
       }
       listEl.innerHTML = appState.referrals.map(r => `
-        <div class="p-3.5 rounded-xl border border-neutral-200 bg-neutral-50/70 flex flex-wrap items-center justify-between gap-3">
+        <div class="p-3.5 rounded-xl border border-neutral-200 bg-neutral-50/60 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded bg-black text-white">${escapeHTML(r.code)}</span>
-              <span class="text-xs font-bold text-black">${escapeHTML(r.ownerName || "Mitra")}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded border border-neutral-300 bg-white">${r.isActive !== false ? "Aktif" : "Nonaktif"}</span>
+              <span class="font-mono font-bold text-xs px-2.5 py-0.5 rounded bg-black text-white">${escapeHTML(r.code)}</span>
+              <span class="text-xs font-bold text-black">${escapeHTML(r.ownerName)}</span>
             </div>
-            <div class="text-xs text-neutral-600 mt-1">${escapeHTML(r.benefit || "")}</div>
+            <div class="text-xs text-neutral-500 mt-1">${escapeHTML(r.benefit || "-")}</div>
           </div>
           <div class="flex items-center gap-2">
             <button type="button" onclick="openReferralEditorModal('${escapeHTML(r.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-black rounded-lg bg-white">Edit</button>
-            <button type="button" onclick="deleteReferralItem('${escapeHTML(r.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-neutral-300 rounded-lg bg-white">Hapus</button>
+            <button type="button" onclick="deleteReferralItem('${escapeHTML(r.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-neutral-300 rounded-lg">Hapus</button>
           </div>
         </div>
       `).join("");
@@ -3689,140 +3398,157 @@ service cloud.firestore {
       const existing = refId ? appState.referrals.find(r => r.id === refId) : null;
       openModal({
         badge: "Kode Referral",
-        title: existing ? `Edit Kode ${existing.code}` : "Buat Kode Referral Baru",
+        title: existing ? `Edit Kode: ${existing.code}` : "Tambah Kode Referral Baru",
         bodyHTML: `
-          <form id="referral-editor-form" onsubmit="saveReferralFromModal(event, '${existing ? escapeHTML(existing.id) : ""}')" class="space-y-3 text-left">
+          <form onsubmit="saveReferralFromModal(event, '${existing ? escapeHTML(existing.id) : ""}')" class="space-y-3 text-left">
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Kode Referral *</label>
-              <input id="ref-code-input" type="text" required value="${escapeHTML(existing?.code || "")}" placeholder="Contoh: MITRA2026" class="w-full px-3 py-2 text-xs sm:text-sm font-mono uppercase border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <input id="ref-code-input" type="text" required value="${escapeHTML(existing?.code || "")}" placeholder="Contoh: MITRA2026" class="w-full px-3 py-2 text-xs font-mono uppercase border border-neutral-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Nama Pemilik / Mitra *</label>
-              <input id="ref-owner-input" type="text" required value="${escapeHTML(existing?.ownerName || "")}" placeholder="Nama afiliasi / mitra" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <input id="ref-owner-input" type="text" required value="${escapeHTML(existing?.ownerName || "")}" placeholder="Nama afiliasi / mitra" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-black mb-1">Keterangan Benefit / Promo</label>
-              <input id="ref-benefit-input" type="text" value="${escapeHTML(existing?.benefit || "")}" placeholder="Contoh: Diskon aktivasi / Bonus panduan" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <label class="block text-xs font-semibold text-black mb-1">Keterangan Benefit / Catatan</label>
+              <input id="ref-benefit-input" type="text" value="${escapeHTML(existing?.benefit || "")}" placeholder="Contoh: Diskon khusus / prioritas aktivasi" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
             </div>
-            <label class="inline-flex items-center gap-2 text-xs font-semibold text-black cursor-pointer">
-              <input id="ref-active-input" type="checkbox" ${existing?.isActive !== false ? "checked" : ""} class="w-4 h-4 accent-black" />
-              <span>Kode Referral Aktif</span>
-            </label>
+            <div class="pt-3 flex justify-end gap-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
+              <button type="submit" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan Kode</button>
+            </div>
           </form>
         `,
-        actionsHTML: `
-          <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-xl">Batal</button>
-          <button type="submit" form="referral-editor-form" class="px-5 py-2 bg-black text-white text-xs font-semibold rounded-xl">Simpan Kode</button>
-        `
+        actionsHTML: `<span></span>`
       });
     };
 
     window.saveReferralFromModal = async function (e, existingId) {
       e.preventDefault();
+      const id = existingId || `ref-${Date.now()}`;
       const refObj = {
-        id: existingId || `ref-${Date.now()}`,
+        id,
         code: document.getElementById("ref-code-input").value.trim().toUpperCase(),
         ownerName: document.getElementById("ref-owner-input").value.trim(),
         benefit: document.getElementById("ref-benefit-input").value.trim(),
-        isActive: document.getElementById("ref-active-input").checked
+        isActive: true
       };
-      const idx = appState.referrals.findIndex(r => r.id === refObj.id);
+      const idx = appState.referrals.findIndex(r => r.id === id);
       if (idx >= 0) appState.referrals[idx] = refObj;
-      else appState.referrals.unshift(refObj);
+      else appState.referrals.push(refObj);
 
       await persistReferralToFirestore(refObj);
       closeModal();
       refreshAllRenderedViews();
-      showToast(`Kode referral ${refObj.code} tersimpan.`);
+      showToast(`Kode referral "${refObj.code}" disimpan.`);
     };
 
     window.deleteReferralItem = async function (refId) {
       appState.referrals = appState.referrals.filter(r => r.id !== refId);
-      await deleteReferralFromFirestore(refId);
+      await removeReferralFromFirestore(refId);
       refreshAllRenderedViews();
       showToast("Kode referral dihapus.");
     };
 
-    /* --- 2. Admin Features Management --- */
+    /* =======================================================================
+       ADMIN — PENGATURAN LINK & DETAIL FITUR
+    ======================================================================== */
     function renderAdminFeaturesList() {
       const listEl = document.getElementById("admin-features-list");
       if (!listEl) return;
       const sorted = [...appState.features].sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999));
 
-      listEl.innerHTML = sorted.map(f => `
-        <div class="p-4 rounded-2xl border border-neutral-200 bg-neutral-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      listEl.innerHTML = sorted.map((f, index) => `
+        <div class="p-4 rounded-2xl border border-neutral-200 bg-neutral-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-start gap-3.5 min-w-0">
             <div class="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center shrink-0 mt-0.5">
-              ${getFeatureIconSVG(f.icon)}
+              ${getFeatureIconSVG(f.icon, "w-5 h-5")}
             </div>
             <div class="min-w-0 space-y-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-neutral-300 bg-white text-black">#${escapeHTML(f.displayOrder)}</span>
-                <span class="text-sm font-bold text-black">${escapeHTML(f.name)}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-200 text-black font-bold">#${index + 1}</span>
+                <h3 class="font-display font-bold text-sm text-black">${escapeHTML(f.name)}</h3>
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${f.isActive !== false ? "bg-black text-white" : "bg-neutral-200 text-neutral-600"}">
-                  ${f.isActive !== false ? "Tampil di Landing" : "Disembunyikan"}
+                  ${f.isActive !== false ? "Aktif" : "Nonaktif"}
                 </span>
               </div>
-              <div class="text-xs text-neutral-600">${escapeHTML(f.description)}</div>
-              <div class="text-[11px] font-mono text-neutral-500 truncate">
-                URL Eksternal Member: ${f.targetUrl ? `<span class="text-black underline">${escapeHTML(f.targetUrl)}</span>` : `<span class="italic">Belum diatur (kosong)</span>`}
+              <div class="text-xs text-neutral-500">${escapeHTML(f.category)}</div>
+              <div class="text-xs font-mono text-neutral-700 truncate">
+                URL Tujuan: <span class="text-black font-semibold">${escapeHTML(f.targetUrl || "(Belum diisi)")}</span>
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="openFeatureEditorModal('${escapeHTML(f.id)}')" class="px-3.5 py-2 text-xs font-semibold border border-black rounded-xl bg-white text-black hover:bg-black hover:text-white transition-colors">
-              Edit &amp; Atur Link
-            </button>
-            <button type="button" onclick="deleteFeatureItem('${escapeHTML(f.id)}')" class="px-3 py-2 text-xs font-semibold border border-neutral-300 rounded-xl bg-white text-neutral-700 hover:border-black hover:text-black transition-colors">
-              Hapus
-            </button>
+
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button type="button" onclick="moveFeatureOrder('${escapeHTML(f.id)}', -1)" title="Naikkan urutan" class="px-2.5 py-1.5 text-xs font-bold border border-neutral-300 bg-white rounded-lg hover:border-black">↑</button>
+            <button type="button" onclick="moveFeatureOrder('${escapeHTML(f.id)}', 1)" title="Turunkan urutan" class="px-2.5 py-1.5 text-xs font-bold border border-neutral-300 bg-white rounded-lg hover:border-black">↓</button>
+            <button type="button" onclick="openFeatureEditorModal('${escapeHTML(f.id)}')" class="px-3.5 py-1.5 text-xs font-semibold bg-black text-white rounded-lg hover:bg-neutral-800">Edit Fitur &amp; Link</button>
+            <button type="button" onclick="deleteFeatureItem('${escapeHTML(f.id)}')" class="px-3 py-1.5 text-xs font-semibold border border-neutral-300 bg-white text-neutral-700 rounded-lg hover:border-black hover:text-black">Hapus</button>
           </div>
         </div>
       `).join("");
     }
 
+    window.moveFeatureOrder = async function (featureId, delta) {
+      const sorted = [...appState.features].sort((a, b) => (Number(a.displayOrder) || 999) - (Number(b.displayOrder) || 999));
+      const idx = sorted.findIndex(f => f.id === featureId);
+      const targetIdx = idx + delta;
+      if (idx < 0 || targetIdx < 0 || targetIdx >= sorted.length) return;
+      const temp = sorted[idx];
+      sorted[idx] = sorted[targetIdx];
+      sorted[targetIdx] = temp;
+      sorted.forEach((item, i) => {
+        item.displayOrder = i + 1;
+      });
+      appState.features = sorted;
+      refreshAllRenderedViews();
+      for (const item of sorted) {
+        await persistFeatureToFirestore(item);
+      }
+    };
+
     window.openFeatureEditorModal = function (featureId = null) {
       const existing = featureId ? appState.features.find(f => f.id === featureId) : null;
-      const nextOrder = existing?.displayOrder || (appState.features.length + 1);
+      const highlightsText = existing && Array.isArray(existing.highlights) ? existing.highlights.join("\n") : "";
 
       openModal({
-        badge: existing ? "Edit Fitur AI" : "Tambah Fitur AI Baru",
-        title: existing ? existing.name : "Tambah Produk AI ke Katalog",
+        badge: existing ? "Edit Produk AI" : "Tambah Produk AI Baru",
+        title: existing ? `Edit: ${existing.name}` : "Tambah Fitur AI ke Katalog",
         bodyHTML: `
-          <form id="feature-editor-form" onsubmit="saveFeatureFromModal(event, '${existing ? escapeHTML(existing.id) : ""}')" class="space-y-3 text-left">
+          <form onsubmit="saveFeatureFromModal(event, '${existing ? escapeHTML(existing.id) : ""}')" class="space-y-3 text-left">
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Nama Fitur *</label>
-              <input id="feat-name" type="text" required value="${escapeHTML(existing?.name || "")}" placeholder="Contoh: AI Generator RPP" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <input id="feat-name" type="text" required value="${escapeHTML(existing?.name || "")}" placeholder="Contoh: AI Generator Modul Ajar" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-black mb-1">Kategori</label>
-                <select id="feat-category" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl">
+                <label class="block text-xs font-semibold text-black mb-1">Kategori *</label>
+                <select id="feat-category" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg bg-white">
                   ${FEATURE_CATEGORIES.map(c => `<option value="${escapeHTML(c)}" ${existing?.category === c ? "selected" : ""}>${escapeHTML(c)}</option>`).join("")}
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-black mb-1">Ikon</label>
-                <select id="feat-icon" class="w-full px-3 py-2 text-xs bg-white border border-neutral-300 rounded-xl">
-                  ${AVAILABLE_ICONS.map(ic => `<option value="${ic.value}" ${existing?.icon === ic.value ? "selected" : ""}>${ic.label}</option>`).join("")}
+                <label class="block text-xs font-semibold text-black mb-1">Ikon Kartu *</label>
+                <select id="feat-icon" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg bg-white">
+                  ${AVAILABLE_ICONS.map(ic => `<option value="${ic.value}" ${existing?.icon === ic.value ? "selected" : ""}>${escapeHTML(ic.label)}</option>`).join("")}
                 </select>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-black mb-1">Urutan Tampil</label>
-                <input id="feat-order" type="number" min="1" value="${escapeHTML(nextOrder)}" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-xl" />
               </div>
             </div>
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Deskripsi Singkat Kartu *</label>
-              <textarea id="feat-desc" rows="2" required class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black">${escapeHTML(existing?.description || "")}</textarea>
+              <textarea id="feat-desc" rows="2" required class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg">${escapeHTML(existing?.description || "")}</textarea>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-black mb-1">Deskripsi Lengkap (Halaman Detail Fitur)</label>
-              <textarea id="feat-long-desc" rows="3" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-black">${escapeHTML(existing?.longDescription || "")}</textarea>
+              <label class="block text-xs font-semibold text-black mb-1">Deskripsi Detail Halaman Fitur</label>
+              <textarea id="feat-long-desc" rows="3" placeholder="Penjelasan lengkap saat tombol Lihat Fitur diklik" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg">${escapeHTML(existing?.longDescription || "")}</textarea>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-black mb-1">URL Tujuan Eksternal (Tombol "Buka & Gunakan Fitur" di Dashboard Member)</label>
-              <input id="feat-url" type="text" value="${escapeHTML(existing?.targetUrl || "")}" placeholder="https://... (kosongkan jika belum ada)" class="w-full px-3 py-2 text-xs font-mono border border-neutral-300 rounded-xl focus:outline-none focus:border-black" />
+              <label class="block text-xs font-semibold text-black mb-1">Keunggulan Fitur (1 poin per baris)</label>
+              <textarea id="feat-highlights" rows="3" placeholder="Poin keunggulan 1&#10;Poin keunggulan 2" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg">${escapeHTML(highlightsText)}</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-black mb-1">URL Tujuan Eksternal (Dibuka dari Dashboard Member)</label>
+              <input id="feat-url" type="text" value="${escapeHTML(existing?.targetUrl || "")}" placeholder="https://... (kosongkan jika belum ada)" class="w-full px-3 py-2 text-xs font-mono border border-neutral-300 rounded-lg" />
             </div>
             <div class="flex flex-wrap gap-4 pt-1">
               <label class="inline-flex items-center gap-2 text-xs font-semibold text-black cursor-pointer">
@@ -3830,50 +3556,51 @@ service cloud.firestore {
                 <span>Tampilkan di Landing Page</span>
               </label>
               <label class="inline-flex items-center gap-2 text-xs font-semibold text-black cursor-pointer">
-                <input id="feat-pkg" type="checkbox" ${existing?.isIncludedInPackage !== false ? "checked" : ""} class="w-4 h-4 accent-black" />
+                <input id="feat-included" type="checkbox" ${existing?.isIncludedInPackage !== false ? "checked" : ""} class="w-4 h-4 accent-black" />
                 <span>Termasuk dalam Paket</span>
               </label>
             </div>
+            <div class="pt-3 flex justify-end gap-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
+              <button type="submit" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan Fitur</button>
+            </div>
           </form>
         `,
-        actionsHTML: `
-          <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-xl">Batal</button>
-          <button type="submit" form="feature-editor-form" class="px-5 py-2 bg-black text-white text-xs font-semibold rounded-xl">Simpan Fitur</button>
-        `
+        actionsHTML: `<span></span>`
       });
     };
 
     window.saveFeatureFromModal = async function (e, existingId) {
       e.preventDefault();
       const rawUrl = document.getElementById("feat-url").value.trim();
-      if (rawUrl && rawUrl !== "#" && !/^https?:\/\//i.test(rawUrl)) {
-        showToast("URL tujuan harus diawali dengan http:// atau https://");
+      if (rawUrl && rawUrl !== "#" && !/^https?:\/\/.+/i.test(rawUrl)) {
+        showToast("URL tujuan harus diawali dengan http:// atau https:// (atau kosongkan).");
         return;
       }
 
-      const nameVal = document.getElementById("feat-name").value.trim();
-      const slug = nameVal.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-      const existing = existingId ? appState.features.find(f => f.id === existingId) : null;
+      const name = document.getElementById("feat-name").value.trim();
+      const id = existingId || `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now().toString().slice(-4)}`;
+      const highlights = document.getElementById("feat-highlights").value
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
 
+      const existing = appState.features.find(f => f.id === id);
       const featureObj = {
-        id: existingId || `${slug || "fitur"}-${Date.now().toString().slice(-4)}`,
-        name: nameVal,
+        id,
+        name,
         category: document.getElementById("feat-category").value,
         icon: document.getElementById("feat-icon").value,
-        displayOrder: Number(document.getElementById("feat-order").value) || 1,
         description: document.getElementById("feat-desc").value.trim(),
         longDescription: document.getElementById("feat-long-desc").value.trim() || document.getElementById("feat-desc").value.trim(),
-        highlights: existing?.highlights || [
-          "Terintegrasi penuh dalam satu paket ekosistem",
-          "Hasil terstruktur dan siap disesuaikan",
-          "Dapat diakses langsung dari Dashboard Member"
-        ],
+        highlights,
         targetUrl: rawUrl,
         isActive: document.getElementById("feat-active").checked,
-        isIncludedInPackage: document.getElementById("feat-pkg").checked
+        isIncludedInPackage: document.getElementById("feat-included").checked,
+        displayOrder: existing ? existing.displayOrder : appState.features.length + 1
       };
 
-      const idx = appState.features.findIndex(f => f.id === featureObj.id);
+      const idx = appState.features.findIndex(f => f.id === id);
       if (idx >= 0) appState.features[idx] = featureObj;
       else appState.features.push(featureObj);
 
@@ -3881,24 +3608,34 @@ service cloud.firestore {
       await persistFeatureToFirestore(featureObj);
       closeModal();
       refreshAllRenderedViews();
-      showToast(`Fitur "${featureObj.name}" berhasil disimpan & tampil di katalog!`);
+      showToast(`Fitur "${featureObj.name}" berhasil disimpan dan muncul di katalog!`);
     };
 
     window.deleteFeatureItem = async function (featureId) {
       appState.features = appState.features.filter(f => f.id !== featureId);
-      await deleteFeatureFromFirestore(featureId);
+      await removeFeatureFromFirestore(featureId);
       refreshAllRenderedViews();
-      showToast("Fitur berhasil dihapus dari katalog.");
+      showToast("Fitur telah dihapus dari katalog.");
     };
 
-    /* --- 3. Admin Pricing & WhatsApp Settings --- */
+    /* =======================================================================
+       ADMIN — PRICING, WHATSAPP, LANDING PAGE, APPEARANCE & FIREBASE FORMS
+    ======================================================================== */
+    function populateAdminPricingForm() {
+      const p = appState.pricing;
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ""; };
+      setVal("cfg-pkg-name", p.packageName);
+      setVal("cfg-pkg-price", p.price);
+      setVal("cfg-pkg-period", p.billingPeriod);
+      setVal("cfg-pkg-btn", p.buttonText);
+      setVal("cfg-pkg-desc", p.description);
+      setVal("cfg-pkg-features", Array.isArray(p.includedFeatures) ? p.includedFeatures.join("\n") : "");
+      const activeEl = document.getElementById("cfg-pkg-active");
+      if (activeEl) activeEl.checked = p.isActive !== false;
+    }
+
     window.handleSavePricingSettings = async function (e) {
       e.preventDefault();
-      const lines = document.getElementById("cfg-pkg-features").value
-        .split("\n")
-        .map(l => l.trim())
-        .filter(Boolean);
-
       appState.pricing = {
         ...appState.pricing,
         packageName: document.getElementById("cfg-pkg-name").value.trim(),
@@ -3906,110 +3643,171 @@ service cloud.firestore {
         billingPeriod: document.getElementById("cfg-pkg-period").value.trim(),
         buttonText: document.getElementById("cfg-pkg-btn").value.trim(),
         description: document.getElementById("cfg-pkg-desc").value.trim(),
-        includedFeatures: lines,
+        includedFeatures: document.getElementById("cfg-pkg-features").value.split("\n").map(s => s.trim()).filter(Boolean),
         isActive: document.getElementById("cfg-pkg-active").checked
       };
-
-      await persistPricingToFirestore(appState.pricing);
+      await persistPricingToFirestore();
       refreshAllRenderedViews();
       showToast("Pengaturan Pricing berhasil disimpan.");
     };
 
-    window.updateWhatsAppPreviewBox = function () {
+    function populateAdminWhatsAppForm() {
+      const s = appState.siteSettings;
       const numEl = document.getElementById("cfg-wa-number");
       const msgEl = document.getElementById("cfg-wa-message");
+      const actEl = document.getElementById("cfg-wa-active");
+      if (numEl) numEl.value = s.whatsappNumber || "";
+      if (msgEl) msgEl.value = s.whatsappMessage || "";
+      if (actEl) actEl.checked = s.whatsappEnabled !== false;
+      updateWhatsAppPreviewBox();
+    }
+
+    window.updateWhatsAppPreviewBox = function () {
+      const num = (document.getElementById("cfg-wa-number")?.value || appState.siteSettings.whatsappNumber || "").replace(/\D/g, "");
+      const msg = document.getElementById("cfg-wa-message")?.value || appState.siteSettings.whatsappMessage || "";
       const previewEl = document.getElementById("wa-preview-url");
-      if (!numEl || !msgEl || !previewEl) return;
-      const clean = numEl.value.replace(/[^0-9]/g, "");
-      previewEl.textContent = `https://wa.me/${clean}?text=${encodeURIComponent(msgEl.value)}`;
+      if (previewEl) {
+        previewEl.textContent = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+      }
     };
 
     window.handleSaveWhatsAppSettings = async function (e) {
       e.preventDefault();
-      const cleanNumber = document.getElementById("cfg-wa-number").value.replace(/[^0-9]/g, "");
-      appState.siteSettings.whatsappNumber = cleanNumber;
+      appState.siteSettings.whatsappNumber = document.getElementById("cfg-wa-number").value.replace(/\D/g, "");
       appState.siteSettings.whatsappMessage = document.getElementById("cfg-wa-message").value;
       appState.siteSettings.whatsappEnabled = document.getElementById("cfg-wa-active").checked;
-
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      await persistSiteSettingsToFirestore();
       refreshAllRenderedViews();
-      showToast("Pengaturan WhatsApp admin berhasil disimpan.");
+      showToast("Pengaturan WhatsApp berhasil disimpan.");
     };
 
-    /* --- 4. Admin Full Landing Page & FAQ Settings --- */
+    function populateAdminLandingForm() {
+      const s = appState.siteSettings;
+      const map = {
+        "cfg-brand-name": s.brandName,
+        "cfg-hero-badge": s.heroBadge,
+        "cfg-hero-title": s.heroTitle,
+        "cfg-hero-desc": s.heroDescription,
+        "cfg-cta-text": s.ctaText,
+        "cfg-sec-cta-text": s.secondaryCtaText,
+        "cfg-stat1-val": s.stat1Value,
+        "cfg-stat1-lbl": s.stat1Label,
+        "cfg-stat2-lbl": s.stat2Label,
+        "cfg-stat3-val": s.stat3Value,
+        "cfg-stat3-lbl": s.stat3Label,
+        "cfg-trust-label": s.trustLabel,
+        "cfg-trust-title": s.trustTitle,
+        "cfg-platform-desc": s.platformDescription,
+        "cfg-p1-title": s.pillar1Title,
+        "cfg-p1-desc": s.pillar1Desc,
+        "cfg-p2-title": s.pillar2Title,
+        "cfg-p2-desc": s.pillar2Desc,
+        "cfg-p3-title": s.pillar3Title,
+        "cfg-p3-desc": s.pillar3Desc,
+        "cfg-catalog-title": s.catalogTitle,
+        "cfg-catalog-desc": s.catalogDesc,
+        "cfg-benefits-title": s.benefitsTitle,
+        "cfg-benefit1-title": s.benefit1Title,
+        "cfg-benefit1-desc": s.benefit1Desc,
+        "cfg-benefit2-title": s.benefit2Title,
+        "cfg-benefit2-desc": s.benefit2Desc,
+        "cfg-steps-title": s.stepsTitle,
+        "cfg-steps-desc": s.stepsDesc,
+        "cfg-s1-title": s.step1Title,
+        "cfg-s1-desc": s.step1Desc,
+        "cfg-s2-title": s.step2Title,
+        "cfg-s2-desc": s.step2Desc,
+        "cfg-s3-title": s.step3Title,
+        "cfg-s3-desc": s.step3Desc,
+        "cfg-preview-title": s.previewTitle,
+        "cfg-preview-desc": s.previewDesc,
+        "cfg-pricing-title": s.pricingTitle,
+        "cfg-pricing-desc": s.pricingDesc,
+        "cfg-final-badge": s.finalCtaBadge,
+        "cfg-final-title": s.finalCtaTitle,
+        "cfg-final-desc": s.finalCtaDesc,
+        "cfg-contact-email": s.contactEmail,
+        "cfg-footer-tagline": s.footerTagline,
+        "cfg-footer-desc": s.footerDescription
+      };
+      Object.entries(map).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val || "";
+      });
+      renderAdminFAQList();
+    }
+
     window.handleSaveLandingSettings = async function (e) {
       e.preventDefault();
-      const getVal = (id) => document.getElementById(id)?.value ?? "";
-      appState.siteSettings = {
-        ...appState.siteSettings,
-        brandName: getVal("cfg-brand-name").trim() || "AKSA.AI",
-        heroBadge: getVal("cfg-hero-badge"),
-        heroTitle: getVal("cfg-hero-title"),
-        heroDescription: getVal("cfg-hero-desc"),
-        ctaText: getVal("cfg-cta-text"),
-        secondaryCtaText: getVal("cfg-sec-cta-text"),
-        stat1Value: getVal("cfg-stat1-val"),
-        stat1Label: getVal("cfg-stat1-lbl"),
-        stat2Label: getVal("cfg-stat2-lbl"),
-        stat3Value: getVal("cfg-stat3-val"),
-        stat3Label: getVal("cfg-stat3-lbl"),
-        trustLabel: getVal("cfg-trust-label"),
-        trustTitle: getVal("cfg-trust-title"),
-        platformDescription: getVal("cfg-platform-desc"),
-        pillar1Title: getVal("cfg-p1-title"),
-        pillar1Desc: getVal("cfg-p1-desc"),
-        pillar2Title: getVal("cfg-p2-title"),
-        pillar2Desc: getVal("cfg-p2-desc"),
-        pillar3Title: getVal("cfg-p3-title"),
-        pillar3Desc: getVal("cfg-p3-desc"),
-        catalogTitle: getVal("cfg-catalog-title"),
-        catalogDesc: getVal("cfg-catalog-desc"),
-        benefitsTitle: getVal("cfg-benefits-title"),
-        benefit1Title: getVal("cfg-benefit1-title"),
-        benefit1Desc: getVal("cfg-benefit1-desc"),
-        benefit2Title: getVal("cfg-benefit2-title"),
-        benefit2Desc: getVal("cfg-benefit2-desc"),
-        stepsTitle: getVal("cfg-steps-title"),
-        stepsDesc: getVal("cfg-steps-desc"),
-        step1Title: getVal("cfg-s1-title"),
-        step1Desc: getVal("cfg-s1-desc"),
-        step2Title: getVal("cfg-s2-title"),
-        step2Desc: getVal("cfg-s2-desc"),
-        step3Title: getVal("cfg-s3-title"),
-        step3Desc: getVal("cfg-s3-desc"),
-        previewTitle: getVal("cfg-preview-title"),
-        previewDesc: getVal("cfg-preview-desc"),
-        pricingTitle: getVal("cfg-pricing-title"),
-        pricingDesc: getVal("cfg-pricing-desc"),
-        finalCtaBadge: getVal("cfg-final-badge"),
-        finalCtaTitle: getVal("cfg-final-title"),
-        finalCtaDesc: getVal("cfg-final-desc"),
-        contactEmail: getVal("cfg-contact-email"),
-        footerTagline: getVal("cfg-footer-tagline"),
-        footerDescription: getVal("cfg-footer-desc")
-      };
-
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      const getV = id => document.getElementById(id)?.value || "";
+      Object.assign(appState.siteSettings, {
+        brandName: getV("cfg-brand-name").trim() || "AKSA.AI",
+        heroBadge: getV("cfg-hero-badge").trim(),
+        heroTitle: getV("cfg-hero-title").trim(),
+        heroDescription: getV("cfg-hero-desc").trim(),
+        ctaText: getV("cfg-cta-text").trim(),
+        secondaryCtaText: getV("cfg-sec-cta-text").trim(),
+        stat1Value: getV("cfg-stat1-val").trim(),
+        stat1Label: getV("cfg-stat1-lbl").trim(),
+        stat2Label: getV("cfg-stat2-lbl").trim(),
+        stat3Value: getV("cfg-stat3-val").trim(),
+        stat3Label: getV("cfg-stat3-lbl").trim(),
+        trustLabel: getV("cfg-trust-label").trim(),
+        trustTitle: getV("cfg-trust-title").trim(),
+        platformDescription: getV("cfg-platform-desc").trim(),
+        pillar1Title: getV("cfg-p1-title").trim(),
+        pillar1Desc: getV("cfg-p1-desc").trim(),
+        pillar2Title: getV("cfg-p2-title").trim(),
+        pillar2Desc: getV("cfg-p2-desc").trim(),
+        pillar3Title: getV("cfg-p3-title").trim(),
+        pillar3Desc: getV("cfg-p3-desc").trim(),
+        catalogTitle: getV("cfg-catalog-title").trim(),
+        catalogDesc: getV("cfg-catalog-desc").trim(),
+        benefitsTitle: getV("cfg-benefits-title").trim(),
+        benefit1Title: getV("cfg-benefit1-title").trim(),
+        benefit1Desc: getV("cfg-benefit1-desc").trim(),
+        benefit2Title: getV("cfg-benefit2-title").trim(),
+        benefit2Desc: getV("cfg-benefit2-desc").trim(),
+        stepsTitle: getV("cfg-steps-title").trim(),
+        stepsDesc: getV("cfg-steps-desc").trim(),
+        step1Title: getV("cfg-s1-title").trim(),
+        step1Desc: getV("cfg-s1-desc").trim(),
+        step2Title: getV("cfg-s2-title").trim(),
+        step2Desc: getV("cfg-s2-desc").trim(),
+        step3Title: getV("cfg-s3-title").trim(),
+        step3Desc: getV("cfg-s3-desc").trim(),
+        previewTitle: getV("cfg-preview-title").trim(),
+        previewDesc: getV("cfg-preview-desc").trim(),
+        pricingTitle: getV("cfg-pricing-title").trim(),
+        pricingDesc: getV("cfg-pricing-desc").trim(),
+        finalCtaBadge: getV("cfg-final-badge").trim(),
+        finalCtaTitle: getV("cfg-final-title").trim(),
+        finalCtaDesc: getV("cfg-final-desc").trim(),
+        contactEmail: getV("cfg-contact-email").trim(),
+        footerTagline: getV("cfg-footer-tagline").trim(),
+        footerDescription: getV("cfg-footer-desc").trim()
+      });
+      await persistSiteSettingsToFirestore();
       refreshAllRenderedViews();
-      showToast("Seluruh perubahan konten Landing Page berhasil disimpan.");
+      showToast("Seluruh konten Landing Page berhasil diperbarui.");
     };
 
-    function renderAdminFAQList() {
+    window.renderAdminFAQList = function () {
       const listEl = document.getElementById("admin-faq-list");
       if (!listEl) return;
-      listEl.innerHTML = appState.faqs.map((f, i) => `
+      listEl.innerHTML = appState.faqs.map((faq, idx) => `
         <div class="p-3.5 rounded-xl border border-neutral-200 bg-neutral-50/70 flex items-start justify-between gap-3">
-          <div>
-            <div class="text-xs font-bold text-black">${escapeHTML(f.question)}</div>
-            <div class="text-xs text-neutral-600 mt-1">${escapeHTML(f.answer)}</div>
+          <div class="space-y-1">
+            <div class="text-xs font-bold text-black">${escapeHTML(faq.question)}</div>
+            <div class="text-xs text-neutral-600">${escapeHTML(faq.answer)}</div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="openFAQEditorModal(${i})" class="px-2.5 py-1 text-xs font-semibold border border-black rounded-lg bg-white">Edit</button>
-            <button type="button" onclick="deleteFAQItem(${i})" class="px-2.5 py-1 text-xs font-semibold border border-neutral-300 rounded-lg bg-white">Hapus</button>
+            <button type="button" onclick="openFAQEditorModal(${idx})" class="px-2.5 py-1 text-xs font-semibold border border-black bg-white rounded-lg">Edit</button>
+            <button type="button" onclick="deleteFAQItem(${idx})" class="px-2.5 py-1 text-xs font-semibold border border-neutral-300 bg-white rounded-lg">Hapus</button>
           </div>
         </div>
       `).join("");
-    }
+    };
 
     window.openFAQEditorModal = function (index = null) {
       const existing = index !== null && appState.faqs[index] ? appState.faqs[index] : null;
@@ -4017,47 +3815,78 @@ service cloud.firestore {
         badge: "FAQ Landing Page",
         title: existing ? "Edit Pertanyaan FAQ" : "Tambah Pertanyaan FAQ",
         bodyHTML: `
-          <form id="faq-editor-form" onsubmit="saveFAQFromModal(event, ${index === null ? "null" : index})" class="space-y-3 text-left">
+          <form onsubmit="saveFAQFromModal(event, ${index !== null ? index : -1})" class="space-y-3 text-left">
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Pertanyaan *</label>
-              <input id="faq-q-input" type="text" required value="${escapeHTML(existing?.question || "")}" class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl" />
+              <input id="faq-q-input" type="text" required value="${escapeHTML(existing?.question || "")}" class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-black mb-1">Jawaban *</label>
-              <textarea id="faq-a-input" rows="4" required class="w-full px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-xl">${escapeHTML(existing?.answer || "")}</textarea>
+              <textarea id="faq-a-input" rows="4" required class="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg">${escapeHTML(existing?.answer || "")}</textarea>
+            </div>
+            <div class="pt-2 flex justify-end gap-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-lg">Batal</button>
+              <button type="submit" class="px-5 py-2 text-xs font-semibold bg-black text-white rounded-lg">Simpan FAQ</button>
             </div>
           </form>
         `,
-        actionsHTML: `
-          <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-xl">Batal</button>
-          <button type="submit" form="faq-editor-form" class="px-5 py-2 bg-black text-white text-xs font-semibold rounded-xl">Simpan FAQ</button>
-        `
+        actionsHTML: `<span></span>`
       });
     };
 
-    window.saveFAQFromModal = async function (e, index) {
+    window.saveFAQFromModal = async function (e, idx) {
       e.preventDefault();
       const item = {
         question: document.getElementById("faq-q-input").value.trim(),
         answer: document.getElementById("faq-a-input").value.trim()
       };
-      if (index !== null && appState.faqs[index]) appState.faqs[index] = item;
+      if (idx >= 0) appState.faqs[idx] = item;
       else appState.faqs.push(item);
-
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+      await persistSiteSettingsToFirestore();
       closeModal();
       refreshAllRenderedViews();
       showToast("Daftar FAQ berhasil diperbarui.");
     };
 
-    window.deleteFAQItem = async function (index) {
-      appState.faqs.splice(index, 1);
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
+    window.deleteFAQItem = async function (idx) {
+      appState.faqs.splice(idx, 1);
+      await persistSiteSettingsToFirestore();
       refreshAllRenderedViews();
-      showToast("Pertanyaan FAQ dihapus.");
+      showToast("Item FAQ dihapus.");
     };
 
-    /* --- 5. Admin Appearance, Colors, Icons & Grid --- */
+    /* =======================================================================
+       ADMIN — GLOBAL APPEARANCE, COLOR & GRID SETTINGS
+    ======================================================================== */
+    function populateAdminAppearanceForm() {
+      const s = appState.siteSettings;
+      const pairs = [
+        ["app-bg-primary", "app-bg-primary-hex", s.themeBgPrimary || "#FFFFFF"],
+        ["app-bg-secondary", "app-bg-secondary-hex", s.themeBgSecondary || "#FAFAFA"],
+        ["app-text-primary", "app-text-primary-hex", s.themeTextPrimary || "#000000"],
+        ["app-text-secondary", "app-text-secondary-hex", s.themeTextSecondary || "#525252"],
+        ["app-accent-primary", "app-accent-primary-hex", s.themeAccentPrimary || "#000000"],
+        ["app-accent-text", "app-accent-text-hex", s.themeAccentText || "#FFFFFF"],
+        ["app-grid-color", "app-grid-color-hex", s.gridColor || "#A3A3A3"]
+      ];
+      pairs.forEach(([pickerId, hexId, val]) => {
+        const pEl = document.getElementById(pickerId);
+        const hEl = document.getElementById(hexId);
+        if (pEl) pEl.value = val;
+        if (hEl) hEl.value = val;
+      });
+      const iconEl = document.getElementById("app-brand-icon");
+      if (iconEl) iconEl.value = s.brandIcon || "grid-node";
+      const tagEl = document.getElementById("app-brand-tagline");
+      if (tagEl) tagEl.value = s.brandTagline || "Unified AI Platform";
+      const opEl = document.getElementById("app-grid-opacity");
+      if (opEl) opEl.value = s.gridOpacity ?? 30;
+      const szEl = document.getElementById("app-grid-size");
+      if (szEl) szEl.value = s.gridSize ?? 36;
+      const enEl = document.getElementById("app-grid-enabled");
+      if (enEl) enEl.checked = s.gridEnabled !== false;
+    }
+
     window.syncColorHexInput = function (pickerId, hexId) {
       const p = document.getElementById(pickerId);
       const h = document.getElementById(hexId);
@@ -4073,8 +3902,7 @@ service cloud.firestore {
     };
 
     window.previewLiveAppearance = function () {
-      const tempSettings = {
-        ...appState.siteSettings,
+      Object.assign(appState.siteSettings, {
         themeBgPrimary: document.getElementById("app-bg-primary")?.value || "#FFFFFF",
         themeBgSecondary: document.getElementById("app-bg-secondary")?.value || "#FAFAFA",
         themeTextPrimary: document.getElementById("app-text-primary")?.value || "#000000",
@@ -4085,10 +3913,10 @@ service cloud.firestore {
         brandTagline: document.getElementById("app-brand-tagline")?.value || "Unified AI Platform",
         gridColor: document.getElementById("app-grid-color")?.value || "#A3A3A3",
         gridOpacity: Number(document.getElementById("app-grid-opacity")?.value ?? 30),
-        gridSize: Number(document.getElementById("app-grid-size")?.value || 36),
-        gridEnabled: Boolean(document.getElementById("app-grid-enabled")?.checked)
-      };
-      applyGlobalTheme(tempSettings);
+        gridSize: Number(document.getElementById("app-grid-size")?.value ?? 36),
+        gridEnabled: document.getElementById("app-grid-enabled")?.checked !== false
+      });
+      applyGlobalThemeAndBrand();
     };
 
     window.applyAppearancePreset = function (presetKey) {
@@ -4100,34 +3928,31 @@ service cloud.firestore {
           themeTextSecondary: "#525252",
           themeAccentPrimary: "#000000",
           themeAccentText: "#FFFFFF",
+          gridEnabled: true,
           gridColor: "#A3A3A3",
-          gridOpacity: 30,
-          gridSize: 36,
-          gridEnabled: true
+          gridOpacity: 30
         },
         dark: {
-          themeBgPrimary: "#09090B",
-          themeBgSecondary: "#18181B",
+          themeBgPrimary: "#0A0A0A",
+          themeBgSecondary: "#141414",
           themeTextPrimary: "#FAFAFA",
-          themeTextSecondary: "#A1A1AA",
+          themeTextSecondary: "#A3A3A3",
           themeAccentPrimary: "#FFFFFF",
-          themeAccentText: "#09090B",
-          gridColor: "#3F3F46",
-          gridOpacity: 30,
-          gridSize: 36,
-          gridEnabled: true
+          themeAccentText: "#000000",
+          gridEnabled: true,
+          gridColor: "#404040",
+          gridOpacity: 30
         },
         emerald: {
           themeBgPrimary: "#FFFFFF",
-          themeBgSecondary: "#ECFDF5",
-          themeTextPrimary: "#064E3B",
+          themeBgSecondary: "#F0FDF4",
+          themeTextPrimary: "#022C22",
           themeTextSecondary: "#374151",
-          themeAccentPrimary: "#065F46",
+          themeAccentPrimary: "#064E3B",
           themeAccentText: "#FFFFFF",
-          gridColor: "#A7F3D0",
-          gridOpacity: 30,
-          gridSize: 36,
-          gridEnabled: true
+          gridEnabled: true,
+          gridColor: "#A3A3A3",
+          gridOpacity: 30
         },
         navy: {
           themeBgPrimary: "#FFFFFF",
@@ -4136,84 +3961,78 @@ service cloud.firestore {
           themeTextSecondary: "#475569",
           themeAccentPrimary: "#0F172A",
           themeAccentText: "#FFFFFF",
-          gridColor: "#CBD5E1",
-          gridOpacity: 30,
-          gridSize: 36,
-          gridEnabled: true
+          gridEnabled: true,
+          gridColor: "#A3A3A3",
+          gridOpacity: 30
         }
       };
-      const chosen = presets[presetKey];
-      if (!chosen) return;
-      appState.siteSettings = { ...appState.siteSettings, ...chosen };
-      populateAdminFormsAndLists();
-      applyGlobalTheme(appState.siteSettings);
-      showToast(`Preset tema "${presetKey}" diterapkan. Klik Simpan untuk menyinkronkan ke semua akun.`);
+      if (!presets[presetKey]) return;
+      Object.assign(appState.siteSettings, presets[presetKey]);
+      populateAdminAppearanceForm();
+      applyGlobalThemeAndBrand();
+      showToast("Preset tema diterapkan. Klik Simpan untuk menyinkronkan ke semua akun.");
     };
 
     window.resetAppearanceToDefault = async function () {
       applyAppearancePreset("monochrome");
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
-      showToast("Tema dikembalikan ke Monokrom Hitam-Putih default.");
+      await persistSiteSettingsToFirestore();
+      showToast("Tampilan dikembalikan ke tema default.");
     };
 
     window.handleSaveAppearanceSettings = async function (e) {
       e.preventDefault();
-      appState.siteSettings = {
-        ...appState.siteSettings,
-        themeBgPrimary: document.getElementById("app-bg-primary").value,
-        themeBgSecondary: document.getElementById("app-bg-secondary").value,
-        themeTextPrimary: document.getElementById("app-text-primary").value,
-        themeTextSecondary: document.getElementById("app-text-secondary").value,
-        themeAccentPrimary: document.getElementById("app-accent-primary").value,
-        themeAccentText: document.getElementById("app-accent-text").value,
-        brandIcon: document.getElementById("app-brand-icon").value,
-        brandTagline: document.getElementById("app-brand-tagline").value.trim() || "Unified AI Platform",
-        gridColor: document.getElementById("app-grid-color").value,
-        gridOpacity: Number(document.getElementById("app-grid-opacity").value ?? 30),
-        gridSize: Number(document.getElementById("app-grid-size").value || 36),
-        gridEnabled: document.getElementById("app-grid-enabled").checked
-      };
-
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
-      refreshAllRenderedViews();
-      showToast("Pengaturan warna, ikon, dan tema global berhasil diterapkan ke semua akun!");
+      previewLiveAppearance();
+      await persistSiteSettingsToFirestore();
+      showToast("Pengaturan warna, ikon & background berhasil disimpan untuk semua akun.");
     };
 
-    /* --- 6. Admin Firebase Configuration --- */
+    /* =======================================================================
+       ADMIN — FIREBASE CONFIG FORM
+    ======================================================================== */
+    function populateAdminFirebaseForm() {
+      const cfg = appState.firebaseConfigObj || EMBEDDED_FIREBASE_CONFIG;
+      const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ""; };
+      setV("fb-apiKey", cfg.apiKey);
+      setV("fb-authDomain", cfg.authDomain);
+      setV("fb-databaseURL", cfg.databaseURL);
+      setV("fb-projectId", cfg.projectId);
+      setV("fb-storageBucket", cfg.storageBucket);
+      setV("fb-messagingSenderId", cfg.messagingSenderId);
+      setV("fb-appId", cfg.appId);
+    }
+
     window.parseRawFirebaseJson = function () {
       const raw = document.getElementById("fb-raw-json")?.value || "";
       try {
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (!match) throw new Error("Objek JSON tidak ditemukan.");
-        const normalized = match[0].replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":').replace(/'/g, '"');
-        const parsed = JSON.parse(normalized);
-        ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId"].forEach(k => {
-          const el = document.getElementById(`fb-${k}`);
-          if (el && parsed[k]) el.value = parsed[k];
-        });
-        showToast("Konfigurasi JSON berhasil diekstrak ke kolom!");
-      } catch (err) {
-        showToast("Format JSON tidak valid. Pastikan berisi properti apiKey, authDomain, projectId, dan appId.");
+        const parsed = JSON.parse(raw);
+        if (parsed.apiKey) document.getElementById("fb-apiKey").value = parsed.apiKey;
+        if (parsed.authDomain) document.getElementById("fb-authDomain").value = parsed.authDomain;
+        if (parsed.databaseURL) document.getElementById("fb-databaseURL").value = parsed.databaseURL;
+        if (parsed.projectId) document.getElementById("fb-projectId").value = parsed.projectId;
+        if (parsed.storageBucket) document.getElementById("fb-storageBucket").value = parsed.storageBucket;
+        if (parsed.messagingSenderId) document.getElementById("fb-messagingSenderId").value = parsed.messagingSenderId;
+        if (parsed.appId) document.getElementById("fb-appId").value = parsed.appId;
+        showToast("JSON firebaseConfig berhasil diekstrak ke form.");
+      } catch (_) {
+        showToast("Format JSON tidak valid. Pastikan menggunakan tanda kutip ganda pada key dan value.");
       }
     };
 
     window.handleSaveFirebaseConfig = async function (e) {
       e.preventDefault();
-      const cfg = {
+      const newCfg = {
         apiKey: document.getElementById("fb-apiKey").value.trim(),
         authDomain: document.getElementById("fb-authDomain").value.trim(),
+        databaseURL: document.getElementById("fb-databaseURL").value.trim(),
         projectId: document.getElementById("fb-projectId").value.trim(),
         storageBucket: document.getElementById("fb-storageBucket").value.trim(),
         messagingSenderId: document.getElementById("fb-messagingSenderId").value.trim(),
         appId: document.getElementById("fb-appId").value.trim()
       };
-
-      const ok = await connectToFirebaseApp(cfg, `aksa-custom-${Date.now()}`);
+      const ok = await connectToFirebaseApp(newCfg, `aksa-custom-${Date.now()}`);
       if (ok) {
-        refreshAllRenderedViews();
-        showToast(`Berhasil terhubung ke project Firebase: ${cfg.projectId}`);
-      } else {
-        showToast("Gagal menghubungkan konfigurasi Firebase.");
+        renderAdminOverviewStats();
+        showToast(`Terhubung ke Firebase project: ${newCfg.projectId}`);
       }
     };
 
@@ -4225,70 +4044,203 @@ service cloud.firestore {
       for (const f of appState.features) await persistFeatureToFirestore(f);
       for (const c of appState.customers) await persistCustomerToFirestore(c);
       for (const r of appState.referrals) await persistReferralToFirestore(r);
-      await persistPricingToFirestore(appState.pricing);
-      await persistSiteSettingsToFirestore(appState.siteSettings, appState.faqs);
-      showToast("Seluruh data berhasil disinkronkan ke Cloud Firestore!");
+      await persistPricingToFirestore();
+      await persistSiteSettingsToFirestore();
+      showToast("Seluruh data berhasil disinkronkan ke Cloud Firestore.");
     };
 
+    /* =======================================================================
+       MASTER REFRESH, NAVIGATION ROUTER & ADMIN AUTH HANDLERS
+    ======================================================================== */
     function refreshAllRenderedViews() {
-      applySiteSettingsToDOM();
-      renderFeatureCatalog();
+      applyGlobalThemeAndBrand();
+      renderLandingTexts();
+      renderCatalogSection();
       renderPricingSection();
       renderTestimonialsSection();
       renderFAQSection();
-
-      if (appState.currentRoute.startsWith("/fitur/") && appState.selectedDetailFeatureId) {
+      renderAdminOverviewStats();
+      renderAdminCustomersList();
+      renderAdminReferralsList();
+      renderAdminFeaturesList();
+      populateAdminPricingForm();
+      populateAdminWhatsAppForm();
+      populateAdminLandingForm();
+      populateAdminAppearanceForm();
+      populateAdminFirebaseForm();
+      if (appState.selectedDetailFeatureId) {
         renderFeatureDetailView(appState.selectedDetailFeatureId);
       }
-      if (appState.currentRoute === "/member" && appState.memberSession) {
+      if (appState.currentRoute === "/member") {
         renderMemberDashboard();
-      }
-      if (appState.currentRoute.startsWith("/dashboard") && appState.user) {
-        populateAdminFormsAndLists();
       }
     }
 
-    /* =======================================================================
-       ADMIN AUTHENTICATION & MOBILE MENU CONTROLS
-    ======================================================================== */
-    function showAdminAuthError(message) {
-      let box = document.getElementById("admin-auth-error-box");
-      if (!box) {
-        const form = document.getElementById("auth-form");
-        if (!form) return;
-        box = document.createElement("div");
-        box.id = "admin-auth-error-box";
-        box.className = "p-3.5 rounded-xl border border-black bg-neutral-100 text-xs text-black leading-relaxed";
-        form.prepend(box);
+    function syncAuthNavState() {
+      const desktopNav = document.getElementById("nav-auth-desktop");
+      const mobileNav = document.getElementById("nav-auth-mobile");
+      const userLabel = document.getElementById("dash-user-label");
+      if (userLabel && appState.user) {
+        userLabel.textContent = appState.user.name || appState.user.email || "Admin";
       }
-      box.innerHTML = message;
-      box.classList.remove("hidden");
+
+      if (appState.user) {
+        if (desktopNav) {
+          desktopNav.innerHTML = `
+            <button type="button" onclick="navigateTo('/member-login')" class="px-4 py-2.5 text-sm font-semibold text-black border border-neutral-300 hover:border-black rounded-lg transition-colors">
+              Masuk Member
+            </button>
+            <button type="button" onclick="navigateTo('/dashboard')" class="px-5 py-2.5 text-sm font-semibold bg-black text-white border border-black rounded-lg hover:bg-white hover:text-black transition-colors">
+              Dashboard Admin
+            </button>
+          `;
+        }
+        if (mobileNav) {
+          mobileNav.innerHTML = `
+            <button type="button" onclick="closeMobileMenu(); navigateTo('/dashboard')" class="w-full py-3 px-4 text-sm font-semibold bg-black text-white rounded-lg">
+              Buka Dashboard Admin
+            </button>
+          `;
+        }
+      }
     }
+
+    window.navigateTo = function (route) {
+      appState.currentRoute = route;
+      try {
+        window.history.replaceState(null, "", route === "/" ? "#" : `#${route}`);
+      } catch (_) {}
+
+      const views = ["view-landing", "view-feature-detail", "view-member-login", "view-member", "view-auth", "view-dashboard"];
+      views.forEach(v => document.getElementById(v)?.classList.add("hidden"));
+
+      if (route === "/" || route === "") {
+        document.getElementById("view-landing")?.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (route.startsWith("/fitur/")) {
+        const featureId = route.replace("/fitur/", "");
+        appState.selectedDetailFeatureId = featureId;
+        renderFeatureDetailView(featureId);
+        document.getElementById("view-feature-detail")?.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (route === "/member-login") {
+        const infoBox = document.getElementById("member-login-target-info");
+        const featNameEl = document.getElementById("member-login-feature-name");
+        const targetFeat = appState.pendingMemberFeatureId
+          ? appState.features.find(f => f.id === appState.pendingMemberFeatureId)
+          : null;
+        if (infoBox && featNameEl) {
+          if (targetFeat) {
+            featNameEl.textContent = targetFeat.name;
+            infoBox.classList.remove("hidden");
+          } else {
+            infoBox.classList.add("hidden");
+          }
+        }
+        document.getElementById("view-member-login")?.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (route === "/member") {
+        if (!appState.memberSession && !appState.user) {
+          navigateTo("/member-login");
+          return;
+        }
+        renderMemberDashboard();
+        document.getElementById("view-member")?.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (route === "/login" || route === "/register") {
+        if (appState.user) {
+          navigateTo("/dashboard");
+          return;
+        }
+        hideAdminAuthError();
+        document.getElementById("view-auth")?.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (route.startsWith("/dashboard")) {
+        if (!appState.user) {
+          navigateTo("/login");
+          return;
+        }
+        document.getElementById("view-dashboard")?.classList.remove("hidden");
+
+        const subviews = [
+          "dash-subview-overview",
+          "dash-subview-admin-customers",
+          "dash-subview-admin-features",
+          "dash-subview-admin-pricing",
+          "dash-subview-admin-whatsapp",
+          "dash-subview-admin-landing",
+          "dash-subview-admin-appearance",
+          "dash-subview-admin-firebase"
+        ];
+        subviews.forEach(s => document.getElementById(s)?.classList.add("hidden"));
+
+        document.querySelectorAll(".dash-nav-btn").forEach(btn => {
+          btn.classList.remove("bg-black", "text-white");
+          btn.classList.add("text-neutral-700", "hover:bg-neutral-100");
+        });
+
+        const routeMap = {
+          "/dashboard": { sub: "dash-subview-overview", nav: "dash-nav-home", label: "Dashboard Utama" },
+          "/dashboard/admin-customers": { sub: "dash-subview-admin-customers", nav: "dash-nav-admin-customers", label: "Pelanggan & Referral" },
+          "/dashboard/admin-features": { sub: "dash-subview-admin-features", nav: "dash-nav-admin-features", label: "Pengaturan Link Fitur" },
+          "/dashboard/admin-pricing": { sub: "dash-subview-admin-pricing", nav: "dash-nav-admin-pricing", label: "Pengaturan Pricing" },
+          "/dashboard/admin-whatsapp": { sub: "dash-subview-admin-whatsapp", nav: "dash-nav-admin-whatsapp", label: "Pengaturan WhatsApp" },
+          "/dashboard/admin-landing": { sub: "dash-subview-admin-landing", nav: "dash-nav-admin-landing", label: "Edit Seluruh Landing Page" },
+          "/dashboard/admin-appearance": { sub: "dash-subview-admin-appearance", nav: "dash-nav-admin-appearance", label: "Warna, Ikon & Tema Global" },
+          "/dashboard/admin-firebase": { sub: "dash-subview-admin-firebase", nav: "dash-nav-admin-firebase", label: "Pengaturan Firebase" }
+        };
+
+        const active = routeMap[route] || routeMap["/dashboard"];
+        document.getElementById(active.sub)?.classList.remove("hidden");
+        const navBtn = document.getElementById(active.nav);
+        if (navBtn) {
+          navBtn.classList.add("bg-black", "text-white");
+          navBtn.classList.remove("text-neutral-700", "hover:bg-neutral-100");
+        }
+        const crumb = document.getElementById("dash-breadcrumb");
+        if (crumb) crumb.textContent = active.label;
+        refreshAllRenderedViews();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    };
 
     window.handleAuthSubmit = async function (e) {
       e.preventDefault();
-      const email = document.getElementById("auth-email").value.trim();
-      const password = document.getElementById("auth-password").value;
+      hideAdminAuthError();
+
+      const email = (document.getElementById("auth-email")?.value || "").trim();
+      const password = document.getElementById("auth-password")?.value || "";
       const submitBtn = document.getElementById("auth-submit-btn");
-      const errBox = document.getElementById("admin-auth-error-box");
-      if (errBox) errBox.classList.add("hidden");
 
       if (!appState.auth) {
-        showAdminAuthError("<strong>Koneksi Firebase belum siap.</strong> Muat ulang halaman lalu coba kembali.");
+        await initFirebaseIntegration();
+      }
+      if (!appState.auth) {
+        showAdminAuthError("<strong>Firebase Auth belum siap.</strong> Periksa koneksi internet dan muat ulang halaman.");
         return;
       }
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = "Memverifikasi ke Firebase...";
+        submitBtn.textContent = "Memverifikasi Akun Firebase...";
       }
 
       try {
-        // Ensure any anonymous session is cleared cleanly before signing in with Email/Password
-        if (appState.auth.currentUser && appState.auth.currentUser.isAnonymous) {
-          await signOut(appState.auth);
-        }
-
         const cred = await signInWithEmailAndPassword(appState.auth, email, password);
         appState.user = {
           name: cred.user.displayName || email.split("@")[0] || "Admin Platform",
@@ -4301,20 +4253,22 @@ service cloud.firestore {
         navigateTo("/dashboard");
       } catch (authErr) {
         const code = authErr.code || "unknown";
-        let detail = `Gagal masuk (${escapeHTML(code)}): ${escapeHTML(authErr.message)}`;
+        const host = window.location.hostname || window.location.origin;
+        const proj = appState.firebaseConfigObj?.projectId || "p-c410f";
+        let detail = `<strong>Kode Error Firebase:</strong> <code>${escapeHTML(code)}</code><br/><strong>Pesan:</strong> ${escapeHTML(authErr.message)}<br/><strong>Project:</strong> <code>${escapeHTML(proj)}</code> | <strong>Domain:</strong> <code>${escapeHTML(host)}</code>`;
 
         if (code === "auth/operation-not-allowed") {
-          detail = "<strong>Metode Email/Password belum diaktifkan:</strong> Buka Firebase Console → <em>Authentication → Sign-in method</em> → aktifkan <strong>Email/Password</strong> lalu klik Save.";
+          detail += "<br/><br/><strong>Solusi:</strong> Buka Firebase Console → <em>Authentication → Sign-in method</em> → aktifkan <strong>Email/Password</strong> lalu klik Save.";
         } else if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
-          detail = "<strong>Email atau Password tidak cocok:</strong> Pastikan user sudah dibuat di tab <em>Authentication → Users</em> pada project <code>p-c410f</code> dan tidak ada spasi berlebih.";
+          detail += "<br/><br/><strong>Solusi:</strong> Pastikan email & password sama persis dengan user di <em>Authentication → Users</em> pada project <code>p-c410f</code>.";
         } else if (code === "auth/unauthorized-domain") {
-          detail = "<strong>Domain belum diizinkan:</strong> Tambahkan domain website Anda di Firebase Console → <em>Authentication → Settings → Authorized domains</em>.";
-        } else if (code === "auth/too-many-requests") {
-          detail = "<strong>Terlalu banyak percobaan gagal:</strong> Tunggu beberapa menit atau reset password user di Firebase Console.";
+          detail += `<br/><br/><strong>Solusi:</strong> Tambahkan domain <code>${escapeHTML(host)}</code> ke Firebase Console → <em>Authentication → Settings → Authorized domains</em>.`;
+        } else if (code === "auth/network-request-failed") {
+          detail += "<br/><br/><strong>Solusi:</strong> Koneksi jaringan ke Firebase terblokir atau offline. Periksa koneksi internet / ekstensi browser.";
         }
 
         showAdminAuthError(detail);
-        showToast("Login admin gagal. Periksa pesan detail pada form.");
+        showToast(`Login gagal (${code})`);
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -4327,7 +4281,6 @@ service cloud.firestore {
       if (appState.auth) {
         try {
           await signOut(appState.auth);
-          await signInAnonymously(appState.auth);
         } catch (_) {}
       }
       appState.user = null;
