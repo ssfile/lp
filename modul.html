@@ -1908,43 +1908,67 @@
             const intiMin = Math.max(20, totalMin - pendMin - penutupMin);
 
             return `
-                <h3>LANGKAH-LANGKAH PEMBELAJARAN &amp; CONTOH DIALOG LENGKAP (TOTAL: ${escapeHtml(inp.waktu)})</h3>
-                <h4>A. Kegiatan Pendahuluan (${pendMin} Menit)</h4>
-                <ol>
-                    <li><strong>Salam, Doa &amp; Kesiapan Kelas (${Math.max(2, Math.round(pendMin * 0.25))} Menit):</strong> Guru menyapa, memeriksa kerapian/kehadiran, dan memimpin doa.<br>
-                    <em>Contoh Ucapan Guru:</em> "Selamat pagi anak-anak. Sebelum memulai pelajaran ${escapeHtml(inp.mapel)}, mari kita berdoa bersama dan periksa kesiapan buku serta meja belajar kalian."<br>
-                    <em>Contoh Respons Murid:</em> "Selamat pagi, Bu/Pak! Kami sudah siap mengikuti pembelajaran."</li>
-                    <li><strong>Apersepsi &amp; Asesmen Awal (${Math.max(3, Math.round(pendMin * 0.35))} Menit):</strong> Guru mengaitkan pengalaman awal murid dengan <strong>${escapeHtml(inp.materi)}</strong>.<br>
-                    <em>Contoh Ucapan Guru:</em> "Siapa yang pagi tadi sempat sarapan atau melihat peristiwa terkait <em>${escapeHtml(inp.materi)}</em> di rumah? Coba ceritakan satu hal yang kalian perhatikan."<br>
-                    <em>Contoh Respons Murid:</em> Murid menyebutkan contoh pengalaman sehari-hari yang berkaitan dengan topik.</li>
-                    <li><strong>Pertanyaan Pemantik, Tujuan &amp; Pengantar Aktivitas (${Math.max(3, pendMin - Math.max(2, Math.round(pendMin * 0.25)) - Math.max(3, Math.round(pendMin * 0.35)))} Menit):</strong> Guru menyampaikan tujuan belajar dan pertanyaan pemantik.<br>
-                    <em>Contoh Ucapan Guru:</em> "Hari ini kita akan mempelajari <strong>${escapeHtml(inp.materi)}</strong> menggunakan model <strong>${escapeHtml(inp.model)}</strong>. Pertanyaan pemantiknya: bagaimana cara kita mengevaluasi penerapan <em>${escapeHtml(inp.materi)}</em> agar tepat sasaran?"</li>
-                </ol>
-
-                <h4>B. Kegiatan Inti — Model ${escapeHtml(inp.model)} (${intiMin} Menit)</h4>
-                <ol>
-                    <li><strong>Tahap 1 — Orientasi Masalah &amp; Observasi Konteks:</strong> Guru menyajikan masalah nyata terkait <strong>${escapeHtml(inp.materi)}</strong> untuk kelas ${escapeHtml(inp.kelas)}.<br>
-                    <em>Contoh Ucapan Guru:</em> "Perhatikan kasus pada lembar kerja kalian mengenai <em>${escapeHtml(inp.materi)}</em>. Menurut kalian, bagian mana yang paling perlu dicermati terlebih dahulu?"</li>
-                    <li><strong>Tahap 2 — Mengorganisasikan Murid &amp; Merancang Penyelidikan:</strong> Murid berkelompok, membagi peran, dan menyiapkan langkah analisis.<br>
-                    <em>Contoh Ucapan Guru:</em> "Silakan bentuk kelompok beranggotakan 4–5 orang, tetapkan moderator, pencatat, dan penyaji, lalu diskusikan langkah penyelesaiannya."</li>
-                    <li><strong>Tahap 3 — Membimbing Penyelidikan Mandiri &amp; Kelompok:</strong> Guru berkeliling memberi <em>scaffolding</em> dan pertanyaan penuntun.<br>
-                    <em>Contoh Ucapan Guru:</em> "Mengapa kelompok kalian memilih solusi tersebut untuk kasus <em>${escapeHtml(inp.materi)}</em>? Bukti apa yang mendukung alasan kalian?"</li>
-                    <li><strong>Tahap 4 — Mengembangkan &amp; Menyajikan Hasil Karya:</strong> Kelompok menyusun simpulan/produk dan mempresentasikannya.<br>
-                    <em>Contoh Ucapan Guru:</em> "Silakan perwakilan kelompok memaparkan hasil analisisnya, sementara kelompok lain menyiapkan tanggapan yang santun dan berbasis bukti."</li>
-                    <li><strong>Tahap 5 — Menganalisis &amp; Mengevaluasi Proses Pemecahan Masalah:</strong> Guru dan murid menyatukan konsep inti serta mengoreksi miskonsepsi.<br>
-                    <em>Contoh Ucapan Guru:</em> "Mari kita bandingkan hasil tiap kelompok dan tegaskan kembali prinsip utama pada <strong>${escapeHtml(inp.materi)}</strong>."</li>
-                </ol>
-
-                <h4>C. Kegiatan Penutup (${penutupMin} Menit)</h4>
-                <ol>
-                    <li><strong>Penyimpulan &amp; Penguatan Konsep (${Math.max(4, Math.round(penutupMin * 0.4))} Menit):</strong> Murid menyimpulkan inti materi dan guru memberi penguatan.<br>
-                    <em>Contoh Ucapan Guru:</em> "Siapa yang bisa merangkum 2 poin terpenting dari pembelajaran <strong>${escapeHtml(inp.materi)}</strong> hari ini?"<br>
-                    <em>Contoh Respons Murid:</em> Murid menyampaikan kesimpulan inti materi secara runtut.</li>
-                    <li><strong>Refleksi, Umpan Balik &amp; Asesmen Penutup (${Math.max(3, Math.round(penutupMin * 0.35))} Menit):</strong> Murid menuliskan hal yang dipahami dan tantangan belajar.<br>
-                    <em>Contoh Ucapan Guru:</em> "Tuliskan di buku catatan kalian: satu hal yang sudah kalian pahami tentang <em>${escapeHtml(inp.materi)}</em> dan satu hal yang masih ingin ditanyakan."</li>
-                    <li><strong>Tindak Lanjut, Doa &amp; Salam Penutup (${Math.max(3, penutupMin - Math.max(4, Math.round(penutupMin * 0.4)) - Math.max(3, Math.round(penutupMin * 0.35)))} Menit):</strong> Guru menyampaikan tugas lanjutan, memimpin doa, dan menutup kelas.<br>
-                    <em>Contoh Ucapan Guru:</em> "Untuk pertemuan berikutnya, pelajari lanjutan materi dan siapkan catatan pengamatan kalian. Mari kita tutup dengan doa dan salam."</li>
-                </ol>
+                <h3>13–16. LANGKAH-LANGKAH PEMBELAJARAN &amp; CONTOH DIALOG LENGKAP (TOTAL: ${escapeHtml(inp.waktu)})</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:18%;">Tahap Pembelajaran</th>
+                            <th style="width:14%;">Alokasi Waktu</th>
+                            <th style="width:34%;">Kegiatan Guru &amp; Murid</th>
+                            <th style="width:34%;">Contoh Dialog Kelas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>13. Kegiatan Pendahuluan — Salam, Doa &amp; Kesiapan</strong></td>
+                            <td>${Math.max(2, Math.round(pendMin * 0.25))} Menit</td>
+                            <td>Guru menyapa, memeriksa kehadiran serta kerapian kelas, dan memimpin doa sebelum belajar <strong>${escapeHtml(inp.mapel)}</strong>.</td>
+                            <td><strong>Guru:</strong> "Selamat pagi anak-anak. Sebelum memulai pelajaran ${escapeHtml(inp.mapel)}, mari kita berdoa bersama dan periksa kesiapan belajar kalian."<br><strong>Murid:</strong> "Selamat pagi, Bu/Pak! Kami sudah siap."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>13. Kegiatan Pendahuluan — Apersepsi &amp; Asesmen Awal</strong></td>
+                            <td>${Math.max(3, Math.round(pendMin * 0.35))} Menit</td>
+                            <td>Guru mengaitkan pengalaman awal murid dengan <strong>${escapeHtml(inp.materi)}</strong> dan memetakan kesiapan belajar.</td>
+                            <td><strong>Guru:</strong> "Siapa yang pagi tadi sempat mengamati hal terkait <em>${escapeHtml(inp.materi)}</em>? Coba ceritakan satu contohnya."<br><strong>Murid:</strong> Murid menyampaikan pengalaman awalnya.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>13. Kegiatan Pendahuluan — Pemantik &amp; Tujuan</strong></td>
+                            <td>${Math.max(3, pendMin - Math.max(2, Math.round(pendMin * 0.25)) - Math.max(3, Math.round(pendMin * 0.35)))} Menit</td>
+                            <td>Guru menyampaikan tujuan pembelajaran, alur kegiatan, dan pertanyaan pemantik topik <strong>${escapeHtml(inp.materi)}</strong>.</td>
+                            <td><strong>Guru:</strong> "Hari ini kita membahas <strong>${escapeHtml(inp.materi)}</strong> melalui <strong>${escapeHtml(inp.model)}</strong>. Bagaimana kita memastikan penerapannya tepat?"</td>
+                        </tr>
+                        <tr>
+                            <td><strong>14. Kegiatan Inti — Orientasi Masalah &amp; Observasi</strong></td>
+                            <td>${Math.max(4, Math.round(intiMin * 0.2))} Menit</td>
+                            <td>Guru menghadirkan kasus kontekstual <strong>${escapeHtml(inp.materi)}</strong> untuk kelas ${escapeHtml(inp.kelas)} dan memantik identifikasi masalah.</td>
+                            <td><strong>Guru:</strong> "Perhatikan studi kasus <em>${escapeHtml(inp.materi)}</em>. Bagian mana yang paling perlu kita cermati lebih dulu?"</td>
+                        </tr>
+                        <tr>
+                            <td><strong>14. Kegiatan Inti — Organisasi &amp; Penyelidikan Kelompok</strong></td>
+                            <td>${Math.max(6, Math.round(intiMin * 0.35))} Menit</td>
+                            <td>Murid bekerja dalam kelompok, membagi peran, menelaah konsep, dan mengumpulkan bukti pendukung.</td>
+                            <td><strong>Guru:</strong> "Diskusikan bukti yang mendukung solusi kelompok kalian."<br><strong>Murid:</strong> "Kami menemukan bahwa faktor ini paling berpengaruh karena..."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>14. Kegiatan Inti — Penyajian &amp; Evaluasi Proses</strong></td>
+                            <td>${Math.max(6, intiMin - Math.max(4, Math.round(intiMin * 0.2)) - Math.max(6, Math.round(intiMin * 0.35)))} Menit</td>
+                            <td>Kelompok mempresentasikan hasil analisis, saling menanggapi, dan guru meluruskan konsep inti <strong>${escapeHtml(inp.materi)}</strong>.</td>
+                            <td><strong>Guru:</strong> "Mari kita simpulkan bersama prinsip utama pada <strong>${escapeHtml(inp.materi)}</strong> dan kaitannya dengan kasus tadi."</td>
+                        </tr>
+                        <tr>
+                            <td><strong>15. Kegiatan Penutup — Penyimpulan &amp; Refleksi</strong></td>
+                            <td>${Math.max(5, Math.round(penutupMin * 0.55))} Menit</td>
+                            <td>Murid menyimpulkan poin utama materi dan menuliskan refleksi pemahaman serta bagian yang masih perlu diperdalam.</td>
+                            <td><strong>Guru:</strong> "Siapa yang bisa merangkum 2 hal terpenting dari <strong>${escapeHtml(inp.materi)}</strong> hari ini?"<br><strong>Murid:</strong> Murid menyampaikan simpulan singkat.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>16. Kegiatan Penutup — Tindak Lanjut &amp; Penutup</strong></td>
+                            <td>${Math.max(4, penutupMin - Math.max(5, Math.round(penutupMin * 0.55)))} Menit</td>
+                            <td>Guru menyampaikan tugas tindak lanjut, memberi apresiasi, memimpin doa, dan menutup pembelajaran dengan salam.</td>
+                            <td><strong>Guru:</strong> "Siapkan catatan lanjutan untuk pertemuan berikutnya. Mari kita tutup dengan doa dan salam."</td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
         }
 
@@ -1955,121 +1979,164 @@
                     <h2>${escapeHtml(inp.mapel.toUpperCase())} — ${escapeHtml(inp.materi.toUpperCase())}</h2>
                 </div>
 
-                <h3>1. IDENTITAS MODUL</h3>
                 <table>
+                    <thead>
+                        <tr>
+                            <th style="width:10%;">No</th>
+                            <th style="width:26%;">Komponen Modul Ajar</th>
+                            <th style="width:64%;">Uraian / Isi Komponen</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><th style="width:28%;">Mata Pelajaran</th><td>${escapeHtml(inp.mapel)}</td><th style="width:22%;">Jenjang / Fase</th><td>${escapeHtml(inp.jenjang)}</td></tr>
-                        <tr><th>Kelas / Semester</th><td>${escapeHtml(inp.kelas)} / Ganjil–Genap</td><th>Alokasi Waktu</th><td>${escapeHtml(inp.waktu)}</td></tr>
-                        <tr><th>Materi Pokok</th><td colspan="3"><strong>${escapeHtml(inp.materi)}</strong></td></tr>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td><strong>Identitas Modul</strong></td>
+                            <td>
+                                <strong>Mata Pelajaran:</strong> ${escapeHtml(inp.mapel)} | <strong>Jenjang / Fase:</strong> ${escapeHtml(inp.jenjang)}<br>
+                                <strong>Kelas / Semester:</strong> ${escapeHtml(inp.kelas)} / Ganjil–Genap | <strong>Alokasi Waktu:</strong> ${escapeHtml(inp.waktu)}<br>
+                                <strong>Materi Pokok:</strong> <strong>${escapeHtml(inp.materi)}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td><strong>Kompetensi Awal</strong></td>
+                            <td>Peserta didik pada ${escapeHtml(inp.kelas)} memiliki pengetahuan awal mengenai konsep dasar dan pengalaman sehari-hari yang berkaitan dengan <strong>${escapeHtml(inp.materi)}</strong> serta mampu berdiskusi dalam kelompok kecil.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td><strong>Profil Pelajar Pancasila / Dimensi Profil Lulusan</strong></td>
+                            <td>
+                                <strong>Bernalar Kritis:</strong> Menganalisis informasi, mengevaluasi argumen, dan menarik simpulan berdasarkan bukti pada topik <em>${escapeHtml(inp.materi)}</em>.<br>
+                                <strong>Gotong Royong / Kolaborasi:</strong> Bekerja sama aktif, menghargai pendapat, dan berbagi peran dalam diskusi maupun tugas kelompok.<br>
+                                <strong>Kemandirian:</strong> Bertanggung jawab menyelesaikan tugas individu dan merefleksikan proses belajar secara jujur.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td><strong>Sarana dan Prasarana</strong></td>
+                            <td>Buku teks mata pelajaran ${escapeHtml(inp.mapel)}, LKPD cetak/digital, papan tulis/spidol, proyektor/media visual pendukung, serta alat tulis peserta didik.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td><strong>Target Murid</strong></td>
+                            <td>Peserta didik reguler/tipikal pada ${escapeHtml(inp.kelas)} dengan keragaman gaya belajar (visual, auditori, kinestetik) serta dukungan diferensiasi bagi murid yang membutuhkan bimbingan tambahan maupun pengayaan.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6</strong></td>
+                            <td><strong>Model dan Metode Pembelajaran</strong></td>
+                            <td><strong>Model Pembelajaran:</strong> ${escapeHtml(inp.model)} • <strong>Metode:</strong> Diskusi kelompok, studi kasus kontekstual, tanya jawab, presentasi, dan refleksi terbimbing.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7</strong></td>
+                            <td><strong>Capaian Pembelajaran (CP)</strong></td>
+                            <td>Pada akhir fase (${escapeHtml(inp.jenjang)}), peserta didik memahami konsep, prinsip, dan penerapan <strong>${escapeHtml(inp.materi)}</strong> pada mata pelajaran ${escapeHtml(inp.mapel)} serta mampu mengomunikasikan hasil analisisnya secara sistematis dan bertanggung jawab.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8</strong></td>
+                            <td><strong>Tujuan Pembelajaran (TP)</strong></td>
+                            <td>
+                                1. Peserta didik mampu menjelaskan pengertian dan unsur utama <strong>${escapeHtml(inp.materi)}</strong> secara tepat dan sistematis.<br>
+                                2. Peserta didik mampu menganalisis hubungan antarunsur serta contoh penerapan <strong>${escapeHtml(inp.materi)}</strong> pada studi kasus nyata.<br>
+                                3. Peserta didik mampu menyusun dan mempresentasikan solusi atau simpulan terkait <strong>${escapeHtml(inp.materi)}</strong> dengan argumen yang logis.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>9</strong></td>
+                            <td><strong>Pemahaman Bermakna</strong></td>
+                            <td>Memahami <strong>${escapeHtml(inp.materi)}</strong> membantu peserta didik mengambil keputusan yang tepat, kritis, dan bertanggung jawab dalam kehidupan sehari-hari di lingkungan rumah maupun sekolah.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>10</strong></td>
+                            <td><strong>Pertanyaan Pemantik</strong></td>
+                            <td>
+                                • Apa yang terjadi apabila konsep dan prinsip dalam <strong>${escapeHtml(inp.materi)}</strong> diabaikan dalam situasi nyata?<br>
+                                • Bagaimana cara membedakan informasi yang akurat dan tidak akurat terkait <strong>${escapeHtml(inp.materi)}</strong>?
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>11</strong></td>
+                            <td><strong>Persiapan Pembelajaran</strong></td>
+                            <td>1. Menyiapkan perangkat asesmen awal, lembar kasus/LKPD, dan media ilustrasi materi <strong>${escapeHtml(inp.materi)}</strong>.<br>2. Menata formasi tempat duduk kelompok dan memastikan alokasi waktu tiap tahap pembelajaran realistis.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>12</strong></td>
+                            <td><strong>Materi Pembelajaran Lengkap</strong></td>
+                            <td>Materi <strong>${escapeHtml(inp.materi)}</strong> pada ${escapeHtml(inp.kelas)} mencakup definisi konsep dasar, identifikasi komponen/unsur utama, alur hubungan/proses, contoh penerapan dalam kehidupan sehari-hari, serta analisis studi kasus kontekstual yang selaras dengan tujuan pembelajaran.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>13–16</strong></td>
+                            <td><strong>Tahap Pembelajaran &amp; Dialog</strong></td>
+                            <td>Diuraikan rinci dalam tabel <strong>Tahap Pembelajaran (Pendahuluan, Inti &amp; Penutup)</strong> di bawah ini agar setiap tahap dan alokasi waktunya terstruktur jelas.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>17</strong></td>
+                            <td><strong>Sintaks Model Pembelajaran (${escapeHtml(inp.model.toUpperCase())})</strong></td>
+                            <td>1. Orientasi / Stimulus masalah <em>${escapeHtml(inp.materi)}</em>; 2. Organisasi kelompok &amp; perumusan fokus; 3. Penyelidikan &amp; pengumpulan bukti; 4. Penyajian / presentasi hasil; 5. Analisis, evaluasi &amp; penguatan konsep.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>18</strong></td>
+                            <td><strong>Asesmen Awal</strong></td>
+                            <td>Tanya jawab lisan atau kuis singkat 3 pertanyaan prasyarat mengenai <strong>${escapeHtml(inp.materi)}</strong> untuk memetakan kesiapan belajar awal peserta didik.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>19</strong></td>
+                            <td><strong>Asesmen Formatif</strong></td>
+                            <td>Observasi keaktifan diskusi kelompok, ketepatan pengisian LKPD, dan ketajaman argumen saat sesi presentasi serta tanya jawab.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>20</strong></td>
+                            <td><strong>Asesmen Sumatif</strong></td>
+                            <td>Tes uraian/studi kasus pada akhir pembelajaran untuk mengukur ketercapaian seluruh Tujuan Pembelajaran pada topik <strong>${escapeHtml(inp.materi)}</strong>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>21</strong></td>
+                            <td><strong>Instrumen Penilaian</strong></td>
+                            <td>Lembar observasi sikap/kolaborasi, lembar penilaian produk/LKPD, dan butir soal uraian/studi kasus berbasis indikator TP.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>22</strong></td>
+                            <td><strong>Rubrik Penilaian (Skala 1–4)</strong></td>
+                            <td>
+                                <strong>Skor 4 (Sangat Baik):</strong> Menjelaskan konsep &amp; analisis kasus secara lengkap, tepat, dan berargumen logis.<br>
+                                <strong>Skor 3 (Baik):</strong> Menjelaskan konsep dengan tepat dan menganalisis kasus cukup runtut.<br>
+                                <strong>Skor 2 (Cukup):</strong> Penjelasan/analisis masih sebagian tepat dan memerlukan arahan.<br>
+                                <strong>Skor 1 (Perlu Bimbingan):</strong> Belum memahami konsep inti atau belum menjawab secara tepat.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>23</strong></td>
+                            <td><strong>Lembar Kerja Peserta Didik (LKPD)</strong></td>
+                            <td>LKPD memuat identitas, tujuan kegiatan, stimulus kasus <strong>${escapeHtml(inp.materi)}</strong>, langkah kerja diskusi, ruang jawaban, kesimpulan, dan refleksi singkat.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>24</strong></td>
+                            <td><strong>Pengayaan dan Remedial</strong></td>
+                            <td><strong>Pengayaan:</strong> Tantangan analisis kasus lanjutan/HOTS atau perancangan proyek mini terkait <em>${escapeHtml(inp.materi)}</em>.<br><strong>Remedial:</strong> Bimbingan ulang konsep dasar dengan contoh yang lebih sederhana diikuti evaluasi ulang terarah.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>25</strong></td>
+                            <td><strong>Refleksi Guru</strong></td>
+                            <td>Guru mengevaluasi ketercapaian TP, ketepatan waktu tiap tahap pembelajaran, tingkat partisipasi murid, dan efektivitas media pembelajaran untuk perbaikan pertemuan berikutnya.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>26</strong></td>
+                            <td><strong>Refleksi Murid</strong></td>
+                            <td>Murid menuliskan hal baru yang dipahami, bagian yang masih membingungkan, serta manfaat materi <strong>${escapeHtml(inp.materi)}</strong> dalam kehidupan sehari-hari.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>27</strong></td>
+                            <td><strong>Glosarium</strong></td>
+                            <td><strong>${escapeHtml(inp.materi)}:</strong> Pokok bahasan utama dalam pembelajaran ${escapeHtml(inp.mapel)} yang dipelajari melalui aktivitas terstruktur. • <strong>Scaffolding:</strong> Dukungan belajar bertahap hingga murid mandiri.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>28</strong></td>
+                            <td><strong>Daftar Pustaka</strong></td>
+                            <td>Kemendikbudristek. (2024). <em>Capaian Pembelajaran pada Kurikulum Merdeka</em>. Jakarta: Kemendikbudristek; serta Buku Teks Utama <strong>${escapeHtml(inp.mapel)}</strong> (${escapeHtml(inp.jenjang)}).</td>
+                        </tr>
                     </tbody>
                 </table>
-
-                <h3>2. KOMPETENSI AWAL</h3>
-                <p>Peserta didik pada ${escapeHtml(inp.kelas)} memiliki pengetahuan awal mengenai konsep dasar dan pengalaman sehari-hari yang berkaitan dengan <strong>${escapeHtml(inp.materi)}</strong> serta mampu berdiskusi dalam kelompok kecil.</p>
-
-                <h3>3. PROFIL PELAJAR PANCASILA / DIMENSI PROFIL LULUSAN</h3>
-                <ul>
-                    <li><strong>Bernalar Kritis:</strong> Menganalisis informasi, mengevaluasi argumen, dan menarik simpulan berdasarkan bukti pada topik <em>${escapeHtml(inp.materi)}</em>.</li>
-                    <li><strong>Gotong Royong / Kolaborasi:</strong> Bekerja sama secara aktif, menghargai pendapat teman, dan berbagi peran dalam diskusi maupun tugas kelompok.</li>
-                    <li><strong>Kemandirian:</strong> Bertanggung jawab menyelesaikan tugas individu dan merefleksikan proses belajar secara jujur.</li>
-                </ul>
-
-                <h3>4. SARANA DAN PRASARANA</h3>
-                <p>Buku teks mata pelajaran ${escapeHtml(inp.mapel)}, LKPD cetak/digital, papan tulis/spidol, proyektor/media visual pendukung, serta alat tulis peserta didik.</p>
-
-                <h3>5. TARGET MURID</h3>
-                <p>Peserta didik reguler/tipikal pada ${escapeHtml(inp.kelas)} dengan keragaman gaya belajar (visual, auditori, kinestetik) serta dukungan diferensiasi bagi murid yang membutuhkan bimbingan tambahan maupun pengayaan.</p>
-
-                <h3>6. MODEL DAN METODE PEMBELAJARAN</h3>
-                <p><strong>Model Pembelajaran:</strong> ${escapeHtml(inp.model)} • <strong>Metode:</strong> Diskusi kelompok, studi kasus kontekstual, tanya jawab, presentasi, dan refleksi terbimbing.</p>
-
-                <h3>7. CAPAIAN PEMBELAJARAN (CP)</h3>
-                <p>Pada akhir fase (${escapeHtml(inp.jenjang)}), peserta didik memahami konsep, prinsip, dan penerapan <strong>${escapeHtml(inp.materi)}</strong> pada mata pelajaran ${escapeHtml(inp.mapel)} serta mampu mengomunikasikan hasil analisisnya secara sistematis dan bertanggung jawab.</p>
-
-                <h3>8. TUJUAN PEMBELAJARAN (TP)</h3>
-                <ol>
-                    <li>Peserta didik mampu menjelaskan pengertian dan unsur utama <strong>${escapeHtml(inp.materi)}</strong> secara tepat dan sistematis.</li>
-                    <li>Peserta didik mampu menganalisis hubungan antarunsur serta contoh penerapan <strong>${escapeHtml(inp.materi)}</strong> pada studi kasus nyata.</li>
-                    <li>Peserta didik mampu menyusun dan mempresentasikan solusi atau simpulan terkait <strong>${escapeHtml(inp.materi)}</strong> dengan argumen yang logis.</li>
-                </ol>
-
-                <h3>9. PEMAHAMAN BERMAKNA</h3>
-                <p>Memahami <strong>${escapeHtml(inp.materi)}</strong> membantu peserta didik mengambil keputusan yang tepat, kritis, dan bertanggung jawab dalam kehidupan sehari-hari di lingkungan rumah maupun sekolah.</p>
-
-                <h3>10. PERTANYAAN PEMANTIK</h3>
-                <ul>
-                    <li>Apa yang terjadi apabila konsep dan prinsip dalam <strong>${escapeHtml(inp.materi)}</strong> diabaikan dalam situasi nyata?</li>
-                    <li>Bagaimana cara membedakan informasi yang akurat dan tidak akurat terkait <strong>${escapeHtml(inp.materi)}</strong>?</li>
-                </ul>
-
-                <h3>11. PERSIAPAN PEMBELAJARAN</h3>
-                <ol>
-                    <li>Menyiapkan perangkat asesmen awal, lembar kasus/LKPD, dan media ilustrasi materi <strong>${escapeHtml(inp.materi)}</strong>.</li>
-                    <li>Menata formasi tempat duduk kelompok dan memastikan alokasi waktu tiap tahap pembelajaran realistis.</li>
-                </ol>
-
-                <h3>12. MATERI PEMBELAJARAN LENGKAP</h3>
-                <p>Materi <strong>${escapeHtml(inp.materi)}</strong> pada ${escapeHtml(inp.kelas)} mencakup definisi konsep dasar, identifikasi komponen/unsur utama, alur hubungan/proses, contoh penerapan dalam kehidupan sehari-hari, serta analisis studi kasus kontekstual yang selaras dengan tujuan pembelajaran.</p>
 
                 ${buildDetailedAlurHtml(inp)}
-
-                <h3>17. SINTAKS MODEL PEMBELAJARAN (${escapeHtml(inp.model.toUpperCase())})</h3>
-                <table>
-                    <thead><tr><th style="width:10%;">No</th><th style="width:28%;">Tahapan Sintaks</th><th>Fokus Aktivitas Guru &amp; Murid</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td>Orientasi / Stimulus</td><td>Menghadirkan fenomena/masalah kontekstual terkait ${escapeHtml(inp.materi)} dan menggali gagasan awal.</td></tr>
-                        <tr><td>2</td><td>Organisasi / Identifikasi</td><td>Membagi kelompok kerja, merumuskan masalah/pertanyaan kunci, dan menyusun rencana kerja.</td></tr>
-                        <tr><td>3</td><td>Penyelidikan / Pengumpulan Data</td><td>Menelusuri konsep, menganalisis contoh/data, dan berdiskusi dengan bimbingan bertahap (scaffolding).</td></tr>
-                        <tr><td>4</td><td>Penyajian / Pembuktian</td><td>Menyusun laporan/paparan hasil analisis dan mempresentasikannya di depan kelas.</td></tr>
-                        <tr><td>5</td><td>Analisis &amp; Evaluasi</td><td>Menyimpulkan konsep utama, melakukan refleksi, dan menindaklanjuti hasil belajar.</td></tr>
-                    </tbody>
-                </table>
-
-                <h3>18. ASESMEN AWAL</h3>
-                <p>Tanya jawab lisan atau kuis singkat 3 pertanyaan prasyarat mengenai <strong>${escapeHtml(inp.materi)}</strong> untuk memetakan kesiapan belajar awal peserta didik.</p>
-
-                <h3>19. ASESMEN FORMATIF</h3>
-                <p>Observasi keaktifan diskusi kelompok, ketepatan pengisian LKPD, dan ketajaman argumen saat sesi presentasi serta tanya jawab.</p>
-
-                <h3>20. ASESMEN SUMATIF</h3>
-                <p>Tes uraian/studi kasus pada akhir pembelajaran untuk mengukur ketercapaian seluruh Tujuan Pembelajaran pada topik <strong>${escapeHtml(inp.materi)}</strong>.</p>
-
-                <h3>21. INSTRUMEN PENILAIAN</h3>
-                <p>Lembar observasi sikap/kolaborasi, lembar penilaian produk/LKPD, dan butir soal uraian/studi kasus berbasis indikator TP.</p>
-
-                <h3>22. RUBRIK PENILAIAN (SKALA 1–4)</h3>
-                <table>
-                    <thead><tr><th style="width:18%;">Aspek</th><th>4 — Sangat Baik</th><th>3 — Baik</th><th>2 — Cukup</th><th>1 — Perlu Bimbingan</th></tr></thead>
-                    <tbody>
-                        <tr><td>Pemahaman Konsep</td><td>Menjelaskan konsep &amp; contoh secara akurat dan lengkap.</td><td>Menjelaskan konsep dengan tepat namun contoh kurang rinci.</td><td>Penjelasan masih sebagian tepat dan perlu arahan.</td><td>Belum memahami konsep inti secara tepat.</td></tr>
-                        <tr><td>Analisis &amp; Argumen</td><td>Menganalisis kasus secara runtut berbasis bukti logis.</td><td>Menganalisis kasus cukup runtut dengan bukti memadai.</td><td>Analisis masih deskriptif dan belum mendalam.</td><td>Belum mampu mengaitkan fakta dengan konsep.</td></tr>
-                    </tbody>
-                </table>
-
-                <h3>23. LEMBAR KERJA PESERTA DIDIK (LKPD)</h3>
-                <p>LKPD memuat identitas, tujuan kegiatan, stimulus kasus <strong>${escapeHtml(inp.materi)}</strong>, langkah kerja diskusi, ruang jawaban, kesimpulan, dan refleksi singkat.</p>
-
-                <h3>24. PENGAYAAN DAN REMEDIAL</h3>
-                <p><strong>Pengayaan:</strong> Tantangan analisis kasus lanjutan/HOTS atau perancangan proyek mini terkait <em>${escapeHtml(inp.materi)}</em>.<br>
-                <strong>Remedial:</strong> Bimbingan ulang konsep dasar dengan contoh yang lebih sederhana diikuti evaluasi ulang terarah.</p>
-
-                <h3>25. REFLEKSI GURU</h3>
-                <p>Guru mengevaluasi ketercapaian TP, ketepatan waktu tiap sintaks, tingkat partisipasi murid, dan efektivitas media pembelajaran untuk perbaikan pertemuan berikutnya.</p>
-
-                <h3>26. REFLEKSI MURID</h3>
-                <p>Murid menuliskan hal baru yang dipahami, bagian yang masih membingungkan, serta manfaat materi <strong>${escapeHtml(inp.materi)}</strong> dalam kehidupan sehari-hari.</p>
-
-                <h3>27. GLOSARIUM</h3>
-                <ul>
-                    <li><strong>${escapeHtml(inp.materi)}:</strong> Pokok bahasan utama dalam pembelajaran ${escapeHtml(inp.mapel)} yang dipelajari melalui aktivitas terstruktur.</li>
-                    <li><strong>Scaffolding:</strong> Dukungan atau bantuan belajar sementara yang diberikan secara bertahap hingga murid mandiri.</li>
-                </ul>
-
-                <h3>28. DAFTAR PUSTAKA</h3>
-                <ul>
-                    <li>Kemendikbudristek. (2024). <em>Capaian Pembelajaran pada Pendidikan Anak Usia Dini, Jenjang Pendidikan Dasar, dan Jenjang Pendidikan Menengah pada Kurikulum Merdeka</em>. Jakarta: Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi.</li>
-                    <li>Buku Teks Utama Mata Pelajaran <strong>${escapeHtml(inp.mapel)}</strong> (${escapeHtml(inp.jenjang)}) yang relevan dengan materi <strong>${escapeHtml(inp.materi)}</strong>.</li>
-                </ul>
             `;
         }
 
@@ -2083,7 +2150,7 @@
                         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-borderCustom pb-4">
                             <div>
                                 <h2 class="text-base font-extrabold theme-heading">AI Specialist Generator Modul Ajar (28 Komponen)</h2>
-                                <p class="text-xs opacity-70">Pilih <strong>Mode Praktis</strong> untuk menyusun modul ajar lengkap sekaligus atau <strong>Mode Advanced</strong> untuk menyusun per komponen secara terpisah.</p>
+                                <p class="text-xs opacity-70">Aturan wajib: setiap nomor komponen dan setiap tahap pembelajaran disajikan dalam format <strong>tabel</strong> terstruktur serta dapat diunduh langsung sebagai <strong>.DOCX</strong>.</p>
                             </div>
                             <div class="inline-flex rounded-xl border border-borderCustom p-1" style="background-color: var(--bg-custom);">
                                 <button type="button" onclick="switchModulGeneratorMode('simple')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold ${!isAdv ? 'theme-btn-primary' : ''}">Mode Praktis</button>
@@ -2185,13 +2252,24 @@
             const c = appState.advancedComponents;
             const html = `
                 <h1>MODUL AJAR (MODE ADVANCED) — ${escapeHtml(inp.materi.toUpperCase())}</h1>
-                <p><strong>Mata Pelajaran:</strong> ${escapeHtml(inp.mapel)} | <strong>Kelas/Fase:</strong> ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}) | <strong>Model:</strong> ${escapeHtml(inp.model)} | <strong>Waktu:</strong> ${escapeHtml(inp.waktu)}</p>
-                <h3>1. Tujuan Pembelajaran &amp; Indikator</h3><p>${escapeHtml(c.tp || '-').replace(/\n/g, '<br>')}</p>
-                <h3>2. Materi Pembelajaran</h3><p>${escapeHtml(c.materi || '-').replace(/\n/g, '<br>')}</p>
-                <h3>3. Media Pembelajaran</h3><p>${escapeHtml(c.media || '-').replace(/\n/g, '<br>')}</p>
-                <h3>4. Alur Pembelajaran</h3><p>${escapeHtml(c.alur || '-').replace(/\n/g, '<br>')}</p>
-                <h3>5. LKPD</h3><p>${escapeHtml(c.lkpd || '-').replace(/\n/g, '<br>')}</p>
-                <h3>6. Asesmen &amp; Rubrik</h3><p>${escapeHtml(c.asesmen || '-').replace(/\n/g, '<br>')}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:10%;">No</th>
+                            <th style="width:28%;">Komponen / Tahap</th>
+                            <th style="width:62%;">Uraian Isi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>1</strong></td><td><strong>Identitas</strong></td><td>Mata Pelajaran: ${escapeHtml(inp.mapel)} | Kelas/Fase: ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}) | Model: ${escapeHtml(inp.model)} | Waktu: ${escapeHtml(inp.waktu)}</td></tr>
+                        <tr><td><strong>2</strong></td><td><strong>Tujuan Pembelajaran &amp; Indikator</strong></td><td>${escapeHtml(c.tp || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>3</strong></td><td><strong>Materi Pembelajaran</strong></td><td>${escapeHtml(c.materi || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>4</strong></td><td><strong>Media Pembelajaran</strong></td><td>${escapeHtml(c.media || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>5</strong></td><td><strong>Tahap Pembelajaran (Pendahuluan, Inti, Penutup)</strong></td><td>${escapeHtml(c.alur || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>6</strong></td><td><strong>LKPD</strong></td><td>${escapeHtml(c.lkpd || '-').replace(/\n/g, '<br>')}</td></tr>
+                        <tr><td><strong>7</strong></td><td><strong>Asesmen &amp; Rubrik</strong></td><td>${escapeHtml(c.asesmen || '-').replace(/\n/g, '<br>')}</td></tr>
+                    </tbody>
+                </table>
             `;
             const title = `Modul Ajar (Advanced) — ${inp.materi}`;
             const saved = await persistDocumentRecord({ title, category: 'Modul Ajar', mapel: inp.mapel, kelas: inp.kelas, html });
@@ -2240,18 +2318,19 @@
 
         function renderSoalGeneratorView(container) {
             const meta = appState.lastAssessmentMeta || {};
+            const currentTingkat = meta.tingkatBerpikir || 'Soal HOTS (C4-C6)';
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto space-y-6">
                     <div class="theme-card p-6 rounded-2xl border border-borderCustom shadow-sm space-y-5">
                         <div class="border-b border-borderCustom pb-4">
                             <h2 class="text-base font-extrabold theme-heading">Generator Soal &amp; Asesmen Lengkap</h2>
-                            <p class="text-xs opacity-70">Menghasilkan kisi-kisi, indikator, soal dengan variasi kasus berbeda tiap butir, kunci jawaban, pembahasan, level C1–C6, dan rubrik penilaian.</p>
+                            <p class="text-xs opacity-70">Menghasilkan kisi-kisi, indikator, soal dengan kaidah <strong>LOTS (C1–C2)</strong>, <strong>MOTS (C3)</strong>, <strong>HOTS (C4–C6)</strong>, atau <strong>Campuran (C1–C6)</strong>, kunci jawaban, pembahasan, dan rubrik penilaian.</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-xs font-bold mb-1">1. Mata Pelajaran *</label>
-                                <input type="text" id="soal-mapel" value="${escapeHtml(meta.mapel || 'Ilmu Pengetahuan Alam (IPA)')}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                                <input type="text" id="soal-mapel" value="${escapeHtml(meta.mapel || 'Pendidikan Pancasila')}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold mb-1">2. Kelas / Fase *</label>
@@ -2259,7 +2338,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold mb-1">3. Materi Pokok *</label>
-                                <input type="text" id="soal-materi" value="${escapeHtml(meta.materi || 'Ekosistem dan Interaksi Makhluk Hidup')}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
+                                <input type="text" id="soal-materi" value="${escapeHtml(meta.materi || 'Macam-Macam Norma')}" class="w-full px-3.5 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold mb-1">4. Jenis Asesmen</label>
@@ -2291,14 +2370,23 @@
                                     <input type="number" id="soal-jumlah" value="5" min="1" max="30" class="w-full px-3 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold mb-1">7. Kesulitan</label>
+                                    <label class="block text-xs font-bold mb-1">7. Tingkat Berpikir</label>
                                     <select id="soal-kesulitan" class="w-full px-3 py-2.5 text-xs border border-borderCustom rounded-xl theme-card">
-                                        <option value="Mudah (C1-C2)">Mudah (C1–C2)</option>
-                                        <option value="Sedang - HOTS (C3-C4)" selected>Sedang–HOTS (C3–C4)</option>
-                                        <option value="Tinggi / HOTS (C4-C6)">Tinggi / HOTS (C4–C6)</option>
+                                        <option value="Soal LOTS (C1-C2)" ${currentTingkat.includes('LOTS') ? 'selected' : ''}>Soal LOTS (C1–C2)</option>
+                                        <option value="Soal MOTS (C3)" ${currentTingkat.includes('MOTS') ? 'selected' : ''}>Soal MOTS (C3)</option>
+                                        <option value="Soal HOTS (C4-C6)" ${currentTingkat.includes('HOTS') ? 'selected' : ''}>Soal HOTS (C4–C6)</option>
+                                        <option value="Soal Campuran (C1-C6)" ${currentTingkat.includes('Campuran') ? 'selected' : ''}>Soal Campuran (C1–C6)</option>
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl border border-borderCustom text-[11px] opacity-80 space-y-1" style="background-color: var(--bg-custom);">
+                            <p class="font-bold theme-heading">Kaedah Tingkat Kemampuan Berpikir (Taksonomi Bloom Revisi):</p>
+                            <p>• <strong>LOTS (C1–C2):</strong> Mengingat definisi/fakta &amp; memahami makna/fungsi konsep.</p>
+                            <p>• <strong>MOTS (C3):</strong> Menerapkan konsep/aturan ke situasi atau contoh perilaku tertentu.</p>
+                            <p>• <strong>HOTS (C4–C6):</strong> Menganalisis kasus/hubungan antarunsur, mengevaluasi sikap/keputusan berdasarkan pertimbangan &amp; bukti, serta merancang/mencipta solusi atas masalah nyata (bukan sekadar membungkus pertanyaan hafalan dalam cerita).</p>
+                            <p>• <strong>Campuran (C1–C6):</strong> Kombinasi berjenjang dari LOTS, MOTS, hingga HOTS.</p>
                         </div>
 
                         <div class="flex justify-end pt-2 border-t border-borderCustom">
@@ -2326,14 +2414,14 @@
                     <tbody>
                         <tr><th style="width:25%;">Mata Pelajaran</th><td>${escapeHtml(meta.mapel)}</td><th style="width:22%;">Kelas / Fase</th><td>${escapeHtml(meta.kelas)}</td></tr>
                         <tr><th>Materi Pokok</th><td>${escapeHtml(meta.materi)}</td><th>Jenis Asesmen</th><td>${escapeHtml(meta.jenis)}</td></tr>
-                        <tr><th>Bentuk Soal</th><td>${escapeHtml(meta.bentuk)}</td><th>Tingkat Kesulitan</th><td>${escapeHtml(meta.kesulitan)}</td></tr>
-                        <tr><th>Tujuan Asesmen</th><td colspan="3">Mengukur pemahaman konsep, kemampuan analisis kasus bervariasi, dan ketepatan penerapan prinsip <strong>${escapeHtml(meta.materi)}</strong> sesuai indikator ketercapaian tujuan pembelajaran.</td></tr>
+                        <tr><th>Bentuk Soal</th><td>${escapeHtml(meta.bentuk)}</td><th>Tingkat Berpikir</th><td>${escapeHtml(meta.kesulitan)}</td></tr>
+                        <tr><th>Tujuan Asesmen</th><td colspan="3">Mengukur kemampuan berpikir sesuai kaidah <strong>${escapeHtml(meta.kesulitan)}</strong> pada materi <strong>${escapeHtml(meta.materi)}</strong>, mulai dari pemahaman konsep hingga analisis kasus, evaluasi keputusan, dan perancangan solusi berbasis pertimbangan logis.</td></tr>
                     </tbody>
                 </table>
 
                 <h3>II. KISI-KISI &amp; INDIKATOR SOAL</h3>
                 <table>
-                    <thead><tr><th style="width:8%;">No</th><th style="width:22%;">Konteks Kasus</th><th>Indikator Soal</th><th style="width:14%;">Level</th><th style="width:12%;">Skor</th></tr></thead>
+                    <thead><tr><th style="width:8%;">No</th><th style="width:22%;">Konteks Kasus</th><th>Indikator Soal</th><th style="width:18%;">Level Kognitif</th><th style="width:10%;">Skor</th></tr></thead>
                     <tbody>
                         ${safeBank.map((q, i) => `
                             <tr>
@@ -2350,106 +2438,195 @@
                 <h3>III. BUTIR SOAL</h3>
                 ${safeBank.map((q, i) => `
                     <div style="margin-bottom: 11pt; padding-bottom: 6pt; border-bottom: 1px dashed #ccc;">
-                        <p><strong>Soal ${i + 1}.</strong> <em>[Kasus: ${escapeHtml(q.caseContext)} | Level: ${escapeHtml(q.level)}]</em><br>${escapeHtml(q.stem)}</p>
+                        <p><strong>Soal ${i + 1}.</strong> <em>[Konteks: ${escapeHtml(q.caseContext)} | Level: ${escapeHtml(q.level)}]</em><br>${escapeHtml(q.stem)}</p>
                         ${Array.isArray(q.options) && q.options.length > 0 ? `<ul style="list-style-type:none; margin-left:8pt;">${q.options.map(opt => `<li>${escapeHtml(opt)}</li>`).join('')}</ul>` : ''}
                     </div>
                 `).join('')}
 
                 <h3>IV. KUNCI JAWABAN &amp; PEMBAHASAN</h3>
                 ${safeBank.map((q, i) => `
-                    <p><strong>Kunci &amp; Pembahasan Soal ${i + 1}:</strong> Jawaban: <strong>${escapeHtml(q.answer)}</strong>. ${escapeHtml(q.explanation)}</p>
+                    <p><strong>Kunci &amp; Pembahasan Soal ${i + 1} (${escapeHtml(q.level)}):</strong> Jawaban: <strong>${escapeHtml(q.answer)}</strong>. ${escapeHtml(q.explanation)}</p>
                 `).join('')}
 
                 <h3>V. PEDOMAN PENSKORAN &amp; RUBRIK PENILAIAN</h3>
-                <p>Rumus Nilai Akhir: <strong>(Total Skor Perolehan ÷ Total Skor Maksimal) × 100</strong>. Untuk soal uraian/studi kasus: Skor 4 = jawaban lengkap, tepat, dan berargumen jelas; Skor 3 = jawaban tepat namun kurang rinci; Skor 2 = sebagian tepat; Skor 1 = belum tepat/belum menjawab.</p>
+                <p>Rumus Nilai Akhir: <strong>(Total Skor Perolehan ÷ Total Skor Maksimal) × 100</strong>. Untuk soal uraian/studi kasus/HOTS: Skor 4 = analisis/evaluasi/solusi tajam, logis, dan berlandaskan alasan kuat; Skor 3 = tepat dan runtut namun kurang mendalam; Skor 2 = baru menyentuh sebagian aspek; Skor 1 = belum tepat atau belum menjawab.</p>
             `;
         }
 
+        function createQuestionByCognitiveLevel(index, levelKey, meta, scenario) {
+            const { mapel, kelas, materi, bentuk } = meta;
+
+            const specs = {
+                C1: {
+                    levelLabel: 'C1 (Mengingat)',
+                    indicator: `Mengidentifikasi pengertian, istilah, atau ketentuan dasar pada ${materi}`,
+                    stem: `Apa pengertian atau ketentuan paling tepat yang berkaitan dengan konsep dasar "${materi}" dalam ${mapel} (${kelas})?`,
+                    correctOption: `Pernyataan yang mendefinisikan secara tepat hakikat dan ciri utama "${materi}" sesuai kaidah ${mapel}.`,
+                    distractors: [
+                        `Pernyataan yang mencampuradukkan "${materi}" dengan aturan atau istilah lain yang tidak relevan.`,
+                        `Pernyataan yang membalikkan makna dasar "${materi}" tanpa landasan konsep.`,
+                        `Pernyataan yang hanya menyebutkan contoh acak tanpa menjelaskan pengertian pokoknya.`
+                    ],
+                    explanation: `Soal ini mengukur tingkat C1 (Mengingat) dengan meminta murid mengidentifikasi definisi/ketentuan dasar "${materi}" secara akurat.`
+                },
+                C2: {
+                    levelLabel: 'C2 (Memahami)',
+                    indicator: `Menjelaskan fungsi, tujuan, atau makna penerapan ${materi}`,
+                    stem: `Mengapa penerapan "${materi}" penting dan apa fungsi utamanya dalam pembelajaran ${mapel} maupun kehidupan sehari-hari?`,
+                    correctOption: `Menjelaskan fungsi utama "${materi}" dalam menjaga keteraturan, ketepatan, dan pemahaman yang bermakna.`,
+                    distractors: [
+                        `Menyatakan bahwa "${materi}" hanya formalitas tanpa fungsi praktis bagi peserta didik.`,
+                        `Menjelaskan fungsi yang bertentangan dengan tujuan utama "${materi}".`,
+                        `Menganggap "${materi}" hanya berlaku pada satu kondisi sempit yang tidak berkaitan dengan maknanya.`
+                    ],
+                    explanation: `Soal ini mengukur tingkat C2 (Memahami) melalui penjelasan makna dan fungsi "${materi}" secara tepat.`
+                },
+                C3: {
+                    levelLabel: 'C3 (Menerapkan)',
+                    indicator: `Menerapkan konsep atau kaidah ${materi} pada situasi/perilaku tertentu (${scenario})`,
+                    stem: `Dalam situasi ${scenario}, seorang peserta didik di ${kelas} ingin menerapkan prinsip "${materi}". Tindakan manakah yang paling tepat mencerminkan penerapan konsep tersebut?`,
+                    correctOption: `Menerapkan langkah yang sesuai dengan kaidah "${materi}" secara langsung pada situasi ${scenario}.`,
+                    distractors: [
+                        `Mengabaikan kaidah "${materi}" dan bertindak berdasarkan dorongan sesaat pada ${scenario}.`,
+                        `Menerapkan aturan yang keliru sehingga tidak menyelesaikan inti persoalan di ${scenario}.`,
+                        `Menunda tindakan tanpa alasan yang sesuai dengan prinsip "${materi}".`
+                    ],
+                    explanation: `Soal ini mengukur tingkat C3 (Menerapkan) dengan meminta murid menggunakan konsep "${materi}" secara tepat pada situasi ${scenario}.`
+                },
+                C4: {
+                    levelLabel: 'C4 (Menganalisis)',
+                    indicator: `Menganalisis kasus, pola hubungan, atau akar persoalan terkait ${materi} (${scenario})`,
+                    stem: `Pada peristiwa ${scenario} di ${kelas}, muncul permasalahan yang berkaitan dengan "${materi}" sehingga memicu perbedaan pendapat antaranggota. Berdasarkan analisis situasi tersebut, faktor atau aspek manakah yang paling tepat menjelaskan inti permasalahan yang terjadi?`,
+                    correctOption: `Analisis kritis yang menguraikan hubungan sebab-akibat dan ketidaksesuaian unsur pada kasus ${scenario} terhadap prinsip "${materi}".`,
+                    distractors: [
+                        `Kesimpulan tergesa-gesa yang hanya menyalahkan satu pihak tanpa menelaah hubungan antarunsur pada ${scenario}.`,
+                        `Pendapat yang mengabaikan fakta dalam peristiwa ${scenario} dan menggantinya dengan asumsi yang tidak terkait "${materi}".`,
+                        `Penilaian dangkal yang hanya melihat permukaan kejadian tanpa mengaitkannya dengan struktur "${materi}".`
+                    ],
+                    explanation: `Soal ini mengukur tingkat C4 (Menganalisis): murid tidak sekadar mengingat definisi, tetapi menguraikan dan menganalisis hubungan/permasalahan dalam kasus ${scenario} berdasarkan konsep "${materi}".`
+                },
+                C5: {
+                    levelLabel: 'C5 (Mengevaluasi)',
+                    indicator: `Mengevaluasi dan menentukan sikap/keputusan paling tepat berdasarkan pertimbangan & bukti (${scenario})`,
+                    stem: `Dalam situasi ${scenario}, terdapat dua pilihan sikap terkait "${materi}": satu pihak memilih jalan pintas yang mengabaikan ketertiban/ketepatan, sementara pihak lain memilih langkah terukur yang mempertimbangkan kepentingan bersama. Jika Anda harus menilai dan mengambil keputusan terbaik, sikap manakah yang paling dapat dipertanggungjawabkan dan apa pertimbangan utamanya?`,
+                    correctOption: `Memilih dan mempertahankan keputusan yang paling adil, terukur, dan selaras dengan "${materi}" disertai alasan/pertimbangan yang kuat.`,
+                    distractors: [
+                        `Memilih jalan pintas karena lebih cepat meskipun mengorbankan ketepatan dan prinsip "${materi}".`,
+                        `Bersikap acuh tak acuh dan menyerahkan keputusan tanpa pertimbangan akibat pada ${scenario}.`,
+                        `Memilih tindakan emosional yang justru memperkeruh keadaan pada ${scenario}.`
+                    ],
+                    explanation: `Soal ini mengukur tingkat C5 (Mengevaluasi): murid menimbang alternatif tindakan, menilai kelayakannya berdasarkan prinsip "${materi}", dan menentukan keputusan terbaik dengan pertimbangan logis.`
+                },
+                C6: {
+                    levelLabel: 'C6 (Mencipta)',
+                    indicator: `Merancang solusi atau strategi baru yang aplikatif untuk mengatasi masalah nyata (${scenario})`,
+                    stem: `Lingkungan ${scenario} di ${kelas} menghadapi tantangan berulang terkait "${materi}" yang belum teratasi dengan cara lama. Rancangan solusi atau strategi baru manakah yang paling efektif disusun untuk menjawab masalah tersebut secara berkelanjutan?`,
+                    correctOption: `Merancang langkah solusi baru yang terstruktur, aplikatif, dan melibatkan evaluasi berkelanjutan sesuai prinsip "${materi}" pada ${scenario}.`,
+                    distractors: [
+                        `Mengulang cara lama yang sudah terbukti gagal mengatasi masalah pada ${scenario}.`,
+                        `Menyusun rencana tanpa langkah pelaksanaan atau ukuran keberhasilan yang jelas.`,
+                        `Menghindari masalah dengan memindahkan beban tanpa solusi yang menyelesaikan akar persoalan.`
+                    ],
+                    explanation: `Soal ini mengukur tingkat C6 (Mencipta): murid merancang gagasan/solusi terstruktur untuk memecahkan masalah nyata pada ${scenario} secara berkelanjutan.`
+                }
+            };
+
+            const spec = specs[levelKey] || specs.C4;
+            let options = [];
+            let answer = 'B';
+
+            if (bentuk === 'Pilihan Ganda (A-C)') {
+                const letters = ['A', 'B', 'C'];
+                const keyLetter = letters[index % 3];
+                answer = keyLetter;
+                const pool = [spec.distractors[0], spec.distractors[1]];
+                let dIdx = 0;
+                options = letters.map(l => {
+                    if (l === keyLetter) return `${l}. ${spec.correctOption}`;
+                    return `${l}. ${pool[dIdx++]}`;
+                });
+            } else if (bentuk === 'Pilihan Ganda (A-D)') {
+                const letters = ['A', 'B', 'C', 'D'];
+                const keyLetter = letters[index % 4];
+                answer = keyLetter;
+                let dIdx = 0;
+                options = letters.map(l => {
+                    if (l === keyLetter) return `${l}. ${spec.correctOption}`;
+                    return `${l}. ${spec.distractors[dIdx++]}`;
+                });
+            } else if (bentuk === 'Pilihan Ganda (A-E)') {
+                const letters = ['A', 'B', 'C', 'D', 'E'];
+                const keyLetter = letters[index % 5];
+                answer = keyLetter;
+                const extendedDistractors = [...spec.distractors, `Pernyataan keliru yang tidak selaras dengan prinsip "${materi}" pada ${scenario}.`];
+                let dIdx = 0;
+                options = letters.map(l => {
+                    if (l === keyLetter) return `${l}. ${spec.correctOption}`;
+                    return `${l}. ${extendedDistractors[dIdx++]}`;
+                });
+            } else if (bentuk === 'Benar atau Salah') {
+                answer = index % 2 === 0 ? 'Benar' : 'Salah';
+                options = ['A. Benar', 'B. Salah'];
+            } else {
+                answer = `${spec.correctOption} (${spec.explanation})`;
+            }
+
+            return {
+                id: index + 1,
+                caseContext: scenario,
+                indicator: spec.indicator,
+                level: spec.levelLabel,
+                score: 20,
+                stem: spec.stem,
+                options,
+                answer,
+                explanation: spec.explanation
+            };
+        }
+
         async function generateSoalDanAsesmen() {
-            const mapel = (document.getElementById('soal-mapel')?.value || 'Ilmu Pengetahuan Alam (IPA)').trim();
+            const mapel = (document.getElementById('soal-mapel')?.value || 'Pendidikan Pancasila').trim();
             const kelas = (document.getElementById('soal-kelas')?.value || 'Kelas VII / Fase D').trim();
-            const materi = (document.getElementById('soal-materi')?.value || 'Ekosistem dan Interaksi Makhluk Hidup').trim();
+            const materi = (document.getElementById('soal-materi')?.value || 'Macam-Macam Norma').trim();
             const jenis = document.getElementById('soal-jenis')?.value || 'Sumatif';
             const bentuk = document.getElementById('soal-bentuk')?.value || 'Pilihan Ganda (A-D)';
             const jumlah = Math.min(30, Math.max(1, parseInt(document.getElementById('soal-jumlah')?.value || '5', 10)));
-            const kesulitan = document.getElementById('soal-kesulitan')?.value || 'Sedang - HOTS (C3-C4)';
+            const kesulitan = document.getElementById('soal-kesulitan')?.value || 'Soal HOTS (C4-C6)';
 
-            const meta = { mapel, kelas, materi, jenis, bentuk, kesulitan };
+            const meta = { mapel, kelas, materi, jenis, bentuk, kesulitan, tingkatBerpikir: kesulitan };
             appState.lastAssessmentMeta = meta;
 
             const caseScenarios = [
                 'Musyawarah OSIS & Tata Tertib Sekolah',
-                'Kerja Bakti Lingkungan & Pengelolaan Sampah Warga',
-                'Proyek Literasi Digital & Verifikasi Informasi',
+                'Kerja Bakti Lingkungan & Kepedulian Warga',
+                'Proyek Literasi Digital & Etika Informasi',
                 'Observasi Pelayanan Publik & Koperasi Sekolah',
                 'Kegiatan Ekstrakurikuler & Manajemen Waktu',
-                'Pengelolaan Fasilitas Kelas & Hemat Energi',
-                'Forum Karang Taruna & Kepedulian Sosial',
-                'Percobaan / Pengamatan Lapangan Sederhana'
+                'Pengelolaan Fasilitas Kelas & Tanggung Jawab Bersama',
+                'Forum Karang Taruna & Penyelesaian Masalah Sosial',
+                'Pengamatan Lapangan & Pengambilan Keputusan'
             ];
+
+            let levelSequence = ['C4', 'C5', 'C6'];
+            if (kesulitan.includes('LOTS')) {
+                levelSequence = ['C1', 'C2'];
+            } else if (kesulitan.includes('MOTS')) {
+                levelSequence = ['C3'];
+            } else if (kesulitan.includes('Campuran')) {
+                levelSequence = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
+            }
 
             await runWithAiProgress('soal-progress-panel', async () => {
                 const bank = [];
                 for (let i = 0; i < jumlah; i++) {
                     const scenario = caseScenarios[i % caseScenarios.length];
-                    const levels = ['C2 (Memahami)', 'C3 (Menerapkan)', 'C4 (Menganalisis)', 'C5 (Mengevaluasi)', 'C6 (Mencipta)'];
-                    const level = levels[i % levels.length];
-                    let options = [];
-                    let answer = 'B';
-
-                    if (bentuk === 'Pilihan Ganda (A-C)') {
-                        const letters = ['A', 'B', 'C'];
-                        const keyLetter = letters[i % 3];
-                        answer = keyLetter;
-                        options = [
-                            `A. Langkah tepat dan selaras dengan prinsip ${materi} pada konteks ${scenario}.`,
-                            `B. Langkah kurang tepat karena mengabaikan bukti utama pada ${scenario}.`,
-                            `C. Langkah keliru yang berpotensi menimbulkan dampak negatif pada ${scenario}.`
-                        ];
-                        if (keyLetter === 'A') options[0] = `A. Langkah paling tepat dan sesuai prinsip ${materi} dalam kasus ${scenario}.`;
-                        if (keyLetter === 'B') options[1] = `B. Langkah paling tepat dan sesuai prinsip ${materi} dalam kasus ${scenario}.`;
-                        if (keyLetter === 'C') options[2] = `C. Langkah paling tepat dan sesuai prinsip ${materi} dalam kasus ${scenario}.`;
-                    } else if (bentuk === 'Pilihan Ganda (A-D)') {
-                        const letters = ['A', 'B', 'C', 'D'];
-                        const keyLetter = letters[i % 4];
-                        answer = keyLetter;
-                        options = [
-                            `A. Opsi A terkait penerapan ${materi} pada ${scenario}.`,
-                            `B. Opsi B terkait penerapan ${materi} pada ${scenario}.`,
-                            `C. Opsi C terkait penerapan ${materi} pada ${scenario}.`,
-                            `D. Opsi D terkait penerapan ${materi} pada ${scenario}.`
-                        ];
-                        const idx = letters.indexOf(keyLetter);
-                        options[idx] = `${keyLetter}. Keputusan paling tepat dan berbasis prinsip ${materi} pada situasi ${scenario}.`;
-                    } else if (bentuk === 'Pilihan Ganda (A-E)') {
-                        const letters = ['A', 'B', 'C', 'D', 'E'];
-                        const keyLetter = letters[i % 5];
-                        answer = keyLetter;
-                        options = letters.map(l => `${l}. Pernyataan ${l} terkait analisis ${materi} pada ${scenario}.`);
-                        options[letters.indexOf(keyLetter)] = `${keyLetter}. Simpulan paling tepat dan terukur mengenai ${materi} pada ${scenario}.`;
-                    } else if (bentuk === 'Benar atau Salah') {
-                        answer = i % 2 === 0 ? 'Benar' : 'Salah';
-                        options = ['A. Benar', 'B. Salah'];
-                    } else {
-                        answer = `Uraian analitis yang mengaitkan konsep ${materi} dengan bukti pada kasus ${scenario}.`;
-                    }
-
-                    bank.push({
-                        id: i + 1,
-                        caseContext: scenario,
-                        indicator: `Menganalisis penerapan ${materi} (${kelas}) pada situasi ${scenario} (Butir ${i + 1})`,
-                        level,
-                        score: 20,
-                        stem: `Dalam situasi ${scenario} di ${kelas}, peserta didik menelaah permasalahan yang berkaitan dengan "${materi}". Manakah analisis atau tindakan yang paling tepat dan dapat dipertanggungjawabkan?`,
-                        options,
-                        answer,
-                        explanation: `Pada konteks ${scenario}, ketepatan analisis ${materi} ditentukan oleh kesesuaian antara konsep dasar, fakta/bukti yang diamati, serta dampak jangka panjangnya.`
-                    });
+                    const lvlKey = levelSequence[i % levelSequence.length];
+                    bank.push(createQuestionByCognitiveLevel(i, lvlKey, meta, scenario));
                 }
 
                 appState.questionBank = bank;
                 const html = buildSoalDocumentHtml(meta, bank);
-                const title = `Soal & Asesmen ${mapel} — ${materi}`;
+                const title = `Soal (${kesulitan}) ${mapel} — ${materi}`;
                 const saved = await persistDocumentRecord({
                     title,
                     category: 'Soal dan Asesmen',
@@ -2469,7 +2646,7 @@
                 };
             });
 
-            showToast('Perangkat soal, kisi-kisi, kunci jawaban & pembahasan berhasil dibuat & dibuka di Editor Soal!', 'success');
+            showToast(`Soal (${kesulitan}) lengkap dengan kunci & pembahasan berhasil dibuat & dibuka di Editor Soal!`, 'success');
             navigate('editor-soal');
         }
 
@@ -3267,20 +3444,25 @@
             const canvas = document.getElementById('document-editor-canvas');
             const contentHtml = canvas ? canvas.innerHTML : (ed.html || '');
             const docTitle = (document.getElementById('editor-doc-title')?.value || ed.title || 'Dokumen_Perangkat_Ajar').trim();
+            const isDocxFormat = editorKey === 'modul' || (ed.category || '').toLowerCase().includes('modul');
+            const extension = isDocxFormat ? 'docx' : 'doc';
+            const mimeType = isDocxFormat
+                ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8'
+                : 'application/msword;charset=utf-8';
             const wordHtml = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="utf-8"><title>${escapeHtml(docTitle)}</title></head>
                 <body style="font-family:'Times New Roman',serif;font-size:11.5pt;line-height:1.5;">${contentHtml}</body>
                 </html>
             `;
-            const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword;charset=utf-8' });
+            const blob = new Blob(['\ufeff', wordHtml], { type: mimeType });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.doc`;
+            a.download = `${docTitle.replace(/[^a-zA-Z0-9_-]+/g, '_')}.${extension}`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Dokumen Word (.doc) berhasil diunduh.', 'success');
+            showToast(`Dokumen berhasil diunduh dalam format .${extension.toUpperCase()}.`, 'success');
         }
 
         function exportEditorToPDF(editorKey) {
@@ -3352,7 +3534,7 @@
                                 <button type="button" onclick="changeEditorPaperOrientation('${editorKey}', 'portrait')" class="px-2.5 py-2 rounded-xl border border-borderCustom text-xs font-bold ${!isLandscape ? 'theme-btn-primary' : 'theme-btn-secondary'}">Portrait</button>
                                 <button type="button" onclick="changeEditorPaperOrientation('${editorKey}', 'landscape')" class="px-2.5 py-2 rounded-xl border border-borderCustom text-xs font-bold ${isLandscape ? 'theme-btn-primary' : 'theme-btn-secondary'}">Landscape</button>
                                 <button type="button" onclick="copyEditorPlainText()" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">Salin Teks</button>
-                                <button type="button" onclick="exportEditorToWord('${editorKey}')" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">Unduh Word</button>
+                                <button type="button" onclick="exportEditorToWord('${editorKey}')" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">${editorKey === 'modul' ? 'Unduh .DOCX' : 'Unduh Word'}</button>
                                 <button type="button" onclick="exportEditorToPDF('${editorKey}')" class="px-3 py-2 rounded-xl border border-borderCustom theme-btn-secondary text-xs font-bold">PDF / Cetak</button>
                                 <button type="button" onclick="saveCurrentDocument('${editorKey}')" class="px-4 py-2 rounded-xl theme-btn-primary text-xs font-extrabold shadow">Simpan ke Dokumen Saya</button>
                             </div>
