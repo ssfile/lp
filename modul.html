@@ -2962,44 +2962,39 @@
 
             const pendStepsRaw = [
                 {
-                    step: 'Orientasi & Salam Pembuka',
-                    guru: `Memberi salam hangat, menyapa murid, dan memimpin doa pembuka sebelum memulai pelajaran ${inp.mapel} di ${inp.sekolah} (${timing.pendDurs[0]} menit; media: papan tulis/daftar hadir).`,
-                    murid: `Menjawab salam, berdoa dengan khidmat, dan memusatkan perhatian. Contoh ucapan guru: "Selamat pagi, mari kita berdoa sebelum memulai ${inp.mapel}." Respons murid: menjawab salam dan berdoa tertib.`
+                    step: '1. Membuka Pembelajaran (Salam & Sapaan)',
+                    guru: `Memberi salam pembuka dengan ramah dan menyapa peserta didik di ${inp.sekolah} (${timing.pendDurs[0]} menit; media: papan tulis).`,
+                    murid: `Menjawab salam dan menyapa kembali dengan santun. Contoh ucapan guru: "Selamat pagi anak-anak, bagaimana kabar kalian hari ini?" Respons murid: "Selamat pagi Bu/Pak, kabar kami baik!"`
                 },
                 {
-                    step: 'Mengondisikan Murid & Kehadiran',
-                    guru: `Mengecek kehadiran murid serta kerapian posisi duduk di ${inp.kelas} Semester ${inp.semester} (${timing.pendDurs[1]} menit; media: daftar hadir).`,
-                    murid: `Merespons presensi dan merapikan meja/alat tulis. Contoh instruksi guru: "Pastikan alat tulis siap dan simak presensi." Respons murid: merespons hadir dengan tertib.`
+                    step: '2. Berdoa Sebelum Belajar',
+                    guru: `Mengajak peserta didik berdoa bersama sebelum memulai pembelajaran ${inp.mapel} (${timing.pendDurs[1]} menit; media: doa pembuka).`,
+                    murid: `Berdoa bersama dengan khidmat sesuai keyakinan. Contoh instruksi guru: "Sebelum mulai belajar, mari kita berdoa menurut kepercayaan masing-masing." Respons murid: berdoa tertib.`
                 },
                 {
-                    step: 'Memeriksa Kesiapan Belajar',
-                    guru: `Memastikan kesiapan fokus dan kelengkapan LKPD/buku sebelum masuk ke ${inp.materi} (${timing.pendDurs[2]} menit; media: LKPD & buku).`,
-                    murid: `Menyatakan kesiapan belajar dan menyiapkan buku/LKPD. Contoh instruksi guru: "Apakah LKPD dan buku catatan sudah siap?" Respons murid: "Sudah siap, Bu/Pak!"`
+                    step: '3. Pemeriksaan Kehadiran (Absensi)',
+                    guru: `Memeriksa kehadiran peserta didik satu per satu di ${inp.kelas} Semester ${inp.semester} (${timing.pendDurs[2]} menit; media: daftar hadir).`,
+                    murid: `Merespons saat namanya dipanggil dan menginformasikan teman yang berhalangan. Contoh guru: "Saya absen terlebih dahulu ya, siapa yang tidak masuk hari ini?" Respons murid: merespons hadir dengan tertib.`
                 },
                 {
-                    step: 'Apersepsi',
-                    guru: `Menghubungkan materi sebelumnya dengan materi baru (${inp.materi}) melalui pertanyaan pengalaman sehari-hari (${timing.pendDurs[3]} menit; media: papan tulis).`,
-                    murid: `Menjawab berdasarkan pengalaman dan pengetahuan sebelumnya. Contoh pertanyaan guru: "Pengalaman apa yang kalian ingat terkait ${inp.materi}?" Respons murid: mengaitkan pengalaman nyata secara singkat.`
+                    step: '4. Menyanyikan Lagu Nasional (Setelah Absensi)',
+                    guru: `Setelah absensi selesai, mengajak seluruh peserta didik berdiri dan menyanyikan lagu nasional Indonesia, misalnya "Garuda Pancasila" atau "Indonesia Raya" (${timing.pendDurs[3]} menit; media: audio/iringan lagu nasional).`,
+                    murid: `Berdiri dengan sikap siap dan menyanyikan lagu nasional bersama penuh semangat. Contoh instruksi guru: "Setelah absensi, mari kita berdiri dan menyanyikan lagu nasional 'Garuda Pancasila' bersama-sama." Respons murid: berdiri dan menyanyikan lagu dengan kompak.`
                 },
                 {
-                    step: 'Menghubungkan Materi Sebelumnya',
-                    guru: `Mengaitkan konsep prasyarat/pertemuan lalu dengan pokok bahasan ${inp.materi} (${timing.pendDurs[4]} menit; media: bagan/papan tulis).`,
-                    murid: `Menyebutkan kembali konsep prasyarat dan menyimak hubungannya dengan ${inp.materi}. Contoh guru: "Bagaimana kaitan konsep dasar tadi dengan ${inp.materi}?" Respons murid: menjelaskan kaitan awal.`
+                    step: '5. Penguatan Nasionalisme, Kesiapan & Apersepsi',
+                    guru: `Mengaitkan lagu nasional dengan semangat persatuan/tanggung jawab, memeriksa kesiapan alat tulis/LKPD, lalu menghubungkan materi sebelumnya dengan ${inp.materi} (${timing.pendDurs[4]} menit; media: LKPD & papan tulis).`,
+                    murid: `Menyimak penguatan nilai, menyiapkan perlengkapan belajar, dan menjawab apersepsi dari pengalaman awal. Contoh guru: "Siapa yang masih ingat kaitan materi sebelumnya dengan ${inp.materi}?" Respons murid: menyampaikan kaitan pengalaman awal.`
                 },
                 {
-                    step: 'Pertanyaan Pemantik & Motivasi',
-                    guru: `Menampilkan kasus/situasi awal ${inp.materi} dan mengajukan pertanyaan pemantik untuk memicu rasa ingin tahu (${timing.pendDurs[5]} menit; media: gambar/kasus pemantik).`,
-                    murid: `Mengemukakan pendapat dan dugaan awal secara kritis. Contoh pertanyaan guru: "Mengapa kondisi pada contoh ${inp.materi} dapat terjadi dan apa dampaknya?" Respons murid: "Menurut saya, hal itu terjadi karena..."`
+                    step: '6. Motivasi & Pertanyaan Pemantik',
+                    guru: `Memberikan motivasi belajar serta menampilkan contoh/kasus awal ${inp.materi} dan mengajukan pertanyaan pemantik (${timing.pendDurs[5]} menit; media: gambar/kasus pemantik).`,
+                    murid: `Menyimak motivasi dan mengemukakan pendapat serta dugaan awal secara kritis. Contoh pertanyaan guru: "Mengapa kondisi pada contoh ${inp.materi} dapat terjadi dan apa dampaknya?" Respons murid: "Menurut saya, hal itu terjadi karena..."`
                 },
                 {
-                    step: 'Menyampaikan Tujuan Pembelajaran',
-                    guru: `Menyampaikan tujuan pembelajaran ${inp.materi} secara jelas dan terukur sesuai fase ${inp.jenjang} (${timing.pendDurs[6]} menit; media: papan tulis/slide).`,
-                    murid: `Menyimak dan mencatat target kemampuan yang ingin dicapai. Contoh ucapan guru: "Tujuan kita hari ini adalah memahami, menganalisis, dan menyimpulkan ${inp.materi}." Respons murid: mencatat tujuan belajar.`
-                },
-                {
-                    step: 'Menjelaskan Aktivitas & Penilaian',
-                    guru: `Menjelaskan langkah kegiatan melalui ${inp.model} serta aspek penilaian formatif & sumatif (${timing.pendDurs[7]} menit; media: LKPD & rubrik).`,
-                    murid: `Memahami alur kerja kelompok/individu dan kriteria penilaian. Contoh instruksi guru: "Kita akan bekerja dengan ${inp.model} dan menilai ketepatan analisis LKPD." Respons murid: "Baik, Bu/Pak!"`
+                    step: '7. Penyampaian Tujuan & Alur Penilaian',
+                    guru: `Menyampaikan tujuan pembelajaran ${inp.materi} sesuai fase ${inp.jenjang}, langkah ${inp.model}, serta cara penilaian (${timing.pendDurs[6] + timing.pendDurs[7]} menit; media: papan tulis/LKPD).`,
+                    murid: `Menyimak dan mencatat target kemampuan serta alur aktivitas/penilaian. Contoh ucapan guru: "Tujuan kita hari ini adalah memahami, menganalisis, dan menyimpulkan ${inp.materi} melalui ${inp.model}." Respons murid: mencatat tujuan dan siap beraktivitas.`
                 }
             ];
 
@@ -3007,7 +3002,7 @@
                 const dur = timing.intiDurs[idx] || 10;
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(st.name)}</strong><br><em>(${dur} Menit • Media: ${escapeHtml(st.media)})</em></td>
+                        <td><strong>${escapeHtml(st.name)}</strong><br><em>(${dur} Menit • Media: ${escapeHtml(st.media)} • Asesmen: ${escapeHtml(st.assessmentNote)})</em></td>
                         <td>
                             ${escapeHtml(st.guruDo)} ${escapeHtml(st.guruHow)}<br>
                             <strong>Contoh Ucapan/Instruksi:</strong> ${escapeHtml(st.examplePrompt)}<br>
@@ -3024,37 +3019,37 @@
 
             const penutupStepsRaw = [
                 {
-                    step: 'Menyimpulkan Pembelajaran',
+                    step: '1. Menyimpulkan Pembelajaran',
                     guru: `Membimbing murid merangkum inti ${inp.materi} dan hasil diskusi/penyelidikan (${timing.penutupDurs[0]} menit; media: papan tulis/LKPD).`,
                     murid: `Menyampaikan kesimpulan pokok materi dengan bahasa sendiri. Contoh guru: "Siapa yang dapat menyimpulkan inti ${inp.materi}?" Contoh kesimpulan murid: "Intinya, ${inp.materi} mencakup konsep dasar, analisis kasus, dan penerapan yang tepat."`
                 },
                 {
-                    step: 'Penguatan Materi',
+                    step: '2. Penguatan Materi',
                     guru: `Memberikan umpan balik dan penguatan konsep kunci ${inp.materi} untuk meluruskan miskonsepsi (${timing.penutupDurs[1]} menit; media: bahan bacaan).`,
                     murid: `Menyimak penguatan dan meluruskan catatan. Contoh umpan balik guru: "Bagus sekali; pastikan selalu mengaitkan alasan/bukti saat menerapkan ${inp.materi}." Respons murid: menyimak dan melengkapi catatan.`
                 },
                 {
-                    step: 'Evaluasi / Asesmen Akhir',
+                    step: '3. Evaluasi / Asesmen Akhir',
                     guru: `Memberikan 1–2 pertanyaan cek pemahaman akhir / exit ticket selaras TP (${timing.penutupDurs[2]} menit; media: lembar tugas).`,
                     murid: `Menjawab pertanyaan evaluasi singkat secara mandiri. Contoh pertanyaan guru: "Bagaimana cara menerapkan ${inp.materi} pada situasi nyata?" Respons murid: menuliskan jawaban cek pemahaman.`
                 },
                 {
-                    step: 'Refleksi Singkat Murid',
+                    step: '4. Refleksi Singkat Murid',
                     guru: `Mengajak murid merefleksikan bagian yang mudah dipahami dan yang masih sulit (${timing.penutupDurs[3]} menit; media: lembar refleksi).`,
                     murid: `Menyampaikan refleksi belajar secara jujur. Contoh pertanyaan refleksi guru: "Bagian mana dari ${inp.materi} yang paling kamu pahami dan mana yang perlu latihan?" Respons murid: menyebutkan kekuatan & kesulitan belajarnya.`
                 },
                 {
-                    step: 'Tindak Lanjut (Pengayaan & Remedial)',
+                    step: '5. Tindak Lanjut (Pengayaan & Remedial)',
                     guru: `Memberikan arahan pengayaan untuk yang tuntas dan pendampingan/latihan bertahap untuk yang belum tuntas (${timing.penutupDurs[4]} menit; media: tugas tindak lanjut).`,
                     murid: `Mencatat tugas tindak lanjut sesuai kebutuhan. Contoh tindak lanjut guru: "Yang tuntas mengerjakan pengayaan kasus lanjutan; yang belum tuntas mengikuti bimbingan konsep & latihan terarah." Respons murid: mencatat tugasnya.`
                 },
                 {
-                    step: 'Materi Pertemuan Berikutnya',
+                    step: '6. Materi Pertemuan Berikutnya',
                     guru: `Menyampaikan agenda atau persiapan singkat untuk pertemuan berikutnya (${timing.penutupDurs[5]} menit; media: agenda kelas).`,
                     murid: `Mencatat informasi pertemuan berikutnya. Contoh guru: "Pertemuan berikutnya kita akan membahas lanjutan terkait ${inp.materi}." Respons murid: mencatat persiapan belajar.`
                 },
                 {
-                    step: 'Penutup Pembelajaran',
+                    step: '7. Penutup Pembelajaran',
                     guru: `Memimpin doa penutup dan salam perpisahan secara tertib (${timing.penutupDurs[6]} menit; media: doa & salam).`,
                     murid: `Berdoa bersama, merapikan perlengkapan, dan menjawab salam. Contoh guru: "Terima kasih, mari kita tutup dengan doa dan salam." Respons murid: berdoa dan menjawab salam dengan tertib.`
                 }
@@ -3071,7 +3066,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>Kegiatan Pendahuluan</strong></td><td><strong>${timing.pendMin} Menit</strong></td><td>Orientasi, kehadiran, kesiapan, apersepsi, koneksi materi, pertanyaan pemantik, tujuan TP, dan rencana asesmen.</td></tr>
+                        <tr><td><strong>Kegiatan Pendahuluan</strong></td><td><strong>${timing.pendMin} Menit</strong></td><td>Salam, doa, absensi, menyanyikan lagu nasional setelah absensi, nasionalisme/kesiapan/apersepsi, motivasi &amp; pertanyaan pemantik, tujuan TP, dan penilaian.</td></tr>
                         <tr><td><strong>Kegiatan Inti (${escapeHtml(syntax.label)})</strong></td><td><strong>${timing.intiMin} Menit</strong></td><td>Pelaksanaan sintaks baku ${escapeHtml(syntax.label)} secara berurutan, operasional, dan terhubung langsung dengan LKPD serta TP.</td></tr>
                         <tr><td><strong>Kegiatan Penutup</strong></td><td><strong>${timing.penutupMin} Menit</strong></td><td>Kesimpulan, penguatan materi, evaluasi akhir, refleksi murid, tindak lanjut, agenda berikutnya, dan doa penutup.</td></tr>
                         <tr><td><strong>Total Alokasi Waktu</strong></td><td><strong>${timing.totalMin} Menit</strong></td><td>Selaras dengan input alokasi waktu: <strong>${escapeHtml(inp.waktu)}</strong>.</td></tr>
@@ -3129,6 +3124,397 @@
                                 <td>${pt.murid}</td>
                             </tr>
                         `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function buildFullModul28Html(inp) {
+            const syntax = getModelSyntaxBlueprint(inp.model, inp);
+            const hasCpInput = Boolean(inp.cpInput && inp.cpInput.trim().length > 0);
+            const cpIsi = hasCpInput
+                ? escapeHtml(inp.cpInput)
+                : `Usulan rumusan CP selaras fase ${escapeHtml(inp.jenjang)} untuk ${escapeHtml(inp.mapel)} pada materi ${escapeHtml(inp.materi)}: memahami konsep pokok, keterkaitan antarunsur, dan penerapan secara runtut serta bertanggung jawab.`;
+            const cpContoh = hasCpInput
+                ? `Menjadi landasan penyusunan TP 1–TP 3 pada ${inp.kelas}.`
+                : `Catatan: CP resmi belum dicantumkan pada form; rumusan ini merupakan usulan selaras fase dan perlu disesuaikan dengan dokumen CP resmi satuan pendidikan.`;
+
+            return `
+                <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 8pt; margin-bottom: 12pt;">
+                    <h1>MODUL AJAR — STANDAR PEDAGOGIS &amp; OPERASIONAL</h1>
+                    <h2>${escapeHtml(inp.mapel.toUpperCase())} — ${escapeHtml(inp.materi.toUpperCase())}</h2>
+                </div>
+
+                <h3>A. INFORMASI UMUM</h3>
+
+                <h4>IDENTITAS MODUL</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Nama Penyusun</strong></td><td>${escapeHtml(inp.penyusun)}</td></tr>
+                        <tr><td><strong>Satuan Pendidikan</strong></td><td>${escapeHtml(inp.sekolah)}</td></tr>
+                        <tr><td><strong>Mata Pelajaran</strong></td><td>${escapeHtml(inp.mapel)}</td></tr>
+                        <tr><td><strong>Fase / Kelas</strong></td><td>${escapeHtml(inp.jenjang)} / ${escapeHtml(inp.kelas)}</td></tr>
+                        <tr><td><strong>Semester</strong></td><td>${escapeHtml(inp.semester)}</td></tr>
+                        <tr><td><strong>Materi Pokok</strong></td><td>${escapeHtml(inp.materi)}</td></tr>
+                        <tr><td><strong>Alokasi Waktu</strong></td><td>${escapeHtml(inp.waktu)}</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>KOMPETENSI AWAL</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Pengetahuan Prasyarat</strong></td><td>Peserta didik pada ${escapeHtml(inp.kelas)} telah mengenal istilah dasar dan fenomena umum yang berkaitan dengan ${escapeHtml(inp.materi)}.</td></tr>
+                        <tr><td><strong>Keterampilan Awal</strong></td><td>Peserta didik mampu membaca informasi singkat, menyampaikan pendapat sederhana, dan bekerja sama dalam kelompok kecil.</td></tr>
+                        <tr><td><strong>Contoh Kemampuan Awal</strong></td><td>Peserta didik dapat menyebutkan contoh pengalaman sehari-hari yang terkait dengan ${escapeHtml(inp.materi)} saat diajak berdiskusi awal.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>PROFIL PELAJAR PANCASILA / PROFIL LULUSAN</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Bernalar Kritis</strong></td><td>Menganalisis permasalahan, bukti, dan hubungan antarunsur pada ${escapeHtml(inp.materi)} secara logis.</td></tr>
+                        <tr><td><strong>Gotong Royong</strong></td><td>Berbagi peran, mendengarkan pendapat teman, dan menyusun kesimpulan bersama dalam diskusi kelompok.</td></tr>
+                        <tr><td><strong>Mandiri &amp; Berkebinekaan Global</strong></td><td>Menyelesaikan tugas secara bertanggung jawab serta menghargai keberagaman pendapat di ${escapeHtml(inp.sekolah)}.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>SARANA DAN PRASARANA</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Sumber &amp; Bahan Ajar</strong></td><td>Buku teks ${escapeHtml(inp.mapel)} (${escapeHtml(inp.jenjang)}), bahan bacaan ringkas, dan studi kasus ${escapeHtml(inp.materi)}.</td></tr>
+                        <tr><td><strong>Media &amp; Perlengkapan</strong></td><td>LKPD terintegrasi kegiatan inti, papan tulis/spidol, audio/lagu nasional, serta contoh gambar/tayangan relevan.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>TARGET PESERTA DIDIK</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Kelompok Sasaran</strong></td><td>Peserta didik reguler/tipikal ${escapeHtml(inp.kelas)} (Semester ${escapeHtml(inp.semester)}) di ${escapeHtml(inp.sekolah)}.</td></tr>
+                        <tr><td><strong>Kebutuhan Diferensiasi</strong></td><td>Mencakup peserta didik dengan kesiapan awal beragam, termasuk yang memerlukan pengayaan maupun pendampingan remedial.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>MODEL DAN METODE PEMBELAJARAN</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Model Pembelajaran</strong></td><td><strong>${escapeHtml(syntax.label)}</strong></td></tr>
+                        <tr><td><strong>Alasan Pemilihan Model</strong></td><td>${escapeHtml(syntax.rationale)}</td></tr>
+                        <tr><td><strong>Urutan Sintaks / Tahapan</strong></td><td>${syntax.steps.map((s, i) => `${i + 1}. ${escapeHtml(s.name)}`).join(' — ')}</td></tr>
+                        <tr><td><strong>Metode Pembelajaran</strong></td><td>Diskusi kelompok, analisis studi kasus, tanya jawab terarah, dan presentasi hasil.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>B. KOMPONEN INTI</h3>
+
+                <h4>CAPAIAN PEMBELAJARAN (CP)</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Rumusan CP</strong></td><td>${cpIsi}</td></tr>
+                        <tr><td><strong>Keterangan Sumber CP</strong></td><td>${escapeHtml(cpContoh)}</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>TUJUAN PEMBELAJARAN (TP)</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>TP 1 (Pemahaman Konsep)</strong></td><td>Menjelaskan pengertian, unsur utama, dan prinsip dasar ${escapeHtml(inp.materi)} secara tepat.</td></tr>
+                        <tr><td><strong>TP 2 (Analisis Kasus)</strong></td><td>Menganalisis permasalahan/contoh terkait ${escapeHtml(inp.materi)} dan mengaitkannya dengan bukti/alasan logis.</td></tr>
+                        <tr><td><strong>TP 3 (Simpulan &amp; Penerapan)</strong></td><td>Merumuskan kesimpulan atau solusi penerapan ${escapeHtml(inp.materi)} yang runtut dan sesuai konteks.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>PEMAHAMAN BERMAKNA</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Makna Utama</strong></td><td>Memahami ${escapeHtml(inp.materi)} membantu peserta didik bertindak cermat, logis, dan bertanggung jawab dalam situasi nyata.</td></tr>
+                        <tr><td><strong>Penerapan Sehari-hari</strong></td><td>Prinsip ${escapeHtml(inp.materi)} dapat diterapkan dalam menjaga ketertiban, kerja sama, dan pemecahan masalah di rumah, ${escapeHtml(inp.sekolah)}, dan masyarakat.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>PERTANYAAN PEMANTIK</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Pertanyaan Pemantik 1</strong></td><td>"Mengapa situasi atau permasalahan yang berkaitan dengan ${escapeHtml(inp.materi)} dapat muncul dalam kehidupan sehari-hari?"</td></tr>
+                        <tr><td><strong>Pertanyaan Pemantik 2</strong></td><td>"Bagaimana cara membedakan tindakan yang tepat dan kurang tepat berdasarkan konsep ${escapeHtml(inp.materi)}?"</td></tr>
+                        <tr><td><strong>Pertanyaan Pemantik 3</strong></td><td>"Apa langkah yang paling perlu dilakukan agar penerapan ${escapeHtml(inp.materi)} memberikan hasil yang baik?"</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>PERSIAPAN PEMBELAJARAN</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Persiapan Perangkat &amp; Media</strong></td><td>Menyiapkan bahan bacaan, studi kasus ${escapeHtml(inp.materi)}, LKPD sesuai sintaks ${escapeHtml(syntax.label)}, dan media audio lagu nasional.</td></tr>
+                        <tr><td><strong>Persiapan Asesmen &amp; Waktu</strong></td><td>Menyiapkan instrumen diagnostik, formatif, sumatif, rubrik penilaian, serta pembagian alokasi waktu ${escapeHtml(inp.waktu)}.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>MATERI PEMBELAJARAN</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:24%;">Aspek Materi</th>
+                            <th style="width:40%;">Uraian Sistematis</th>
+                            <th style="width:36%;">Contoh Penerapan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pengertian &amp; Konsep Utama</strong></td>
+                            <td>Menguraikan definisi dasar, unsur/komponen utama, dan hubungan sebab-akibat pada ${escapeHtml(inp.materi)} sesuai ${escapeHtml(inp.kelas)} (${escapeHtml(inp.jenjang)}).</td>
+                            <td>Menjelaskan pengertian ${escapeHtml(inp.materi)} dan mengidentifikasi komponen utamanya secara runtut.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Keterkaitan Unsur &amp; Simpulan</strong></td>
+                            <td>Menjelaskan bagaimana perubahan satu unsur memengaruhi bagian lain serta merangkum pokok materi yang esensial.</td>
+                            <td>Menganalisis contoh kasus di ${escapeHtml(inp.sekolah)} dan menyimpulkan prinsip utamanya.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                ${buildDetailedAlurHtml(inp)}
+
+                <h4>ASESMEN PEMBELAJARAN</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:22%;">Jenis Asesmen</th>
+                            <th style="width:26%;">Bentuk Penilaian</th>
+                            <th style="width:52%;">Contoh Instrumen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Diagnostik</strong></td>
+                            <td>Pertanyaan awal / tanya jawab singkat</td>
+                            <td>"Apa yang sudah kamu ketahui tentang ${escapeHtml(inp.materi)} dan contoh apa yang pernah kamu temui?" (Untuk memetakan kesiapan awal).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Formatif</strong></td>
+                            <td>Observasi diskusi &amp; LKPD</td>
+                            <td>Mengidentifikasi unsur utama, menganalisis kasus pada LKPD sesuai TP 1–TP 2, dan memberi umpan balik selama proses.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sumatif</strong></td>
+                            <td>Tes tertulis / analisis kasus &amp; uraian</td>
+                            <td>Menjelaskan konsep, menganalisis kasus terkait ${escapeHtml(inp.materi)}, dan merumuskan kesimpulan/solusi (TP 1–TP 3).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>PENGAYAAN DAN REMEDIAL</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:22%;">Program</th>
+                            <th style="width:38%;">Langkah Pelaksanaan</th>
+                            <th style="width:40%;">Contoh Aktivitas / Tugas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pengayaan</strong></td>
+                            <td>Diberikan kepada peserta didik yang telah mencapai TP untuk memperdalam analisis dan penerapan.</td>
+                            <td>Menganalisis kasus lanjutan yang lebih kompleks atau menyusun contoh penerapan ${escapeHtml(inp.materi)} di lingkungan ${escapeHtml(inp.sekolah)}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Remedial</strong></td>
+                            <td>Diberikan kepada peserta didik yang belum mencapai TP dengan bimbingan bertahap (tidak sekadar mengulang soal yang sama).</td>
+                            <td>Penjelasan ulang konsep dengan contoh konkret yang lebih sederhana, latihan terbimbing, serta kasus baru yang setara.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>REFLEKSI GURU</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:28%;">Aspek Refleksi</th>
+                            <th style="width:72%;">Refleksi Guru</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Ketercapaian Tujuan</strong></td>
+                            <td>Sebagian besar peserta didik di ${escapeHtml(inp.kelas)} diproyeksikan mampu memahami konsep dan menganalisis kasus ${escapeHtml(inp.materi)}, namun beberapa peserta didik masih memerlukan bimbingan dalam merumuskan alasan simpulan secara lengkap.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Keaktifan Peserta Didik</strong></td>
+                            <td>Diskusi kelompok dalam ${escapeHtml(syntax.label)} dirancang untuk mendorong partisipasi aktif, tetapi beberapa peserta didik yang cenderung pendiam perlu didorong melalui pembagian peran yang jelas.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Efektivitas Pembelajaran</strong></td>
+                            <td>Penggunaan studi kasus kontekstual, lagu nasional setelah absensi, dan LKPD terarah membantu peserta didik menghubungkan ${escapeHtml(inp.materi)} dengan situasi nyata dalam durasi ${escapeHtml(inp.waktu)}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kendala Pembelajaran</strong></td>
+                            <td>Perbedaan kecepatan membaca dan berdiskusi antar-kelompok serta keterbatasan waktu presentasi berpotensi muncul bila alokasi waktu tidak dijaga secara disiplin.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tindak Lanjut</strong></td>
+                            <td>Saya akan memberikan pendampingan terarah bagi peserta didik yang belum tuntas, menyiapkan pengayaan bagi yang sudah tuntas, serta menyempurnakan pengelolaan waktu pada pertemuan berikutnya.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>REFLEKSI PESERTA DIDIK</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:20%;">Aspek Refleksi</th>
+                            <th style="width:38%;">Pertanyaan/Panduan dari Guru</th>
+                            <th style="width:42%;">Contoh Respons Peserta Didik</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pemahaman</strong></td>
+                            <td>Apa hal baru yang kamu pahami tentang ${escapeHtml(inp.materi)} setelah mengikuti pembelajaran hari ini?</td>
+                            <td>Saya memahami pengertian pokok ${escapeHtml(inp.materi)}, keterkaitan unsurnya, dan cara menerapkannya secara tepat.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kesulitan</strong></td>
+                            <td>Bagian materi atau kegiatan mana yang masih sulit kamu pahami pada topik ${escapeHtml(inp.materi)}?</td>
+                            <td>Saya masih perlu berlatih menentukan alasan dan bukti yang paling tepat saat menganalisis kasus.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pengalaman</strong></td>
+                            <td>Bagaimana pengalamanmu selama mengikuti kegiatan pembelajaran hari ini dan bagian mana yang paling kamu sukai?</td>
+                            <td>Saya senang berdiskusi dengan teman kelompok dan menyanyikan lagu nasional di awal pembelajaran.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>C. LAMPIRAN</h3>
+
+                <h4>LKPD — ${escapeHtml(inp.materi)}</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:26%;">Komponen LKPD</th>
+                            <th style="width:74%;">Isi &amp; Contoh Operasional</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Judul Kegiatan</strong></td><td>Lembar Kerja Peserta Didik (LKPD): Analisis &amp; Penerapan ${escapeHtml(inp.materi)}</td></tr>
+                        <tr><td><strong>Identitas Peserta Didik</strong></td><td>Nama / Kelompok: ............................... | Kelas / Fase: ${escapeHtml(inp.kelas)} / ${escapeHtml(inp.jenjang)} | Mata Pelajaran: ${escapeHtml(inp.mapel)}</td></tr>
+                        <tr><td><strong>Tujuan Kegiatan</strong></td><td>Menganalisis permasalahan/contoh terkait ${escapeHtml(inp.materi)} secara runtut dan merumuskan kesimpulan berdasarkan bukti yang relevan.</td></tr>
+                        <tr><td><strong>Petunjuk Pengerjaan</strong></td><td>1. Baca stimulus dengan saksama. 2. Diskusikan bersama kelompok sesuai ${escapeHtml(syntax.label)}. 3. Isilah kolom jawaban dan kesimpulan dengan jelas.</td></tr>
+                        <tr><td><strong>Alat dan Bahan</strong></td><td>LKPD, buku teks ${escapeHtml(inp.mapel)}, bahan bacaan/stimulus kasus, alat tulis.</td></tr>
+                        <tr><td><strong>Stimulus (Kasus/Teks)</strong></td><td>Pada kegiatan di ${escapeHtml(inp.sekolah)}/sehari-hari, ditemukan situasi yang berkaitan dengan <strong>${escapeHtml(inp.materi)}</strong> di mana dua pilihan tindakan menghasilkan dampak berbeda sehingga perlu dianalisis berdasarkan konsep dan bukti.</td></tr>
+                        <tr><td><strong>Langkah-Langkah Kegiatan</strong></td><td>1) Amati stimulus dan catat informasi penting. 2) Identifikasi masalah/pertanyaan fokus. 3) Analisis keterkaitan unsur &amp; bukti. 4) Rumuskan kesimpulan dan refleksi bersama.</td></tr>
+                        <tr><td><strong>Pertanyaan / Tugas</strong></td><td>1. Apa inti masalah atau konsep utama pada stimulus ${escapeHtml(inp.materi)}? 2. Bagaimana hubungan unsur-unsur pada kasus tersebut memengaruhi hasilnya? 3. Apa solusi/tindakan paling tepat dan apa alasannya?</td></tr>
+                        <tr><td><strong>Ruang Jawaban</strong></td><td><em>Jawaban 1:</em> ........................................................................................................................<br><em>Jawaban 2:</em> ........................................................................................................................<br><em>Jawaban 3:</em> ........................................................................................................................</td></tr>
+                        <tr><td><strong>Kesimpulan</strong></td><td><em>Tuliskan kesimpulan akhir kelompok:</em> ........................................................................................</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>BAHAN BACAAN GURU DAN PESERTA DIDIK</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:26%;">Komponen</th>
+                            <th style="width:74%;">Uraian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Judul Materi</strong></td><td>${escapeHtml(inp.materi)} (${escapeHtml(inp.mapel)} — ${escapeHtml(inp.kelas)} / ${escapeHtml(inp.jenjang)})</td></tr>
+                        <tr><td><strong>Pengertian</strong></td><td>${escapeHtml(inp.materi)} merupakan pokok bahasan pada ${escapeHtml(inp.mapel)} yang menguraikan konsep dasar, hubungan antarunsur, dan penerapannya secara terarah.</td></tr>
+                        <tr><td><strong>Penjelasan Materi</strong></td><td>Peserta didik mempelajari definisi dasar, ciri/unsur penting, serta hubungan sebab-akibat pada ${escapeHtml(inp.materi)}. Guru memfasilitasi melalui ${escapeHtml(syntax.label)} dan meluruskan miskonsepsi yang mungkin muncul.</td></tr>
+                        <tr><td><strong>Contoh dalam Kehidupan</strong></td><td>Penerapan konsep ${escapeHtml(inp.materi)} dalam kegiatan belajar, kerja sama kelompok, dan pengambilan keputusan sehari-hari di ${escapeHtml(inp.sekolah)} maupun masyarakat.</td></tr>
+                        <tr><td><strong>Pesan Penting</strong></td><td>Ketepatan konsep dan pertimbangan bukti membantu peserta didik menerapkan ${escapeHtml(inp.materi)} secara bertanggung jawab.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>MEDIA PEMBELAJARAN</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:20%;">Jenis Media</th>
+                            <th style="width:30%;">Nama Media</th>
+                            <th style="width:50%;">Fungsi dan Penggunaan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Visual</strong></td><td>Teks/gambar studi kasus ${escapeHtml(inp.materi)} &amp; papan tulis</td><td>Membantu peserta didik mengamati masalah, mencatat unsur utama, dan memetakan simpulan.</td></tr>
+                        <tr><td><strong>Audio</strong></td><td>Lagu nasional Indonesia</td><td>Dinyanyikan setelah absensi pada kegiatan pendahuluan untuk menumbuhkan semangat kebangsaan dan kesiapan belajar.</td></tr>
+                        <tr><td><strong>Cetak</strong></td><td>LKPD &amp; bahan bacaan ${escapeHtml(inp.mapel)}</td><td>Menjadi panduan aktivitas ${escapeHtml(syntax.label)}, analisis kasus, dan pengisian kesimpulan peserta didik.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>INSTRUMEN PENILAIAN</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:8%;">No.</th>
+                            <th style="width:56%;">Pertanyaan / Instrumen</th>
+                            <th style="width:36%;">Indikator yang Dinilai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Apa pengertian dan unsur utama dari ${escapeHtml(inp.materi)}? (Diagnostik/Formatif)</td><td>Kemampuan memahami konsep dasar ${escapeHtml(inp.materi)} (TP 1).</td></tr>
+                        <tr><td>2</td><td>Analisislah penyebab dan dampak pada kasus ${escapeHtml(inp.materi)} di LKPD! (Formatif/Sumatif)</td><td>Kemampuan menganalisis hubungan unsur &amp; bukti kasus (TP 2).</td></tr>
+                        <tr><td>3</td><td>Rumuskan kesimpulan atau solusi penerapan ${escapeHtml(inp.materi)} beserta alasannya! (Sumatif)</td><td>Kemampuan menyimpulkan dan menentukan langkah tepat (TP 3).</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>RUBRIK PENILAIAN</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:20%;">Aspek Penilaian</th>
+                            <th style="width:20%;">Skor 4 (Sangat Baik)</th>
+                            <th style="width:20%;">Skor 3 (Baik)</th>
+                            <th style="width:20%;">Skor 2 (Cukup)</th>
+                            <th style="width:20%;">Skor 1 (Perlu Bimbingan)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pemahaman Konsep</strong></td>
+                            <td>Menjelaskan konsep ${escapeHtml(inp.materi)} dengan tepat, lengkap, dan mandiri.</td>
+                            <td>Menjelaskan konsep ${escapeHtml(inp.materi)} dengan tepat tetapi belum lengkap.</td>
+                            <td>Menjelaskan sebagian konsep dengan beberapa kekeliruan.</td>
+                            <td>Belum mampu menjelaskan konsep meskipun telah dibimbing.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Analisis &amp; Kerja Sama</strong></td>
+                            <td>Menganalisis kasus berbasis bukti dan berkolaborasi aktif dengan kelompok.</td>
+                            <td>Menganalisis kasus dengan cukup tepat dan bekerja sama dengan baik.</td>
+                            <td>Analisis masih terbatas dan sesekali terlibat dalam kelompok.</td>
+                            <td>Belum mampu menganalisis kasus maupun terlibat aktif.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Simpulan &amp; Komunikasi</strong></td>
+                            <td>Menyajikan simpulan/solusi runtut, logis, dan jelas saat dipaparkan.</td>
+                            <td>Menyajikan simpulan/solusi cukup jelas dan sesuai topik.</td>
+                            <td>Simpulan masih umum atau penyampaian kurang runtut.</td>
+                            <td>Belum mampu menyusun atau menyampaikan simpulan.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>PEDOMAN PENSKORAN</h4>
+                <table>
+                    <tbody>
+                        <tr><td style="width:32%;"><strong>Skor Maksimal</strong></td><td>12 (3 aspek × skor maksimal 4)</td></tr>
+                        <tr><td><strong>Skor Minimal</strong></td><td>3 (3 aspek × skor minimal 1)</td></tr>
+                        <tr><td><strong>Rumus Nilai</strong></td><td>(Skor Perolehan / Skor Maksimal) × 100</td></tr>
+                        <tr><td><strong>Kategori</strong></td><td>Disesuaikan dengan kriteria ketercapaian tujuan pembelajaran (KKTP) satuan pendidikan.</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>LAMPIRAN PENDUKUNG (KUNCI JAWABAN, GLOSARIUM &amp; DAFTAR PUSTAKA)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:26%;">Jenis Lampiran</th>
+                            <th style="width:74%;">Isi Lampiran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Kunci Jawaban Acuan</strong></td><td>1) Definisi dan unsur inti ${escapeHtml(inp.materi)} sesuai konsep ${escapeHtml(inp.mapel)}; 2) Analisis unsur &amp; bukti yang relevan dengan stimulus; 3) Simpulan/solusi yang logis dan dapat diterapkan.</td></tr>
+                        <tr><td><strong>Glosarium</strong></td><td><strong>${escapeHtml(inp.materi)}:</strong> Materi pokok pembelajaran; <strong>Asesmen Formatif:</strong> Penilaian proses belajar; <strong>Refleksi:</strong> Peninjauan kembali pengalaman dan pemahaman belajar.</td></tr>
+                        <tr><td><strong>Daftar Pustaka</strong></td><td>Kemendikbudristek (2024), <em>Capaian Pembelajaran Kurikulum Merdeka</em>; Buku Teks ${escapeHtml(inp.mapel)} (${escapeHtml(inp.jenjang)}).</td></tr>
                     </tbody>
                 </table>
             `;
