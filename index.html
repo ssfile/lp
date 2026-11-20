@@ -137,6 +137,31 @@
       color: var(--text-secondary);
     }
 
+    /* Rich Text (MS Word-like) Rendered Content */
+    .rich-doc-content {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.75;
+    }
+    .rich-doc-content h1, .rich-doc-content h2, .rich-doc-content h3 {
+      color: var(--text-primary);
+      font-weight: 800;
+      margin-top: 1rem;
+      margin-bottom: 0.45rem;
+      line-height: 1.3;
+    }
+    .rich-doc-content h2 { font-size: 1.15rem; }
+    .rich-doc-content h3 { font-size: 1rem; }
+    .rich-doc-content p { margin-bottom: 0.65rem; }
+    .rich-doc-content ul { list-style-type: disc; padding-left: 1.35rem; margin-bottom: 0.7rem; }
+    .rich-doc-content ol { list-style-type: decimal; padding-left: 1.35rem; margin-bottom: 0.7rem; }
+    .rich-doc-content li { margin-bottom: 0.25rem; }
+    .rich-doc-content a { color: var(--text-primary); text-decoration: underline; font-weight: 600; }
+
+    .msword-editor-surface:focus {
+      outline: none;
+    }
+
     .reveal {
       opacity: 0;
       transform: translateY(14px);
@@ -650,18 +675,25 @@
   </main>
 
   <!-- =======================================================================
-       VIEW 2: FEATURE DETAIL (#view-feature-detail)
+       VIEW 2: FEATURE / MODULE DETAIL (#view-feature-detail)
        ======================================================================= -->
-  <section id="view-feature-detail" class="view-container hidden white-grid-bg py-12 min-h-[75vh]">
+  <section id="view-feature-detail" class="view-container hidden white-grid-bg py-10 sm:py-12 min-h-[75vh]">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <button
-        type="button"
-        onclick="navigateTo('/')"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border theme-border bg-white text-xs font-semibold hover:bg-slate-50 mb-6 cursor-pointer"
-      >
-        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        <span>Kembali ke Beranda</span>
-      </button>
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+        <button
+          type="button"
+          id="feature-back-btn"
+          onclick="handleBackFromFeatureDetail()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border theme-border bg-white text-xs font-semibold hover:bg-slate-50 cursor-pointer"
+        >
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span id="feature-back-label">Kembali</span>
+        </button>
+
+        <span id="feature-detail-source-badge" class="px-3 py-1 rounded-full border theme-border bg-white text-[11px] font-semibold theme-muted">
+          Detail Modul AI
+        </span>
+      </div>
 
       <div id="feature-detail-card" class="theme-card rounded-3xl p-6 sm:p-8 shadow-sm">
         <!-- Populated dynamically -->
@@ -729,7 +761,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="theme-card rounded-3xl p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div class="text-xs font-semibold theme-muted">Workspace Member Aktif</div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold theme-muted">Workspace Member Aktif</span>
+            <span id="member-total-modules-badge" class="px-2.5 py-0.5 rounded-full border theme-border bg-slate-50 text-[11px] font-bold">
+              10 Modul Tersedia
+            </span>
+          </div>
           <h1 id="member-welcome-title" class="text-xl font-extrabold mt-0.5">Selamat Datang, Member</h1>
           <p id="member-session-meta" class="text-xs theme-secondary mt-0.5"></p>
         </div>
@@ -744,7 +781,7 @@
       </div>
 
       <div id="member-apps-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        <!-- Populated dynamically -->
+        <!-- Populated dynamically with all features from appState.features -->
       </div>
     </div>
   </section>
@@ -1256,13 +1293,15 @@
         </div>
       </div>
 
-      <!-- TAB 5: ADD / EDIT AI FEATURES & FAQ -->
+      <!-- TAB 5: ADD / EDIT AI FEATURES (MS WORD EDITOR, YOUTUBE, 2 CUSTOM BUTTONS) & FAQ -->
       <div id="admin-panel-features" class="admin-panel hidden space-y-6">
         <div class="theme-card rounded-3xl p-5 sm:p-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b theme-border mb-5">
             <div>
               <h2 class="text-base font-extrabold">Tambah &amp; Edit Fitur / Tools AI + Daftar FAQ</h2>
-              <p class="text-xs theme-muted">Tambah tools AI baru, edit fitur yang sudah ada (termasuk 10 fitur awal), atau kelola FAQ tanpa mengedit HTML.</p>
+              <p class="text-xs theme-muted">
+                Setiap fitur baru/edit otomatis tampil di Dashboard Member, dilengkapi editor Deskripsi Lengkap ala MS Word, Video YouTube, dan 2 Tombol Kustom.
+              </p>
             </div>
             <div class="flex flex-wrap gap-2">
               <button type="button" onclick="addFeatureRowInAdmin()" class="px-3.5 py-2 rounded-xl border theme-border bg-white text-xs font-semibold hover:bg-slate-50 inline-flex items-center gap-1 cursor-pointer">
@@ -1279,7 +1318,7 @@
             </div>
           </div>
 
-          <div id="admin-features-editor-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div id="admin-features-editor-list" class="space-y-5 mb-8">
             <!-- Populated dynamically -->
           </div>
 
@@ -1370,7 +1409,7 @@
     };
 
     const APP_ID = "default-app-id";
-    const STORAGE_KEY = "aksa_ai_realtime_state_v2";
+    const STORAGE_KEY = "aksa_ai_realtime_state_v3";
 
     const DEFAULT_COLORS = {
       bgPrimary: "#ffffff",
@@ -1387,18 +1426,26 @@
       borderColor: "#e2e8f0"
     };
 
-    const DEFAULT_FEATURES = [
-      { id: "ai-01", num: "01", title: "Copywriter Konversi", category: "Konten", icon: "pen-tool", description: "Menyusun hook iklan, caption, dan landing page persuasif dalam hitungan detik.", url: "#harga" },
-      { id: "ai-02", num: "02", title: "Riset Pasar & Audiens", category: "Riset", icon: "search", description: "Memetakan pain point, minat, dan peluang niche pasar secara terstruktur.", url: "#harga" },
-      { id: "ai-03", num: "03", title: "Asisten CS Otomatis", category: "Operasional", icon: "bot", description: "Menyiapkan balasan pertanyaan pelanggan yang konsisten, ramah, dan cepat.", url: "#harga" },
-      { id: "ai-04", num: "04", title: "Generator Ide Konten", category: "Konten", icon: "lightbulb", description: "Menghasilkan kalender konten mingguan untuk video pendek dan artikel.", url: "#harga" },
-      { id: "ai-05", num: "05", title: "Skrip Video & Reels", category: "Konten", icon: "video", description: "Merangkai alur cerita opening, isi, dan call-to-action yang siap rekam.", url: "#harga" },
-      { id: "ai-06", num: "06", title: "Analisa Kampanye", category: "Analitik", icon: "bar-chart-2", description: "Meringkas performa metrik dan memberi rekomendasi optimasi berikutnya.", url: "#harga" },
-      { id: "ai-07", num: "07", title: "SOP & Dokumen Bisnis", category: "Operasional", icon: "file-text", description: "Menyusun standar operasional prosedur tim agar kerja lebih rapi dan terukur.", url: "#harga" },
-      { id: "ai-08", num: "08", title: "Email & Follow-Up", category: "Penjualan", icon: "mail", description: "Merancang urutan pesan tindak lanjut prospek agar tidak kehilangan peluang.", url: "#harga" },
-      { id: "ai-09", num: "09", title: "Ringkasan Rapat & Riset", category: "Analitik", icon: "file-check-2", description: "Mengubah catatan panjang menjadi poin keputusan dan action item jelas.", url: "#harga" },
-      { id: "ai-10", num: "10", title: "Prompt & Workflow Studio", category: "Riset", icon: "workflow", description: "Menyimpan dan menjalankan template alur kerja AI favorit secara berulang.", url: "#harga" }
-    ];
+    function createDefaultFeatures() {
+      const base = [
+        { id: "ai-01", num: "01", title: "Copywriter Konversi", category: "Konten", icon: "pen-tool", description: "Menyusun hook iklan, caption, dan landing page persuasif dalam hitungan detik.", youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", btn1Text: "Buka Tools AI", btn1Url: "#harga", btn2Text: "Panduan Penggunaan", btn2Url: "#faq" },
+        { id: "ai-02", num: "02", title: "Riset Pasar & Audiens", category: "Riset", icon: "search", description: "Memetakan pain point, minat, dan peluang niche pasar secara terstruktur.", youtubeUrl: "", btn1Text: "Mulai Riset", btn1Url: "#harga", btn2Text: "Lihat Paket", btn2Url: "#harga" },
+        { id: "ai-03", num: "03", title: "Asisten CS Otomatis", category: "Operasional", icon: "bot", description: "Menyiapkan balasan pertanyaan pelanggan yang konsisten, ramah, dan cepat.", youtubeUrl: "", btn1Text: "Buka Asisten CS", btn1Url: "#harga", btn2Text: "Hubungi Admin", btn2Url: "#faq" },
+        { id: "ai-04", num: "04", title: "Generator Ide Konten", category: "Konten", icon: "lightbulb", description: "Menghasilkan kalender konten mingguan untuk video pendek dan artikel.", youtubeUrl: "", btn1Text: "Generate Ide", btn1Url: "#harga", btn2Text: "Info Paket", btn2Url: "#harga" },
+        { id: "ai-05", num: "05", title: "Skrip Video & Reels", category: "Konten", icon: "video", description: "Merangkai alur cerita opening, isi, dan call-to-action yang siap rekam.", youtubeUrl: "", btn1Text: "Buat Skrip", btn1Url: "#harga", btn2Text: "Bantuan FAQ", btn2Url: "#faq" },
+        { id: "ai-06", num: "06", title: "Analisa Kampanye", category: "Analitik", icon: "bar-chart-2", description: "Meringkas performa metrik dan memberi rekomendasi optimasi berikutnya.", youtubeUrl: "", btn1Text: "Analisa Data", btn1Url: "#harga", btn2Text: "Detail Paket", btn2Url: "#harga" },
+        { id: "ai-07", num: "07", title: "SOP & Dokumen Bisnis", category: "Operasional", icon: "file-text", description: "Menyusun standar operasional prosedur tim agar kerja lebih rapi dan terukur.", youtubeUrl: "", btn1Text: "Susun SOP", btn1Url: "#harga", btn2Text: "FAQ", btn2Url: "#faq" },
+        { id: "ai-08", num: "08", title: "Email & Follow-Up", category: "Penjualan", icon: "mail", description: "Merancang urutan pesan tindak lanjut prospek agar tidak kehilangan peluang.", youtubeUrl: "", btn1Text: "Buat Follow-Up", btn1Url: "#harga", btn2Text: "Paket All-in-One", btn2Url: "#harga" },
+        { id: "ai-09", num: "09", title: "Ringkasan Rapat & Riset", category: "Analitik", icon: "file-check-2", description: "Mengubah catatan panjang menjadi poin keputusan dan action item jelas.", youtubeUrl: "", btn1Text: "Ringkas Dokumen", btn1Url: "#harga", btn2Text: "FAQ", btn2Url: "#faq" },
+        { id: "ai-10", num: "10", title: "Prompt & Workflow Studio", category: "Riset", icon: "workflow", description: "Menyimpan dan menjalankan template alur kerja AI favorit secara berulang.", youtubeUrl: "", btn1Text: "Buka Workflow", btn1Url: "#harga", btn2Text: "Paket All-in-One", btn2Url: "#harga" }
+      ];
+      return base.map((item) => ({
+        ...item,
+        fullDescription: `<p><strong>${item.title}</strong> membantu Anda mempercepat proses kerja pada kategori <em>${item.category}</em>.</p><p>${item.description}</p><ul><li>Langkah 1: Siapkan konteks utama atau target audiens Anda.</li><li>Langkah 2: Jalankan instruksi modul sesuai kebutuhan hasil.</li><li>Langkah 3: Tinjau dan sesuaikan output sebelum dipublikasikan.</li></ul>`
+      }));
+    }
+
+    const DEFAULT_FEATURES = createDefaultFeatures();
 
     const DEFAULT_FAQ = [
       {
@@ -1410,8 +1457,8 @@
         a: "Ya. Selama terhubung ke Cloud Firestore, setiap perubahan section, About Me, testimoni (foto & bintang), warna, identitas/logo, fitur AI, FAQ, maupun data member langsung tersinkronisasi tanpa perlu refresh manual."
       },
       {
-        q: "Apakah admin bisa menambah fitur/tools AI baru tanpa edit HTML?",
-        a: "Ya. Di tab Tambah/Edit Fitur AI & FAQ pada Dashboard Admin, Anda bisa menambah tools AI baru, mengedit fitur yang ada, atau menghapus fitur yang tidak diperlukan."
+        q: "Apakah admin bisa menambah fitur/tools AI baru dan mengedit deskripsi lengkap ala MS Word?",
+        a: "Ya. Di tab Tambah/Edit Fitur AI & FAQ pada Dashboard Admin, Anda bisa menambah fitur baru (otomatis tampil di dashboard member), mengedit Deskripsi Lengkap dengan toolbar format teks ala MS Word, mengatur link YouTube, serta mengkustomisasi 2 tombol."
       },
       {
         q: "Bagaimana cara mengatur foto dan bintang pada testimoni?",
@@ -1499,18 +1546,40 @@
       ]
     };
 
+    function normalizeFeature(f, idx = 0) {
+      const fallbackDesc = f.description || "Deskripsi modul AI.";
+      return {
+        id: f.id || `ai-${idx + 1}`,
+        num: String(idx + 1).padStart(2, "0"),
+        title: f.title || `Tools AI #${idx + 1}`,
+        category: f.category || "Konten",
+        icon: f.icon || "sparkles",
+        description: fallbackDesc,
+        fullDescription: f.fullDescription || `<p>${escapeHtml(fallbackDesc)}</p>`,
+        youtubeUrl: f.youtubeUrl || "",
+        btn1Text: f.btn1Text || "Buka Akses",
+        btn1Url: f.btn1Url || "#harga",
+        btn2Text: f.btn2Text || "Pusat Bantuan",
+        btn2Url: f.btn2Url || "#faq",
+        url: f.url || "#harga"
+      };
+    }
+
     function loadLocalState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return structuredClone(DEFAULT_STATE);
         const parsed = JSON.parse(raw);
+        const rawFeatures = Array.isArray(parsed.features) && parsed.features.length
+          ? parsed.features
+          : structuredClone(DEFAULT_FEATURES);
         return {
           ...structuredClone(DEFAULT_STATE),
           ...parsed,
           identity: { ...DEFAULT_STATE.identity, ...(parsed.identity || {}) },
           colors: { ...DEFAULT_COLORS, ...(parsed.colors || {}) },
           sections: { ...DEFAULT_STATE.sections, ...(parsed.sections || {}) },
-          features: Array.isArray(parsed.features) && parsed.features.length ? parsed.features : structuredClone(DEFAULT_FEATURES),
+          features: rawFeatures.map((f, i) => normalizeFeature(f, i)),
           faq: Array.isArray(parsed.faq) && parsed.faq.length ? parsed.faq : structuredClone(DEFAULT_FAQ),
           testimonials: Array.isArray(parsed.testimonials) && parsed.testimonials.length ? parsed.testimonials : structuredClone(DEFAULT_STATE.testimonials),
           members: Array.isArray(parsed.members) ? parsed.members : structuredClone(DEFAULT_STATE.members)
@@ -1525,6 +1594,8 @@
     let openFaqIndex = 0;
     let currentAdminUser = null;
     let currentMemberSession = null;
+    let currentDetailFeatureId = appState.features[0]?.id || "ai-01";
+    let featureDetailSource = "landing"; // "landing" | "member"
     let isRemoteApplying = false;
 
     function getActiveAuthUser() {
@@ -1661,7 +1732,6 @@
       }
     }
 
-    // Real-time Firestore Listeners across devices
     function startRealtimeListeners() {
       onSnapshot(
         settingsDocRef,
@@ -1691,7 +1761,9 @@
           if (!snap.exists()) return;
           const data = snap.data();
           isRemoteApplying = true;
-          if (Array.isArray(data.features) && data.features.length) appState.features = data.features;
+          if (Array.isArray(data.features) && data.features.length) {
+            appState.features = data.features.map((f, i) => normalizeFeature(f, i));
+          }
           if (Array.isArray(data.faq) && data.faq.length) appState.faq = data.faq;
           saveLocalState();
           renderAll();
@@ -1712,7 +1784,7 @@
             isRemoteApplying = true;
             appState.members = cloudMembers;
             saveLocalState();
-            hydrateAdminEditors();
+            hydrateAdminEditors(false);
             if (window.lucide) window.lucide.createIcons();
             isRemoteApplying = false;
           }
@@ -1723,7 +1795,7 @@
       onAuthStateChanged(fbAuth, (user) => {
         currentAdminUser = user || null;
         updateAccountSessionUI();
-        hydrateAdminEditors();
+        hydrateAdminEditors(false);
         if (currentAdminUser && !isRemoteApplying) {
           setSyncIndicator("Cloud Firestore Live", true);
         } else if (!currentAdminUser) {
@@ -1827,7 +1899,7 @@
                 <div class="text-[11px] theme-muted truncate">${escapeHtml(f.category)}</div>
               </div>
             </div>
-            <button type="button" onclick="openFeatureDetail('${escapeAttr(f.id)}')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg border theme-border hover:bg-slate-50 cursor-pointer">
+            <button type="button" onclick="openFeatureDetail('${escapeAttr(f.id)}', 'landing')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg border theme-border hover:bg-slate-50 cursor-pointer">
               Detail
             </button>
           </div>
@@ -1889,7 +1961,7 @@
           <div class="pt-3 mt-3 border-t theme-border">
             <button
               type="button"
-              onclick="openFeatureDetail('${escapeAttr(feat.id)}')"
+              onclick="openFeatureDetail('${escapeAttr(feat.id)}', 'landing')"
               class="theme-btn w-full py-2 px-3 rounded-xl text-[11px] sm:text-xs font-semibold inline-flex items-center justify-center gap-1 cursor-pointer"
             >
               <span>Buka Fitur</span>
@@ -2061,6 +2133,11 @@
       const grid = document.getElementById("member-apps-grid");
       const welcome = document.getElementById("member-welcome-title");
       const meta = document.getElementById("member-session-meta");
+      const badge = document.getElementById("member-total-modules-badge");
+
+      if (badge) {
+        badge.textContent = `${appState.features.length} Modul Tersedia`;
+      }
       if (welcome && currentMemberSession) {
         welcome.textContent = `Selamat Datang, ${currentMemberSession.name}`;
       }
@@ -2071,18 +2148,23 @@
 
       grid.innerHTML = appState.features
         .map(
-          (feat) => `
+          (feat, idx) => `
         <div class="theme-card rounded-2xl p-4 flex flex-col justify-between">
           <div>
-            <span class="w-9 h-9 rounded-xl border theme-border bg-slate-50 flex items-center justify-center mb-3">
-              <i data-lucide="${escapeAttr(feat.icon || "sparkles")}" class="w-4 h-4"></i>
-            </span>
-            <h3 class="text-xs sm:text-sm font-bold">${escapeHtml(feat.title)}</h3>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="w-9 h-9 rounded-xl border theme-border bg-slate-50 flex items-center justify-center">
+                <i data-lucide="${escapeAttr(feat.icon || "sparkles")}" class="w-4 h-4"></i>
+              </span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border theme-border theme-muted">
+                #${String(idx + 1).padStart(2, "0")}
+              </span>
+            </div>
+            <h3 class="text-xs sm:text-sm font-bold line-clamp-1">${escapeHtml(feat.title)}</h3>
             <p class="text-[11px] theme-secondary mt-1 line-clamp-2">${escapeHtml(feat.description)}</p>
           </div>
           <button
             type="button"
-            onclick="openFeatureDetail('${escapeAttr(feat.id)}')"
+            onclick="openFeatureDetail('${escapeAttr(feat.id)}', 'member')"
             class="theme-btn mt-4 w-full py-2 px-3 rounded-xl text-xs font-semibold cursor-pointer"
           >
             Buka Modul
@@ -2093,7 +2175,211 @@
         .join("");
     }
 
-    function hydrateAdminEditors() {
+    function extractYoutubeEmbedUrl(url = "") {
+      const clean = String(url || "").trim();
+      if (!clean) return "";
+      const watchMatch = clean.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+      if (watchMatch && watchMatch[1]) {
+        return `https://www.youtube.com/embed/${watchMatch[1]}`;
+      }
+      const shortMatch = clean.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+      if (shortMatch && shortMatch[1]) {
+        return `https://www.youtube.com/embed/${shortMatch[1]}`;
+      }
+      const embedMatch = clean.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{6,})/);
+      if (embedMatch && embedMatch[1]) {
+        return `https://www.youtube.com/embed/${embedMatch[1]}`;
+      }
+      const shortsMatch = clean.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/);
+      if (shortsMatch && shortsMatch[1]) {
+        return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+      }
+      return "";
+    }
+
+    function renderFeatureDetailView() {
+      const feat = appState.features.find((f) => f.id === currentDetailFeatureId) || appState.features[0];
+      const card = document.getElementById("feature-detail-card");
+      const backLabel = document.getElementById("feature-back-label");
+      const srcBadge = document.getElementById("feature-detail-source-badge");
+
+      if (backLabel) {
+        backLabel.textContent = featureDetailSource === "member" ? "Kembali ke Dashboard Member" : "Kembali ke Beranda";
+      }
+      if (srcBadge) {
+        srcBadge.textContent = featureDetailSource === "member" ? "Workspace Member • Detail Modul" : "Katalog Publik • Detail Modul";
+      }
+      if (!feat || !card) return;
+
+      const embedUrl = extractYoutubeEmbedUrl(feat.youtubeUrl || "");
+      const videoSectionHtml = embedUrl
+        ? `
+          <div class="mt-6 pt-6 border-t theme-border">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="play-circle" class="w-4 h-4"></i>
+                <span>Video Panduan YouTube</span>
+              </div>
+              <a href="${escapeAttr(feat.youtubeUrl)}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-semibold underline">
+                Buka di YouTube ↗
+              </a>
+            </div>
+            <div class="relative w-full overflow-hidden rounded-2xl border theme-border bg-slate-900" style="aspect-ratio: 16 / 9;">
+              <iframe
+                src="${escapeAttr(embedUrl)}"
+                title="${escapeAttr(feat.title)} - Video YouTube"
+                class="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        `
+        : feat.youtubeUrl
+        ? `
+          <div class="mt-6 pt-6 border-t theme-border">
+            <div class="p-4 rounded-2xl border theme-border bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs">
+                <i data-lucide="video" class="w-4 h-4"></i>
+                <span>Tautan Video: <strong>${escapeHtml(feat.youtubeUrl)}</strong></span>
+              </div>
+              <a href="${escapeAttr(feat.youtubeUrl)}" target="_blank" rel="noopener noreferrer" class="theme-btn px-3.5 py-2 rounded-xl text-xs font-semibold">
+                Tonton Video ↗
+              </a>
+            </div>
+          </div>
+        `
+        : "";
+
+      const btn1Text = (feat.btn1Text || "").trim() || "Buka Tautan 1";
+      const btn1Url = (feat.btn1Url || "").trim() || "#";
+      const btn2Text = (feat.btn2Text || "").trim() || "Buka Tautan 2";
+      const btn2Url = (feat.btn2Url || "").trim() || "#";
+
+      card.innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-4 pb-6 border-b theme-border">
+          <div class="flex items-center gap-3.5">
+            <span class="w-12 h-12 rounded-2xl border theme-border bg-slate-50 flex items-center justify-center shrink-0">
+              <i data-lucide="${escapeAttr(feat.icon || "sparkles")}" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border theme-border bg-slate-50">
+                  ${escapeHtml(feat.category)}
+                </span>
+                <span class="text-[11px] font-semibold theme-muted">Modul #${escapeHtml(feat.num || "AI")}</span>
+              </div>
+              <h1 class="text-xl sm:text-2xl font-extrabold mt-1">${escapeHtml(feat.title)}</h1>
+              <p class="text-xs sm:text-sm theme-secondary mt-0.5">${escapeHtml(feat.description)}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deskripsi Lengkap -->
+        <div class="mt-6">
+          <div class="text-xs font-bold uppercase tracking-wider theme-muted mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>Deskripsi Lengkap</span>
+          </div>
+          <div class="rich-doc-content p-4 sm:p-5 rounded-2xl border theme-border bg-slate-50/50">
+            ${feat.fullDescription || `<p>${escapeHtml(feat.description)}</p>`}
+          </div>
+        </div>
+
+        <!-- Kotak Video YouTube -->
+        ${videoSectionHtml}
+
+        <!-- 2 Tombol Kustom (Teks & Link diatur di Admin) -->
+        <div class="mt-7 pt-6 border-t theme-border flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <button
+            type="button"
+            onclick="handleCustomFeatureAction('${escapeAttr(btn1Url)}')"
+            class="theme-btn flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-semibold inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>${escapeHtml(btn1Text)}</span>
+            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+          </button>
+
+          <button
+            type="button"
+            onclick="handleCustomFeatureAction('${escapeAttr(btn2Url)}')"
+            class="flex-1 py-3 px-5 rounded-xl text-xs sm:text-sm font-semibold border theme-border bg-white hover:bg-slate-50 inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>${escapeHtml(btn2Text)}</span>
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `;
+    }
+
+    window.handleCustomFeatureAction = function (rawUrl = "") {
+      const target = String(rawUrl || "").trim();
+      if (!target || target === "#") return;
+      if (target.startsWith("#")) {
+        const anchorId = target.slice(1);
+        navigateTo("/");
+        setTimeout(() => {
+          document.getElementById(anchorId)?.scrollIntoView({ behavior: "smooth" });
+        }, 90);
+        return;
+      }
+      window.open(target, "_blank", "noopener,noreferrer");
+    };
+
+    window.handleBackFromFeatureDetail = function () {
+      if (featureDetailSource === "member" && currentMemberSession) {
+        navigateTo("/member");
+      } else {
+        navigateTo("/");
+      }
+    };
+
+    function syncAllAdminFormInputsToState() {
+      // Sync feature fields & MS Word rich editor content before re-rendering
+      document.querySelectorAll(".adm-feat-input").forEach((el) => {
+        const idx = Number(el.getAttribute("data-feat-idx"));
+        const field = el.getAttribute("data-field");
+        if (appState.features[idx] && field) {
+          appState.features[idx][field] = el.value;
+        }
+      });
+      document.querySelectorAll(".msword-editor-surface").forEach((editorEl) => {
+        const idx = Number(editorEl.getAttribute("data-feat-idx"));
+        if (appState.features[idx]) {
+          appState.features[idx].fullDescription = editorEl.innerHTML;
+        }
+      });
+
+      // Sync FAQ fields
+      const faqRows = document.querySelectorAll("#admin-faq-editor-list > div");
+      if (faqRows.length) {
+        const nextFaq = [];
+        faqRows.forEach((row) => {
+          const q = row.querySelector('[data-field="q"]')?.value ?? "";
+          const a = row.querySelector('[data-field="a"]')?.value ?? "";
+          if (q.trim() || a.trim()) nextFaq.push({ q: q.trim(), a: a.trim() });
+        });
+        if (nextFaq.length) appState.faq = nextFaq;
+      }
+
+      // Sync Testimonials fields
+      const testInputs = document.querySelectorAll(".adm-test-input");
+      if (testInputs.length) {
+        testInputs.forEach((el) => {
+          const idx = Number(el.getAttribute("data-test-idx"));
+          const field = el.getAttribute("data-field");
+          if (appState.testimonials[idx] && field) {
+            appState.testimonials[idx][field] = field === "rating" ? Number(el.value || 5) : el.value;
+          }
+        });
+      }
+    }
+
+    function hydrateAdminEditors(preserveUnsaved = true) {
+      if (preserveUnsaved) {
+        syncAllAdminFormInputsToState();
+      }
+
       const s = appState.sections;
       const setVal = (id, v) => {
         const el = document.getElementById(id);
@@ -2130,7 +2416,7 @@
       setVal("sec-footer-desc", s.footerDesc);
       setVal("sec-footer-copyright", s.footerCopyright);
 
-      // Testimonials Editor (Photo Upload + Star Rating)
+      // Testimonials Editor
       const testEditor = document.getElementById("admin-testimonials-editor-list");
       if (testEditor) {
         testEditor.innerHTML = appState.testimonials
@@ -2207,29 +2493,110 @@
           : `<i data-lucide="sparkles" class="w-6 h-6"></i>`;
       }
 
-      // Render Features Editor (Add, Edit, Delete)
+      // Features Editor (MS Word Rich Editor + YouTube + 2 Custom Buttons)
       const featEditor = document.getElementById("admin-features-editor-list");
       if (featEditor) {
         featEditor.innerHTML = appState.features
           .map(
             (f, i) => `
-          <div class="p-3.5 rounded-2xl border theme-border bg-slate-50/60 space-y-2">
-            <div class="flex items-center justify-between text-[11px] font-bold theme-muted">
-              <span>Fitur #${escapeHtml(f.num || String(i + 1).padStart(2, "0"))}</span>
+          <div class="p-4 sm:p-5 rounded-2xl border theme-border bg-slate-50/60 space-y-3.5">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b theme-border">
               <div class="flex items-center gap-2">
-                <span>ID: ${escapeHtml(f.id)}</span>
-                <button type="button" onclick="removeFeatureRowInAdmin(${i})" class="text-rose-600 hover:underline cursor-pointer">Hapus</button>
+                <span class="px-2.5 py-0.5 rounded-full border theme-border bg-white text-[11px] font-bold">
+                  Modul #${String(i + 1).padStart(2, "0")}
+                </span>
+                <span class="text-xs font-extrabold">${escapeHtml(f.title)}</span>
+              </div>
+              <div class="flex items-center gap-3 text-[11px]">
+                <span class="theme-muted font-mono">ID: ${escapeHtml(f.id)}</span>
+                <button type="button" onclick="removeFeatureRowInAdmin(${i})" class="text-rose-600 font-semibold hover:underline cursor-pointer">
+                  Hapus Fitur
+                </button>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <input type="text" data-feat-idx="${i}" data-field="title" value="${escapeAttr(f.title)}" placeholder="Nama Fitur / Tools AI" class="adm-feat-input px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
-              <input type="text" data-feat-idx="${i}" data-field="category" value="${escapeAttr(f.category)}" placeholder="Kategori" class="adm-feat-input px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div>
+                <label class="block text-[11px] font-semibold mb-1">Nama Fitur / Tools AI</label>
+                <input type="text" data-feat-idx="${i}" data-field="title" value="${escapeAttr(f.title)}" placeholder="Nama Fitur" class="adm-feat-input w-full px-3 py-1.5 rounded-xl border theme-border bg-white text-xs font-semibold" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold mb-1">Kategori</label>
+                <input type="text" data-feat-idx="${i}" data-field="category" value="${escapeAttr(f.category)}" placeholder="Kategori" class="adm-feat-input w-full px-3 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold mb-1">Nama Icon Lucide</label>
+                <input type="text" data-feat-idx="${i}" data-field="icon" value="${escapeAttr(f.icon)}" placeholder="cth: sparkles, bot, video" class="adm-feat-input w-full px-3 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+              </div>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <input type="text" data-feat-idx="${i}" data-field="icon" value="${escapeAttr(f.icon)}" placeholder="Nama Icon Lucide (cth: bot)" class="adm-feat-input px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
-              <input type="text" data-feat-idx="${i}" data-field="url" value="${escapeAttr(f.url)}" placeholder="Link / Anchor" class="adm-feat-input px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+
+            <div>
+              <label class="block text-[11px] font-semibold mb-1">Ringkasan Kartu (Tampil di Grid &amp; Dashboard Member)</label>
+              <input type="text" data-feat-idx="${i}" data-field="description" value="${escapeAttr(f.description)}" placeholder="Deskripsi singkat kartu" class="adm-feat-input w-full px-3 py-1.5 rounded-xl border theme-border bg-white text-xs" />
             </div>
-            <textarea data-feat-idx="${i}" data-field="description" rows="2" placeholder="Deskripsi fitur" class="adm-feat-input w-full px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs">${escapeHtml(f.description)}</textarea>
+
+            <!-- MS Word-like Rich Text Toolbar & Editable Area for Deskripsi Lengkap -->
+            <div>
+              <label class="block text-[11px] font-semibold mb-1">Deskripsi Lengkap (Editor Format Ala MS Word)</label>
+              <div class="rounded-2xl border theme-border bg-white overflow-hidden">
+                <div class="flex flex-wrap items-center gap-1 p-2 border-b theme-border bg-slate-50 text-xs">
+                  <button type="button" onclick="formatWordDoc(${i}, 'bold')" title="Bold (Ctrl+B)" class="px-2 py-1 rounded-lg border theme-border bg-white font-bold hover:bg-slate-100 cursor-pointer">B</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'italic')" title="Italic (Ctrl+I)" class="px-2 py-1 rounded-lg border theme-border bg-white italic hover:bg-slate-100 cursor-pointer">I</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'underline')" title="Underline (Ctrl+U)" class="px-2 py-1 rounded-lg border theme-border bg-white underline hover:bg-slate-100 cursor-pointer">U</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'strikeThrough')" title="Coret" class="px-2 py-1 rounded-lg border theme-border bg-white line-through hover:bg-slate-100 cursor-pointer">S</button>
+                  <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                  <button type="button" onclick="formatWordHeading(${i}, 'H2')" title="Heading Besar" class="px-2 py-1 rounded-lg border theme-border bg-white font-bold text-[11px] hover:bg-slate-100 cursor-pointer">H2</button>
+                  <button type="button" onclick="formatWordHeading(${i}, 'H3')" title="Sub-Heading" class="px-2 py-1 rounded-lg border theme-border bg-white font-semibold text-[11px] hover:bg-slate-100 cursor-pointer">H3</button>
+                  <button type="button" onclick="formatWordHeading(${i}, 'P')" title="Paragraf Normal" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">P</button>
+                  <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                  <button type="button" onclick="formatWordDoc(${i}, 'insertUnorderedList')" title="Bullet List" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">• List</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'insertOrderedList')" title="Numbered List" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">1. List</button>
+                  <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                  <button type="button" onclick="formatWordDoc(${i}, 'justifyLeft')" title="Rata Kiri" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">Kiri</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'justifyCenter')" title="Rata Tengah" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">Tengah</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'justifyRight')" title="Rata Kanan" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">Kanan</button>
+                  <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                  <button type="button" onclick="insertWordLink(${i})" title="Sisipkan Link" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] font-semibold hover:bg-slate-100 cursor-pointer">Link</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'undo')" title="Undo" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">Undo</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'redo')" title="Redo" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] hover:bg-slate-100 cursor-pointer">Redo</button>
+                  <button type="button" onclick="formatWordDoc(${i}, 'removeFormat')" title="Hapus Format" class="px-2 py-1 rounded-lg border theme-border bg-white text-[11px] text-rose-600 hover:bg-rose-50 cursor-pointer">Clear</button>
+                </div>
+                <div
+                  id="msword-editor-${i}"
+                  data-feat-idx="${i}"
+                  contenteditable="true"
+                  class="msword-editor-surface rich-doc-content min-h-[130px] p-3.5 text-xs"
+                >${f.fullDescription || `<p>${escapeHtml(f.description)}</p>`}</div>
+              </div>
+            </div>
+
+            <!-- YouTube Link & 2 Custom Buttons -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold mb-1">Link Video YouTube (di bawah Deskripsi Lengkap)</label>
+                <input type="text" data-feat-idx="${i}" data-field="youtubeUrl" value="${escapeAttr(f.youtubeUrl || "")}" placeholder="https://youtube.com/watch?v=... atau youtu.be/..." class="adm-feat-input w-full px-3 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-semibold mb-1">Teks Tombol 1</label>
+                  <input type="text" data-feat-idx="${i}" data-field="btn1Text" value="${escapeAttr(f.btn1Text || "Buka Akses")}" placeholder="Teks Tombol 1" class="adm-feat-input w-full px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold mb-1">Link Tombol 1</label>
+                  <input type="text" data-feat-idx="${i}" data-field="btn1Url" value="${escapeAttr(f.btn1Url || "#harga")}" placeholder="https://... atau #section" class="adm-feat-input w-full px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-semibold mb-1">Teks Tombol 2</label>
+                  <input type="text" data-feat-idx="${i}" data-field="btn2Text" value="${escapeAttr(f.btn2Text || "Pusat Bantuan")}" placeholder="Teks Tombol 2" class="adm-feat-input w-full px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold mb-1">Link Tombol 2</label>
+                  <input type="text" data-feat-idx="${i}" data-field="btn2Url" value="${escapeAttr(f.btn2Url || "#faq")}" placeholder="https://... atau #section" class="adm-feat-input w-full px-2.5 py-1.5 rounded-xl border theme-border bg-white text-xs" />
+                </div>
+              </div>
+            </div>
           </div>
         `
           )
@@ -2294,6 +2661,39 @@
       }
     }
 
+    // MS Word-like Editor Commands
+    window.formatWordDoc = function (featIdx, cmd) {
+      const editor = document.getElementById(`msword-editor-${featIdx}`);
+      if (!editor) return;
+      editor.focus();
+      document.execCommand(cmd, false, null);
+      if (appState.features[featIdx]) {
+        appState.features[featIdx].fullDescription = editor.innerHTML;
+      }
+    };
+
+    window.formatWordHeading = function (featIdx, tagName) {
+      const editor = document.getElementById(`msword-editor-${featIdx}`);
+      if (!editor) return;
+      editor.focus();
+      document.execCommand("formatBlock", false, tagName);
+      if (appState.features[featIdx]) {
+        appState.features[featIdx].fullDescription = editor.innerHTML;
+      }
+    };
+
+    window.insertWordLink = function (featIdx) {
+      const editor = document.getElementById(`msword-editor-${featIdx}`);
+      if (!editor) return;
+      const url = prompt("Masukkan URL tautan (contoh: https://example.com):");
+      if (!url) return;
+      editor.focus();
+      document.execCommand("createLink", false, url.trim());
+      if (appState.features[featIdx]) {
+        appState.features[featIdx].fullDescription = editor.innerHTML;
+      }
+    };
+
     function updateAccountSessionUI() {
       const statusEl = document.getElementById("account-session-status");
       const loggedBox = document.getElementById("account-logged-actions");
@@ -2325,7 +2725,10 @@
       renderTestimonials();
       renderFaqAccordion();
       renderMemberWorkspace();
-      hydrateAdminEditors();
+      if (!document.getElementById("view-feature-detail")?.classList.contains("hidden")) {
+        renderFeatureDetailView();
+      }
+      hydrateAdminEditors(false);
       updateAccountSessionUI();
       if (window.lucide) {
         window.lucide.createIcons();
@@ -2362,7 +2765,7 @@
         document.getElementById("view-auth")?.classList.remove("hidden");
       } else if (route === "/dashboard") {
         document.getElementById("view-dashboard")?.classList.remove("hidden");
-        hydrateAdminEditors();
+        hydrateAdminEditors(true);
       } else if (route === "/member-login") {
         document.getElementById("view-member-login")?.classList.remove("hidden");
       } else if (route === "/member") {
@@ -2374,6 +2777,7 @@
         }
       } else if (route === "/feature-detail") {
         document.getElementById("view-feature-detail")?.classList.remove("hidden");
+        renderFeatureDetailView();
       } else {
         document.getElementById("view-landing")?.classList.remove("hidden");
       }
@@ -2409,31 +2813,9 @@
       if (window.lucide) window.lucide.createIcons();
     };
 
-    window.openFeatureDetail = function (featId) {
-      const feat = appState.features.find((f) => f.id === featId) || appState.features[0];
-      const card = document.getElementById("feature-detail-card");
-      if (feat && card) {
-        card.innerHTML = `
-          <div class="flex items-center gap-3 mb-4">
-            <span class="w-11 h-11 rounded-2xl border theme-border bg-slate-50 flex items-center justify-center">
-              <i data-lucide="${escapeAttr(feat.icon || "sparkles")}" class="w-5 h-5"></i>
-            </span>
-            <div>
-              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border theme-border">${escapeHtml(feat.category)}</span>
-              <h1 class="text-xl sm:text-2xl font-extrabold mt-1">${escapeHtml(feat.title)}</h1>
-            </div>
-          </div>
-          <p class="text-sm theme-secondary leading-relaxed mb-6">${escapeHtml(feat.description)}</p>
-          <div class="flex flex-wrap items-center gap-3">
-            <button type="button" onclick="navigateTo('/'); setTimeout(() => document.getElementById('harga')?.scrollIntoView({ behavior: 'smooth' }), 80)" class="theme-btn px-5 py-2.5 rounded-xl text-xs font-semibold cursor-pointer">
-              Akses via Paket All-in-One
-            </button>
-            <button type="button" onclick="navigateTo('/member-login')" class="px-5 py-2.5 rounded-xl border theme-border bg-white text-xs font-semibold hover:bg-slate-50 cursor-pointer">
-              Masuk Portal Member
-            </button>
-          </div>
-        `;
-      }
+    window.openFeatureDetail = function (featId, source = "landing") {
+      currentDetailFeatureId = featId;
+      featureDetailSource = source;
       navigateTo("/feature-detail");
     };
 
@@ -2466,7 +2848,7 @@
         const cred = await signInWithEmailAndPassword(fbAuth, email, password);
         currentAdminUser = cred.user;
         updateAccountSessionUI();
-        hydrateAdminEditors();
+        hydrateAdminEditors(false);
         navigateTo("/dashboard");
         showToast("Berhasil login Firebase Auth sebagai Admin");
       } catch (err) {
@@ -2520,6 +2902,7 @@
 
     // Admin Tab & Saving Handlers
     window.switchAdminTab = function (tabName) {
+      syncAllAdminFormInputsToState();
       document.querySelectorAll(".admin-panel").forEach((p) => p.classList.add("hidden"));
       document.getElementById(`admin-panel-${tabName}`)?.classList.remove("hidden");
 
@@ -2532,7 +2915,7 @@
         }
       });
 
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
     };
 
@@ -2574,14 +2957,15 @@
       await pushSettingsToFirestore();
     };
 
-    // Testimonials Handlers (Photo Upload, Star Rating, Add/Delete/Save)
+    // Testimonials Handlers
     window.handleTestimonialPhotoUpload = function (ev, idx) {
+      syncAllAdminFormInputsToState();
       const file = ev.target?.files?.[0];
       if (!file || !appState.testimonials[idx]) return;
       const reader = new FileReader();
       reader.onload = () => {
         appState.testimonials[idx].photoDataUrl = String(reader.result || "");
-        hydrateAdminEditors();
+        hydrateAdminEditors(false);
         renderTestimonials();
         if (window.lucide) window.lucide.createIcons();
       };
@@ -2589,6 +2973,7 @@
     };
 
     window.addTestimonialRowInAdmin = function () {
+      syncAllAdminFormInputsToState();
       appState.testimonials.push({
         name: "Pengguna Baru",
         role: "Kreator / Pebisnis",
@@ -2596,13 +2981,14 @@
         photoDataUrl: "",
         quote: "Sangat membantu mempercepat pekerjaan harian kami."
       });
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
     };
 
     window.removeTestimonialRowInAdmin = function (idx) {
+      syncAllAdminFormInputsToState();
       appState.testimonials.splice(idx, 1);
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
     };
 
@@ -2611,13 +2997,7 @@
       if (titleInput) {
         appState.sections.testimonialsTitle = titleInput.value;
       }
-      document.querySelectorAll(".adm-test-input").forEach((el) => {
-        const idx = Number(el.getAttribute("data-test-idx"));
-        const field = el.getAttribute("data-field");
-        if (appState.testimonials[idx] && field) {
-          appState.testimonials[idx][field] = field === "rating" ? Number(el.value || 5) : el.value;
-        }
-      });
+      syncAllAdminFormInputsToState();
       renderAll();
       await pushSettingsToFirestore();
     };
@@ -2706,67 +3086,64 @@
 
     // Add / Edit / Remove AI Features + FAQ
     window.addFeatureRowInAdmin = function () {
+      syncAllAdminFormInputsToState();
       const nextNum = String(appState.features.length + 1).padStart(2, "0");
-      appState.features.push({
-        id: `ai-${Date.now()}`,
-        num: nextNum,
-        title: `Tools AI Baru #${nextNum}`,
-        category: "Konten",
-        icon: "cpu",
-        description: "Deskripsi singkat tools AI baru yang siap membantu pekerjaan.",
-        url: "#harga"
-      });
-      hydrateAdminEditors();
+      appState.features.push(
+        normalizeFeature(
+          {
+            id: `ai-${Date.now()}`,
+            num: nextNum,
+            title: `Tools AI Baru #${nextNum}`,
+            category: "Konten",
+            icon: "cpu",
+            description: "Deskripsi singkat tools AI baru yang siap membantu pekerjaan.",
+            fullDescription: `<p><strong>Tools AI Baru #${nextNum}</strong> siap digunakan pada workspace member.</p><p>Edit deskripsi lengkap ini melalui toolbar editor di atas.</p>`,
+            youtubeUrl: "",
+            btn1Text: "Buka Modul",
+            btn1Url: "#harga",
+            btn2Text: "Panduan FAQ",
+            btn2Url: "#faq"
+          },
+          appState.features.length
+        )
+      );
+      hydrateAdminEditors(false);
+      renderMemberWorkspace();
       if (window.lucide) window.lucide.createIcons();
+      showToast(`Fitur ditambah (total ${appState.features.length} fitur). Klik "Simpan Fitur & FAQ" untuk push ke Cloud.`);
     };
 
     window.removeFeatureRowInAdmin = function (idx) {
+      syncAllAdminFormInputsToState();
       appState.features.splice(idx, 1);
-      appState.features.forEach((f, i) => {
-        f.num = String(i + 1).padStart(2, "0");
-      });
-      hydrateAdminEditors();
+      appState.features = appState.features.map((f, i) => normalizeFeature(f, i));
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
     };
 
     window.saveFeaturesAndFaqFromAdmin = async function () {
-      document.querySelectorAll(".adm-feat-input").forEach((el) => {
-        const idx = Number(el.getAttribute("data-feat-idx"));
-        const field = el.getAttribute("data-field");
-        if (appState.features[idx] && field) {
-          appState.features[idx][field] = el.value;
-        }
-      });
-
-      const nextFaq = [];
-      const rows = document.querySelectorAll("#admin-faq-editor-list > div");
-      rows.forEach((row) => {
-        const q = row.querySelector('[data-field="q"]')?.value?.trim() || "";
-        const a = row.querySelector('[data-field="a"]')?.value?.trim() || "";
-        if (q || a) nextFaq.push({ q, a });
-      });
-      if (nextFaq.length) {
-        appState.faq = nextFaq;
-      }
-
+      syncAllAdminFormInputsToState();
+      appState.features = appState.features.map((f, i) => normalizeFeature(f, i));
       renderAll();
       await pushSettingsToFirestore();
     };
 
     window.addFaqRowInAdmin = function () {
+      syncAllAdminFormInputsToState();
       appState.faq.push({ q: "Pertanyaan baru?", a: "Tuliskan jawaban lengkap di sini." });
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
     };
 
     window.removeFaqRowInAdmin = function (idx) {
+      syncAllAdminFormInputsToState();
       appState.faq.splice(idx, 1);
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
     };
 
     window.restoreDefaultFeaturesAndFaq = async function () {
-      appState.features = structuredClone(DEFAULT_FEATURES);
+      appState.features = createDefaultFeatures();
       appState.faq = structuredClone(DEFAULT_FAQ);
       renderAll();
       await pushSettingsToFirestore();
@@ -2797,7 +3174,7 @@
       document.getElementById("new-member-password").value = "";
       document.getElementById("new-member-uid").value = "";
 
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
       await syncMemberToFirestore(memberObj, false);
     };
@@ -2806,12 +3183,13 @@
       const target = appState.members[idx];
       if (!target) return;
       appState.members.splice(idx, 1);
-      hydrateAdminEditors();
+      hydrateAdminEditors(false);
       if (window.lucide) window.lucide.createIcons();
       await syncMemberToFirestore(target, true);
     };
 
     window.syncAllToCloudNow = async function () {
+      syncAllAdminFormInputsToState();
       await pushSettingsToFirestore();
       for (const m of appState.members) {
         await syncMemberToFirestore(m, false);
