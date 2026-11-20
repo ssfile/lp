@@ -1355,6 +1355,7 @@
       setDoc,
       deleteDoc,
       onSnapshot,
+      collection,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -1526,6 +1527,10 @@
     let currentMemberSession = null;
     let isRemoteApplying = false;
 
+    function getActiveAuthUser() {
+      return fbAuth.currentUser || currentAdminUser || null;
+    }
+
     function saveLocalState() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
@@ -1539,6 +1544,7 @@
 
     const settingsDocRef = doc(fbDb, "artifacts", APP_ID, "public", "data", "siteSettings", "main");
     const catalogDocRef = doc(fbDb, "artifacts", APP_ID, "public", "data", "catalog", "main");
+    const customersColRef = collection(fbDb, "artifacts", APP_ID, "public", "data", "customers");
 
     function setSyncIndicator(statusText, isOnline = true) {
       const textEl = document.getElementById("live-sync-text");
@@ -1566,20 +1572,22 @@
       text.textContent = message;
       if (icon) {
         icon.setAttribute("data-lucide", isError ? "alert-circle" : "check-circle-2");
-        icon.className = `w-4 h-4 ${isError ? "text-rose-600" : "text-emerald-600"}`;
+        icon.setAttribute("class", `w-4 h-4 ${isError ? "text-rose-600" : "text-emerald-600"}`);
       }
       toast.classList.remove("hidden");
       if (window.lucide) window.lucide.createIcons();
       clearTimeout(showToast._timer);
       showToast._timer = setTimeout(() => {
         toast.classList.add("hidden");
-      }, 3200);
+      }, 3600);
     }
 
     async function pushSettingsToFirestore() {
       saveLocalState();
-      if (!currentAdminUser) {
-        setSyncIndicator("Lokal (Login Admin utk Cloud)", false);
+      const authUser = getActiveAuthUser();
+      if (!authUser) {
+        setSyncIndicator("Belum Login Firebase Auth", false);
+        showToast("Tersimpan lokal. Login Admin dulu agar bisa push ke Cloud Firestore.", true);
         return;
       }
       try {
@@ -1592,6 +1600,7 @@
             advantages: appState.advantages,
             benefits: appState.benefits,
             testimonials: appState.testimonials,
+            updatedBy: authUser.uid,
             updatedAt: serverTimestamp()
           },
           { merge: true }
@@ -1601,6 +1610,7 @@
           {
             features: appState.features,
             faq: appState.faq,
+            updatedBy: authUser.uid,
             updatedAt: serverTimestamp()
           },
           { merge: true }
@@ -1608,14 +1618,16 @@
         setSyncIndicator("Cloud Firestore Live", true);
         showToast("Tersimpan & tersinkron ke Cloud Firestore");
       } catch (err) {
-        setSyncIndicator("Gagal Push Cloud", false);
-        showToast("Gagal simpan ke Firestore: " + (err?.message || err), true);
+        const code = err?.code || "firestore-error";
+        setSyncIndicator(`Gagal Push (${code})`, false);
+        showToast(`Gagal push cloud [${code}]: ${err?.message || err}`, true);
       }
     }
 
     async function syncMemberToFirestore(member, remove = false) {
       saveLocalState();
-      if (!currentAdminUser) {
+      const authUser = getActiveAuthUser();
+      if (!authUser) {
         showToast("Tersimpan lokal. Login Admin agar tersinkron ke koleksi users Firestore.", true);
         return;
       }
@@ -1636,6 +1648,7 @@
             password: member.password,
             role: "member",
             active: member.active !== false,
+            updatedBy: authUser.uid,
             updatedAt: serverTimestamp()
           };
           await setDoc(userRef, payload, { merge: true });
@@ -1643,7 +1656,8 @@
           showToast(`Member "${member.name}" tersinkron ke Firestore users`);
         }
       } catch (err) {
-        showToast("Gagal sinkron member Firestore: " + (err?.message || err), true);
+        const code = err?.code || "firestore-error";
+        showToast(`Gagal sinkron member [${code}]: ${err?.message || err}`, true);
       }
     }
 
@@ -1666,8 +1680,8 @@
           isRemoteApplying = false;
           setSyncIndicator("Cloud Firestore Live", true);
         },
-        () => {
-          setSyncIndicator("Mode Lokal / Cek Rules", false);
+        (err) => {
+          setSyncIndicator(err?.code === "permission-denied" ? "Cek Firestore Rules" : "Mode Lokal", false);
         }
       );
 
@@ -1686,11 +1700,34 @@
         () => {}
       );
 
+      onSnapshot(
+        customersColRef,
+        (snap) => {
+          if (snap.empty) return;
+          const cloudMembers = [];
+          snap.forEach((d) => {
+            cloudMembers.push({ id: d.id, uid: d.id, ...d.data() });
+          });
+          if (cloudMembers.length) {
+            isRemoteApplying = true;
+            appState.members = cloudMembers;
+            saveLocalState();
+            hydrateAdminEditors();
+            if (window.lucide) window.lucide.createIcons();
+            isRemoteApplying = false;
+          }
+        },
+        () => {}
+      );
+
       onAuthStateChanged(fbAuth, (user) => {
         currentAdminUser = user || null;
         updateAccountSessionUI();
+        hydrateAdminEditors();
         if (currentAdminUser && !isRemoteApplying) {
           setSyncIndicator("Cloud Firestore Live", true);
+        } else if (!currentAdminUser) {
+          setSyncIndicator("Belum Login Admin", false);
         }
       });
     }
@@ -2248,11 +2285,12 @@
           .join("");
       }
 
+      const authUser = getActiveAuthUser();
       const admEmail = document.getElementById("admin-user-email");
       if (admEmail) {
-        admEmail.textContent = currentAdminUser
-          ? `Login sebagai: ${currentAdminUser.email} • UID: ${currentAdminUser.uid}`
-          : "Mode Pratinjau Admin (Login Firebase untuk push penuh ke Cloud)";
+        admEmail.textContent = authUser
+          ? `Login Firebase Auth aktif: ${authUser.email} • UID: ${authUser.uid}`
+          : "Belum login Firebase Auth — silakan masuk via menu Login Admin agar bisa push ke Cloud Firestore.";
       }
     }
 
@@ -2260,9 +2298,10 @@
       const statusEl = document.getElementById("account-session-status");
       const loggedBox = document.getElementById("account-logged-actions");
       const labelEl = document.getElementById("account-menu-label");
+      const authUser = getActiveAuthUser();
 
-      if (currentAdminUser) {
-        if (statusEl) statusEl.textContent = `Admin: ${currentAdminUser.email}`;
+      if (authUser) {
+        if (statusEl) statusEl.textContent = `Admin: ${authUser.email}`;
         if (labelEl) labelEl.textContent = "Admin Aktif";
         if (loggedBox) loggedBox.classList.remove("hidden");
       } else if (currentMemberSession) {
@@ -2427,8 +2466,9 @@
         const cred = await signInWithEmailAndPassword(fbAuth, email, password);
         currentAdminUser = cred.user;
         updateAccountSessionUI();
+        hydrateAdminEditors();
         navigateTo("/dashboard");
-        showToast("Berhasil masuk sebagai Admin");
+        showToast("Berhasil login Firebase Auth sebagai Admin");
       } catch (err) {
         if (errBox) {
           errBox.classList.remove("hidden");
