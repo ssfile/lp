@@ -1,4 +1,3 @@
-// lp/auth-guard.js
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
@@ -17,54 +16,83 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// URL Halaman Login Utama
+// URL Halaman Login / Landing Utama
 const LOGIN_URL = "https://ssfile.github.io/lp/";
 
-// 1. Sembunyikan seluruh halaman sejak milidetik pertama agar isi tidak bocor
+// Sembunyikan halaman sementara selama proses verifikasi sesi
 document.documentElement.style.visibility = "hidden";
 
-// 2. Cek status autentikasi Firebase
-onAuthStateChanged(auth, async (user) => {
+let verificationCompleted = false;
+
+function redirectToLogin(reason = "") {
+  const currentUrl = window.location.href.split("#")[0].split("?")[0];
+  const isAlreadyOnLanding =
+    currentUrl === LOGIN_URL ||
+    currentUrl === "https://ssfile.github.io/lp" ||
+    currentUrl === "https://ssfile.github.io/lp/index.html";
+
+  if (isAlreadyOnLanding) {
+    document.documentElement.style.visibility = "visible";
+    return;
+  }
+
+  const targetUrl = encodeURIComponent(window.location.href);
+  const query = reason ? `?redirect=${targetUrl}&reason=${encodeURIComponent(reason)}` : `?redirect=${targetUrl}`;
+  window.location.replace(`${LOGIN_URL}${query}`);
+}
+
+async function checkMembershipAndUnlock(user) {
   if (!user) {
-    // Belum login -> kirim ke halaman login dengan membawa link tujuan
-    const targetUrl = encodeURIComponent(window.location.href);
-    window.location.replace(`${LOGIN_URL}?redirect=${targetUrl}`);
+    redirectToLogin("not_logged_in");
     return;
   }
 
   try {
-    // 3. Verifikasi apakah UID terdaftar sebagai member aktif atau admin di Realtime Database
-    const [memberSnap, adminSnap] = await Promise.all([
-      get(ref(database, `members/${user.uid}/active`)),
+    const [memberNodeSnap, adminNodeSnap] = await Promise.all([
+      get(ref(database, `members/${user.uid}`)),
       get(ref(database, `admins/${user.uid}`))
     ]);
 
-    const isMemberActive = memberSnap.exists() && memberSnap.val() === true;
-    const isAdmin = adminSnap.exists() && adminSnap.val() === true;
+    const memberVal = memberNodeSnap.exists() ? memberNodeSnap.val() : null;
+    const isMemberActive =
+      memberVal === true ||
+      memberVal === "true" ||
+      (memberVal && typeof memberVal === "object" && (memberVal.active === true || memberVal.active === "true"));
+
+    const isAdmin = adminNodeSnap.exists() && (adminNodeSnap.val() === true || adminNodeSnap.val() === "true");
 
     if (!isMemberActive && !isAdmin) {
+      console.warn("UID tidak terdaftar sebagai member aktif:", user.uid);
       await signOut(auth);
-      alert("Akun Anda belum terdaftar sebagai member aktif. Silakan hubungi admin.");
-      window.location.replace(LOGIN_URL);
+      redirectToLogin("not_member");
       return;
     }
 
-    // 4. Terverifikasi -> Tampilkan halaman
+    verificationCompleted = true;
     document.documentElement.style.visibility = "visible";
-
-    // Simpan info user di window agar bisa dipakai oleh tombol Logout atau profil
     window.currentMember = {
       uid: user.uid,
       email: user.email,
       isAdmin
     };
   } catch (error) {
-    console.error("Error verifikasi member:", error);
-    window.location.replace(LOGIN_URL);
+    console.error("Gagal memverifikasi sesi member:", error);
+    document.documentElement.style.visibility = "visible";
+    alert("Gagal memverifikasi status member dari database: " + error.message);
+  }
+}
+
+// Gunakan satu listener onAuthStateChanged sebagai sumber utama (menghindari race condition)
+const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  if (!verificationCompleted) {
+    unsubscribe();
+    await checkMembershipAndUnlock(user);
+  } else if (!user) {
+    redirectToLogin("session_ended");
   }
 });
 
-// Fungsi Logout global untuk dipasang di tombol Keluar pada halaman member
+// Fungsi tombol logout yang bisa dipanggil dari halaman member
 window.memberLogout = async function () {
   await signOut(auth);
   window.location.replace(LOGIN_URL);
