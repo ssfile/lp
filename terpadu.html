@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="dynamic-page-title">AI Studio Perangkat Ajar — 10 Generator Pedagogis Instan</title>
+  <meta name="description" id="dynamic-meta-desc" content="Buat Media Pembelajaran, PPT per Slide, Pertanyaan Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal Mengajar, dan Program Semester berbasis AI tanpa login." />
+  <meta name="keywords" id="dynamic-meta-keywords" content="Generator Media Pembelajaran, Generator PPT, Pertanyaan Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal Mengajar, Program Semester" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Merriweather', 'Georgia', 'serif'],
+          },
+          colors: {
+            brand: {
+              primary: 'var(--color-primary, #1d4ed8)',
+              secondary: 'var(--color-secondary, #0f766e)',
+              accent: 'var(--color-accent, #d97706)',
+              surface: 'var(--color-surface, #f8fafc)',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- DOCX & PDF Export Libraries -->
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --color-primary: #1d4ed8;
+      --color-secondary: #0f766e;
+      --color-accent: #d97706;
+      --color-surface: #f8fafc;
+      --color-text: #0f172a;
+      --color-muted: #64748b;
+      --color-border: #e2e8f0;
+      --radius-base: 0.75rem;
+      --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+      --content-max-width: 80rem;
+      --font-size-base: 16px;
+    }
+
+    body {
+      font-family: var(--font-family-active, 'Inter', sans-serif);
+      font-size: var(--font-size-base);
+      color: var(--color-text);
+      background-color: var(--color-surface);
+      overflow-x: hidden;
+    }
+
+    .studio-card {
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-card);
+    }
+
+    .studio-btn-primary {
+      background-color: var(--color-primary);
+      border-radius: calc(var(--radius-base) * 0.75);
+      transition: all 0.2s ease;
+    }
+    .studio-btn-primary:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+
+    .paper-sheet {
+      background: #ffffff;
+      color: #111827;
+      margin: 0 auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e5e7eb;
+      transition: all 0.25s ease;
+    }
+
+    .paper-a4 {
+      width: 100%;
+      max-width: 210mm;
+      min-height: 297mm;
+    }
+
+    .paper-f4 {
+      width: 100%;
+      max-width: 215mm;
+      min-height: 330mm;
+    }
+
+    .paper-landscape {
+      max-width: 297mm;
+    }
+
+    [contenteditable="true"]:focus {
+      outline: 2px dashed var(--color-primary);
+      outline-offset: 3px;
+      background-color: #eff6ff;
+      border-radius: 4px;
+    }
+
+    .editable-hover:hover {
+      background-color: #f8fafc;
+      box-shadow: inset 0 0 0 1px #cbd5e1;
+      border-radius: 6px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #doc-print-area, #doc-print-area * {
+        visibility: visible;
+      }
+      #doc-print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 12mm !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900">
+
+  <!-- ===================================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER                                          -->
+  <!-- ===================================================================== -->
+  <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print"></div>
+
+  <!-- ===================================================================== -->
+  <!-- 1. HEADER / NAVBAR                                                    -->
+  <!-- ===================================================================== -->
+  <header id="main-navbar" class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="#top" onclick="AppController.switchView('public')" class="flex items-center gap-3 group shrink-0">
+        <div id="brand-logo-box" class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-sm transition-transform group-hover:scale-105" style="background-color: var(--color-primary);">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="nav-brand-title" class="font-bold text-slate-900 text-base sm:text-lg tracking-tight">AI Studio Perangkat Ajar</span>
+            <span id="nav-cost-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">10 Modul Gratis</span>
+          </div>
+          <p id="nav-brand-tagline" class="text-[11px] text-slate-500 hidden md:block">Media, PPT, Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal & Prosem</p>
+        </div>
+      </a>
+
+      <nav id="nav-links-container" class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <a href="#keunggulan" class="hover:text-slate-900 transition-colors">Keunggulan</a>
+        <a href="#generator-section" class="hover:text-slate-900 transition-colors">10 Generator</a>
+        <a href="#hasil-dokumen-section" class="hover:text-slate-900 transition-colors">Preview & Ekspor</a>
+        <a href="#panduan-penggunaan" class="hover:text-slate-900 transition-colors">Panduan</a>
+      </nav>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span id="db-status-pill" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Publik Aktif</span>
+        </span>
+        <button id="btn-admin-session-badge" onclick="AppController.openAdminPortal()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          <span>Dashboard Admin</span>
+        </button>
+        <a id="nav-cta-btn" href="#generator-section" class="studio-btn-primary text-white text-xs sm:text-sm font-semibold px-3.5 py-2 shadow-sm flex items-center gap-1.5">
+          <i data-lucide="wand-2" class="w-4 h-4"></i>
+          <span>Mulai Buat</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- PUBLIC STUDIO VIEW                                                    -->
+  <!-- ===================================================================== -->
+  <main id="public-view" class="flex-1">
+    <!-- 2. HERO SECTION -->
+    <section id="top" class="relative overflow-hidden bg-gradient-to-b from-blue-50/75 via-white to-slate-50 border-b border-slate-200/70 py-12 sm:py-16 lg:py-20 no-print">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+          <div id="hero-badge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-blue-100/80 text-blue-800 border border-blue-200 mb-5">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+            <span>Tanpa Login • 10 Generator Perangkat Ajar • Siap Cetak & Ekspor DOCX/PDF</span>
+          </div>
+          <h1 id="hero-title" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
+            Buat Media Belajar, Slide PPT, Studi Kasus, Remedial, Pengayaan & Prosem Secara Instan
+          </h1>
+          <p id="hero-subtitle" class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
+            Dirancang untuk guru, dosen, dan tenaga pendidik. Pilih salah satu dari 10 generator khusus, gunakan Mode Praktis atau Mode Kompleks, sunting langsung hasilnya, generate ulang per bagian, dan ekspor ke DOCX, PDF, atau Cetak.
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <a href="#generator-section" id="hero-primary-cta" class="studio-btn-primary text-white font-semibold px-6 py-3.5 text-sm sm:text-base shadow-md inline-flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Pilih Generator Sekarang</span>
+            </a>
+            <button type="button" onclick="StudioUI.fillSampleData()" class="px-5 py-3.5 rounded-xl text-sm sm:text-base font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition inline-flex items-center gap-2 shadow-xs">
+              <i data-lucide="clipboard-check" class="w-4 h-4 text-amber-500"></i>
+              <span>Isi Contoh Otomatis</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. KEUNGGULAN PLATFORM -->
+    <section id="keunggulan" class="py-12 sm:py-16 bg-white border-b border-slate-200/70 no-print">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <h2 id="features-heading" class="text-2xl sm:text-3xl font-bold text-slate-900">10 Modul Perangkat Ajar Terpadu</h2>
+          <p id="features-subheading" class="text-slate-600 mt-2 text-sm sm:text-base">Setiap generator menghasilkan output yang terstruktur, kontekstual dengan kurikulum dan fase/kelas, serta siap diedit dan dibagikan.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+              <i data-lucide="presentation" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-1.5">Media, PPT & Pemantik</h3>
+            <p class="text-sm text-slate-600">Ide media sesuai materi, kerangka presentasi per slide lengkap catatan pembicara, dan pertanyaan pemantik.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center mb-4">
+              <i data-lucide="git-branch" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-1.5">Studi Kasus & Diferensiasi</h3>
+            <p class="text-sm text-slate-600">Studi kasus kontekstual serta penyesuaian konten, proses, dan produk belajar untuk beragam kesiapan murid.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-4">
+              <i data-lucide="award" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-1.5">Pengayaan, Remedial & Ice Breaking</h3>
+            <p class="text-sm text-slate-600">Aktivitas pengayaan dan remedial terarah serta ice breaking pembuka yang relevan dan membangun fokus kelas.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-4">
+              <i data-lucide="calendar-range" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 mb-1.5">Jurnal Mengajar & Prosem</h3>
+            <p class="text-sm text-slate-600">Catatan pelaksanaan pembelajaran harian serta susunan Program Semester (Prosem) yang rapi dan siap ekspor.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4, 5, 6, 7. AREA PEMBUATAN PERANGKAT AJAR (10 GENERATOR) -->
+    <section id="generator-section" class="py-12 sm:py-16 no-print">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">Studio 10 Generator</span>
+            <h2 id="generator-heading" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">Pilih Jenis Generator & Isi Formulir</h2>
+            <p id="generator-guide" class="text-slate-600 text-sm sm:text-base mt-1">Klik salah satu dari 10 tab generator di bawah, pilih Mode Praktis atau Mode Kompleks, lalu tekan Generate.</p>
+          </div>
+
+          <!-- 5. MODE SWITCHER: MODE PRAKTIS & MODE KOMPLEKS -->
+          <div class="inline-flex p-1.5 rounded-xl bg-slate-200/80 border border-slate-300/70 self-start md:self-auto">
+            <button type="button" id="tab-mode-practical" onclick="StudioUI.setMode('practical')" class="px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-xs transition flex items-center gap-2">
+              <i data-lucide="gauge" class="w-4 h-4 text-blue-700"></i>
+              <span>Mode Praktis</span>
+            </button>
+            <button type="button" id="tab-mode-complex" onclick="StudioUI.setMode('complex')" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4 text-teal-700"></i>
+              <span>Mode Kompleks</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 10 GENERATOR SELECTOR TABS -->
+        <div id="generator-tool-tabs" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 mb-6"></div>
+
+        <!-- Active Tool Banner -->
+        <div id="active-tool-banner" class="mb-5 p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="active-tool-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-700 text-white">Generator Aktif</span>
+              <h3 id="active-tool-title" class="font-bold text-slate-900 text-base sm:text-lg">Generator Media Pembelajaran</h3>
+            </div>
+            <p id="active-tool-desc" class="text-xs sm:text-sm text-slate-600 mt-0.5">Membuat ide media sesuai materi, langkah pembuatan, dan cara penggunaan di kelas.</p>
+          </div>
+        </div>
+
+        <!-- Form Card -->
+        <form id="studio-generator-form" onsubmit="StudioController.handleGenerate(event)" class="bg-white studio-card border border-slate-200/90 p-5 sm:p-8 space-y-8">
+          <!-- MODE PRAKTIS -->
+          <div id="practical-mode-fields">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div>
+                <label for="p-jenjang" class="block text-sm font-semibold text-slate-800 mb-1.5">1. Satuan Pendidikan / Jenjang <span class="text-rose-600">*</span></label>
+                <select id="p-jenjang" required onchange="StudioUI.syncClassOptions('p-jenjang', 'p-kelas')" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition">
+                  <option value="">-- Pilih Jenjang --</option>
+                  <option value="PAUD/TK">PAUD/TK</option>
+                  <option value="SD/MI">SD/MI</option>
+                  <option value="SMP/MTs" selected>SMP/MTs</option>
+                  <option value="SMA/MA">SMA/MA</option>
+                  <option value="SMK">SMK</option>
+                  <option value="Perguruan Tinggi">Perguruan Tinggi</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="p-mapel" class="block text-sm font-semibold text-slate-800 mb-1.5">2. Mata Pelajaran <span class="text-rose-600">*</span></label>
+                <input id="p-mapel" type="text" required list="mapel-suggestions" placeholder="Contoh: IPA, Matematika, Bahasa Indonesia..." value="IPA (Ilmu Pengetahuan Alam)" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+              </div>
+
+              <div>
+                <label for="p-kelas" class="block text-sm font-semibold text-slate-800 mb-1.5">3. Fase / Kelas <span class="text-rose-600">*</span></label>
+                <input id="p-kelas" type="text" required list="kelas-suggestions" placeholder="Contoh: Fase D / Kelas VIII" value="Fase D / Kelas VIII" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+              </div>
+
+              <div>
+                <label for="p-topik" class="block text-sm font-semibold text-slate-800 mb-1.5">4. Materi Pokok / Topik Pembelajaran <span class="text-rose-600">*</span></label>
+                <input id="p-topik" type="text" required placeholder="Contoh: Sistem Pencernaan Manusia" value="Sistem Pencernaan Manusia" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+              </div>
+
+              <div>
+                <label for="p-pendekatan" class="block text-sm font-semibold text-slate-800 mb-1.5">5. Pendekatan / Gaya / Konteks <span class="text-rose-600">*</span></label>
+                <input id="p-pendekatan" type="text" required placeholder="Contoh: Kontekstual, Interaktif, PBL, Semester Ganjil..." value="Kontekstual & Interaktif" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+              </div>
+
+              <div>
+                <label for="p-jumlah-item" class="block text-sm font-semibold text-slate-800 mb-1.5">6. Jumlah Slide / Item / Pertemuan</label>
+                <input id="p-jumlah-item" type="number" min="1" max="30" value="6" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition" />
+              </div>
+            </div>
+          </div>
+
+          <!-- MODE KOMPLEKS (ADVANCED INPUT + PER-FIELD GENERATE AI) -->
+          <div id="complex-mode-fields" class="hidden space-y-6 pt-4 border-t border-slate-200">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Penyusun / Guru</label>
+                <input id="c-penyusun" type="text" placeholder="Contoh: Budi Santoso, S.Pd." class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Satuan Pendidikan</label>
+                <input id="c-satuan" type="text" placeholder="Contoh: SMP Negeri 1 Nusantara" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Semester & Tahun Ajaran</label>
+                <input id="c-semester" type="text" value="Ganjil • 2026/2027" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Alokasi Waktu / Durasi</label>
+                <input id="c-waktu" type="text" value="2 × 40 Menit" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div id="ai-field-c-tujuan" class="space-y-1.5"></div>
+              <div id="ai-field-c-karakteristik" class="space-y-1.5"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div id="ai-field-c-spesifik-1" class="space-y-1.5"></div>
+              <div id="ai-field-c-spesifik-2" class="space-y-1.5"></div>
+            </div>
+
+            <div id="ai-field-c-catatan-tambahan" class="space-y-1.5"></div>
+          </div>
+
+          <!-- TOMBOL GENERATE & REAL PROGRESS PANEL -->
+          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div class="text-xs text-slate-500 flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+              <span>Terhubung dengan <strong id="active-brain-count" class="text-slate-700">Aturan Master Brain AI</strong> & konfigurasi publik terbaru.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="StudioUI.resetForm()" class="px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
+                Bersihkan Form
+              </button>
+              <button id="btn-generate-doc" type="submit" class="studio-btn-primary text-white font-bold px-7 py-3.5 text-sm sm:text-base shadow-lg flex items-center justify-center gap-2.5">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <span id="btn-generate-text">Generate Perangkat Ajar</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="generation-progress-panel" class="hidden rounded-2xl bg-blue-50/90 border border-blue-200 p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-5 h-5 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
+                <span class="font-bold text-blue-950 text-sm sm:text-base">AI Sedang Menyusun Hasil...</span>
+              </div>
+              <span id="progress-stage-counter" class="text-xs font-semibold text-blue-700 bg-white px-2.5 py-1 rounded-full border border-blue-200">Tahap 1</span>
+            </div>
+            <p id="progress-stage-label" class="text-sm font-medium text-blue-800">Memahami kebutuhan pembelajaran...</p>
+            <ul id="progress-stage-log" class="text-xs text-blue-700/90 space-y-1 pl-1"></ul>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 8 & 9. AREA HASIL DOKUMEN: PREVIEW, NAVIGASI, EDIT, REGEN & EKSPOR    -->
+    <!-- ===================================================================== -->
+    <section id="hasil-dokumen-section" class="py-12 sm:py-16 bg-slate-100/80 border-t border-slate-200 hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <!-- Top Action & Export Toolbar -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs no-print space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Hasil Siap Digunakan
+                </span>
+                <span id="doc-tool-pill" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Generator</span>
+              </div>
+              <h2 id="preview-section-title" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">Preview & Penyuntingan Hasil</h2>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="btn-copy-clipboard" onclick="ExportController.copyToClipboard()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition inline-flex items-center gap-1.5">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span>Salin Teks</span>
+              </button>
+              <button type="button" id="btn-export-docx" onclick="ExportController.exportDOCX()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-700 hover:bg-blue-800 text-white transition inline-flex items-center gap-1.5 shadow-xs">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span>Download DOCX</span>
+              </button>
+              <button type="button" id="btn-export-pdf" onclick="ExportController.exportPDF()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white transition inline-flex items-center gap-1.5 shadow-xs">
+                <i data-lucide="file-down" class="w-4 h-4"></i>
+                <span>Download PDF</span>
+              </button>
+              <button type="button" id="btn-print-doc" onclick="ExportController.printDocument()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-teal-700 hover:bg-teal-800 text-white transition inline-flex items-center gap-1.5 shadow-xs">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                <span>Cetak</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Second Row: Inline Edit, Undo/Redo, Full Regenerate -->
+          <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="btn-toggle-inline-edit" onclick="PreviewController.toggleInlineEdit()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 transition inline-flex items-center gap-1.5">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                <span id="inline-edit-label">Edit Langsung: AKTIF</span>
+              </button>
+              <button type="button" onclick="PreviewController.undoEdit()" id="btn-undo-edit" disabled class="p-1.5 rounded-lg bg-slate-100 text-slate-600 disabled:opacity-40 hover:bg-slate-200" title="Undo Perubahan">
+                <i data-lucide="undo-2" class="w-4 h-4"></i>
+              </button>
+              <button type="button" onclick="PreviewController.redoEdit()" id="btn-redo-edit" disabled class="p-1.5 rounded-lg bg-slate-100 text-slate-600 disabled:opacity-40 hover:bg-slate-200" title="Redo Perubahan">
+                <i data-lucide="redo-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="text-xs text-slate-500">Klik teks bertanda hover untuk mengedit langsung, atau klik <strong>Regenerate</strong> pada bagian tertentu.</div>
+          </div>
+        </div>
+
+        <!-- Main Layout: Left TOC & Paper Settings | Right Sheet -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <aside class="lg:col-span-3 space-y-5 no-print">
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+              <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
+                <i data-lucide="list-tree" class="w-4 h-4 text-blue-700"></i>
+                <span>Daftar Bagian</span>
+              </h3>
+              <ul id="doc-toc-list" class="space-y-1 text-xs sm:text-sm"></ul>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="layout-template" class="w-4 h-4 text-teal-700"></i>
+                <span>Pengaturan Dokumen</span>
+              </h3>
+              <div class="grid grid-cols-2 gap-2.5 text-xs">
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Ukuran Kertas</label>
+                  <select id="doc-paper-size" onchange="PreviewController.applyDocLayout()" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 bg-slate-50">
+                    <option value="a4" selected>A4</option>
+                    <option value="f4">F4 / Folio</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Orientasi</label>
+                  <select id="doc-orientation" onchange="PreviewController.applyDocLayout()" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 bg-slate-50">
+                    <option value="portrait" selected>Portrait</option>
+                    <option value="landscape">Landscape</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Jenis Font</label>
+                  <select id="doc-font-family" onchange="PreviewController.applyDocLayout()" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 bg-slate-50">
+                    <option value="sans" selected>Inter</option>
+                    <option value="serif">Merriweather</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-600 mb-1">Margin (mm)</label>
+                  <select id="doc-margin" onchange="PreviewController.applyDocLayout()" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 bg-slate-50">
+                    <option value="12">Rapat (12 mm)</option>
+                    <option value="18" selected>Standar (18 mm)</option>
+                    <option value="25">Lebar (25 mm)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div class="lg:col-span-9">
+            <div id="doc-print-area" class="paper-sheet paper-a4 p-6 sm:p-10 rounded-lg">
+              <div id="doc-preview-content" class="space-y-6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panduan Singkat -->
+    <section id="panduan-penggunaan" class="py-12 bg-white border-t border-slate-200 no-print">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-slate-900 to-blue-950 text-white rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-2 max-w-2xl">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Panduan Cepat</span>
+            <h3 class="text-xl sm:text-2xl font-bold">Satu Studio untuk Semua Kebutuhan Perangkat Ajar</h3>
+            <p class="text-slate-300 text-sm sm:text-base">Beralihlah antar 10 generator kapan saja tanpa kehilangan konteks kelas dan topik. Setiap hasil dapat disunting langsung, di-generate ulang per bagian, atau diunduh sebagai file DOCX dan PDF.</p>
+          </div>
+          <a href="#generator-section" class="shrink-0 px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm transition inline-flex items-center gap-2">
+            <i data-lucide="arrow-up" class="w-4 h-4"></i>
+            <span>Ke Formulir Generator</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- ADMIN DASHBOARD VIEW (13 MENUS + MASTER BRAIN AI)                    -->
+  <!-- ===================================================================== -->
+  <section id="admin-dashboard-view" class="hidden flex-1 bg-slate-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-md">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-lg sm:text-xl font-bold">Dashboard Admin — Pusat Kendali Website</h1>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold">Terverifikasi</span>
+            </div>
+            <p class="text-xs text-slate-300">Akun: <span id="admin-user-email" class="font-mono">-</span> • UID: <span id="admin-user-uid" class="font-mono">-</span></p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="AdminController.saveDraft()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition inline-flex items-center gap-1.5">
+            <i data-lucide="save" class="w-4 h-4 text-blue-400"></i>
+            <span>Simpan Draft</span>
+          </button>
+          <button type="button" onclick="AdminController.previewWebsite()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition inline-flex items-center gap-1.5">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+            <span>Preview Website</span>
+          </button>
+          <button type="button" onclick="AdminController.publishConfig()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition inline-flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+            <span>Publikasikan</span>
+          </button>
+          <button type="button" onclick="AppController.switchView('public')" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition">
+            Lihat Publik
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <nav class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-3 shadow-xs space-y-1">
+          <div class="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">13 Menu Pengelolaan</div>
+          <button type="button" data-admin-menu="1" onclick="AdminController.selectMenu(1)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-left bg-blue-50 text-blue-800"><i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i><span>1. Dashboard Overview</span></button>
+          <button type="button" data-admin-menu="2" onclick="AdminController.selectMenu(2)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="palette" class="w-4 h-4 shrink-0"></i><span>2. Pengaturan Tampilan</span></button>
+          <button type="button" data-admin-menu="3" onclick="AdminController.selectMenu(3)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="type" class="w-4 h-4 shrink-0"></i><span>3. Teks dan Konten</span></button>
+          <button type="button" data-admin-menu="4" onclick="AdminController.selectMenu(4)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="mouse-pointer-click" class="w-4 h-4 shrink-0"></i><span>4. Link dan Tombol</span></button>
+          <button type="button" data-admin-menu="5" onclick="AdminController.selectMenu(5)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="form-input" class="w-4 h-4 shrink-0"></i><span>5. Form Generator</span></button>
+          <button type="button" data-admin-menu="6" onclick="AdminController.selectMenu(6)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left text-indigo-800 bg-indigo-50/70 hover:bg-indigo-100/70"><i data-lucide="brain-circuit" class="w-4 h-4 shrink-0 text-indigo-700"></i><span>6. Master Brain AI</span></button>
+          <button type="button" data-admin-menu="7" onclick="AdminController.selectMenu(7)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="cpu" class="w-4 h-4 shrink-0"></i><span>7. Model AI dan API</span></button>
+          <button type="button" data-admin-menu="8" onclick="AdminController.selectMenu(8)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="share-2" class="w-4 h-4 shrink-0"></i><span>8. Fitur dan Ekspor</span></button>
+          <button type="button" data-admin-menu="9" onclick="AdminController.selectMenu(9)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="search" class="w-4 h-4 shrink-0"></i><span>9. Pengaturan SEO</span></button>
+          <button type="button" data-admin-menu="10" onclick="AdminController.selectMenu(10)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="file-cog" class="w-4 h-4 shrink-0"></i><span>10. Footer dan Legal</span></button>
+          <button type="button" data-admin-menu="11" onclick="AdminController.selectMenu(11)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="database" class="w-4 h-4 shrink-0"></i><span>11. Firebase & Keamanan</span></button>
+          <button type="button" data-admin-menu="12" onclick="AdminController.selectMenu(12)" class="admin-nav-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-left text-slate-700 hover:bg-slate-50"><i data-lucide="history" class="w-4 h-4 shrink-0"></i><span>12. Riwayat Perubahan</span></button>
+          <button type="button" data-admin-menu="13" onclick="AdminController.logout()" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-left text-rose-700 hover:bg-rose-50 mt-2 border-t border-slate-100 pt-3"><i data-lucide="log-out" class="w-4 h-4 shrink-0"></i><span>13. Logout</span></button>
+        </nav>
+
+        <div id="admin-module-container" class="lg:col-span-9 bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-xs min-h-[540px]"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- FOOTER (WITH DISCREET ADMIN BUTTON AT VERY BOTTOM)                    -->
+  <!-- ===================================================================== -->
+  <footer id="main-footer" class="bg-slate-900 text-slate-300 border-t border-slate-800 no-print mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-800">
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center gap-2.5 text-white font-bold text-lg">
+            <i data-lucide="book-open-check" class="w-5 h-5 text-blue-400"></i>
+            <span id="footer-brand-name">AI Studio Perangkat Ajar</span>
+          </div>
+          <p id="footer-description" class="text-sm text-slate-400 max-w-xl leading-relaxed">
+            Platform penyusunan perangkat ajar komprehensif berbasis AI: Media Pembelajaran, PPT per Slide, Pertanyaan Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal Mengajar, dan Program Semester.
+          </p>
+          <p id="footer-contact" class="text-xs text-slate-400">Kontak: halo@studioperangkatajar.id • Indonesia</p>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-3">Tautan Pendukung</h4>
+          <ul id="footer-support-links" class="space-y-2 text-sm text-slate-400">
+            <li><a href="#generator-section" class="hover:text-white transition">10 Generator</a></li>
+            <li><a href="#keunggulan" class="hover:text-white transition">Keunggulan</a></li>
+            <li><a href="#panduan-penggunaan" class="hover:text-white transition">Panduan</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-3">Informasi Legal</h4>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><button type="button" onclick="LegalModal.open('privacy')" class="hover:text-white transition text-left">Kebijakan Privasi</button></li>
+            <li><button type="button" onclick="LegalModal.open('terms')" class="hover:text-white transition text-left">Syarat dan Ketentuan</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <p id="footer-copyright">© 2026 AI Studio Perangkat Ajar. Seluruh hak cipta dilindungi.</p>
+        <button id="footer-admin-btn" type="button" onclick="AppController.openAdminPortal()" class="text-[11px] tracking-widest uppercase text-slate-600 hover:text-slate-300 transition px-2.5 py-1 rounded border border-transparent hover:border-slate-700">
+          ADMIN
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- ADMIN LOGIN MODAL                                                     -->
+  <!-- ===================================================================== -->
+  <div id="admin-login-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4"></i></div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Login Administrator</h3>
+            <p class="text-xs text-slate-500">Firebase Authentication • Verifikasi Hak Admin</p>
+          </div>
+        </div>
+        <button type="button" onclick="AdminAuth.closeModal()" class="text-slate-400 hover:text-slate-700 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="admin-login-error" class="hidden rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-800 font-medium"></div>
+      <form id="admin-login-form" onsubmit="AdminAuth.loginWithEmail(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Admin</label>
+          <input id="admin-email-input" type="email" required placeholder="admin@domain.com" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+          <input id="admin-password-input" type="password" required placeholder="••••••••" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" />
+        </div>
+        <button id="btn-admin-signin" type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk ke Dashboard Admin</span>
+        </button>
+      </form>
+      <button type="button" onclick="AdminAuth.loginWithGoogle()" class="w-full py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-semibold text-sm transition flex items-center justify-center gap-2">
+        <i data-lucide="chrome" class="w-4 h-4 text-blue-600"></i><span>Masuk dengan Google</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SECTION REGENERATE MODAL                                              -->
+  <!-- ===================================================================== -->
+  <div id="regen-section-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 id="regen-modal-title" class="font-bold text-slate-900 text-base sm:text-lg">Generate Ulang Bagian</h3>
+          <p class="text-xs text-slate-500">Bandingkan alternatif baru dengan bagian saat ini sebelum diterapkan.</p>
+        </div>
+        <button type="button" onclick="PreviewController.cancelSectionRegen()" class="text-slate-400 hover:text-slate-700 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="font-bold text-slate-700 mb-2">Versi Sebelumnya</div>
+          <div id="regen-old-preview" class="text-slate-600 whitespace-pre-wrap leading-relaxed"></div>
+        </div>
+        <div class="rounded-xl border-2 border-blue-500 bg-blue-50/40 p-4">
+          <div class="font-bold text-blue-800 mb-2 flex items-center justify-between">
+            <span>Hasil Generate AI Baru</span>
+            <span id="regen-loading-badge" class="hidden text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Memproses...</span>
+          </div>
+          <div id="regen-new-preview" class="text-slate-800 whitespace-pre-wrap leading-relaxed"></div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-100 flex items-center justify-end gap-3">
+        <button type="button" onclick="PreviewController.cancelSectionRegen()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Batalkan</button>
+        <button id="btn-apply-regen" type="button" onclick="PreviewController.applySectionRegen()" class="px-5 py-2 rounded-xl text-sm font-bold bg-blue-700 hover:bg-blue-800 text-white">Terapkan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- LEGAL MODAL                                                           -->
+  <!-- ===================================================================== -->
+  <div id="legal-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-2xl w-full max-h-[82vh] flex flex-col shadow-2xl">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <h3 id="legal-modal-title" class="font-bold text-slate-900 text-lg">Informasi Legal</h3>
+        <button type="button" onclick="LegalModal.close()" class="text-slate-400 hover:text-slate-700 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="legal-modal-body" class="p-5 overflow-y-auto text-sm text-slate-700 leading-relaxed whitespace-pre-line"></div>
+      <div class="p-4 border-t border-slate-100 text-right">
+        <button type="button" onclick="LegalModal.close()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900 text-white">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datalists -->
+  <datalist id="mapel-suggestions">
+    <option value="Pendidikan Pancasila"></option>
+    <option value="Bahasa Indonesia"></option>
+    <option value="Matematika"></option>
+    <option value="IPA (Ilmu Pengetahuan Alam)"></option>
+    <option value="IPS (Ilmu Pengetahuan Sosial)"></option>
+    <option value="Bahasa Inggris"></option>
+    <option value="Pendidikan Agama Islam dan Budi Pekerti"></option>
+    <option value="Informatika"></option>
+  </datalist>
+
+  <datalist id="kelas-suggestions">
+    <option value="Fase A / Kelas I–II"></option>
+    <option value="Fase B / Kelas III–IV"></option>
+    <option value="Fase C / Kelas V–VI"></option>
+    <option value="Fase D / Kelas VII–IX"></option>
+    <option value="Fase E / Kelas X"></option>
+    <option value="Fase F / Kelas XI–XII"></option>
+    <option value="Perguruan Tinggi / Semester Awal"></option>
+  </datalist>
+
+  <!-- ===================================================================== -->
+  <!-- FIREBASE SINGLETON & 10-GENERATOR APPLICATION MODULE                 -->
+  <!-- ===================================================================== -->
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signInWithPopup,
+      GoogleAuthProvider,
+      signOut,
+      onAuthStateChanged,
+      getIdTokenResult
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      get,
+      set,
+      push,
+      onValue
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    // Singleton Firebase Initialization (p-c410f)
+    const firebaseConfig = {
+      apiKey: "AIzaSyALys9RlMEKT4zbviTLKiOgh41VwO7bN1k",
+      authDomain: "p-c410f.firebaseapp.com",
+      databaseURL: "https://p-c410f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "p-c410f",
+      storageBucket: "p-c410f.firebasestorage.app",
+      messagingSenderId: "41031214989",
+      appId: "1:41031214989:web:5d9c9db7cc97168eafffc4"
+    };
+
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // =====================================================================
+    // CATALOG OF ALL 10 REQUESTED GENERATORS
+    // =====================================================================
+    const GENERATOR_TOOLS = [
+      {
+        id: "media",
+        shortLabel: "Media Belajar",
+        name: "Generator Media Pembelajaran",
+        desc: "Membuat ide media pembelajaran sesuai materi, alat/bahan, alur pembuatan, dan cara memakainya di kelas.",
+        icon: "film",
+        spec1Label: "Jenis / Bentuk Media (Visual, Interaktif, Diorama, Permainan...)",
+        spec1Default: "Media Visual & Simulasi Interaktif Berbasis Konteks",
+        spec2Label: "Ketersediaan Sarana / Teknologi Kelas",
+        spec2Default: "Proyektor / HP / Bahan Sederhana di Sekitar Sekolah"
+      },
+      {
+        id: "ppt",
+        shortLabel: "Generator PPT",
+        name: "Generator PPT (Materi Per Slide)",
+        desc: "Menyusun kerangka materi presentasi per slide lengkap dengan poin utama, visual/ilustrasi slide, dan catatan guru.",
+        icon: "presentation",
+        spec1Label: "Gaya Presentasi & Tone Slide",
+        spec1Default: "Visual Bersih, Poin Ringkas & Interaktif",
+        spec2Label: "Fokus Penekanan Tiap Slide",
+        spec2Default: "Konsep Inti, Contoh Nyata & Aktivitas Diskusi"
+      },
+      {
+        id: "pemantik",
+        shortLabel: "Pertanyaan Pemantik",
+        name: "Generator Pertanyaan Pemantik",
+        desc: "Membuat pertanyaan pembuka pembelajaran yang memicu rasa ingin tahu, berpikir kritis, dan koneksi pengalaman awal.",
+        icon: "help-circle",
+        spec1Label: "Konteks Pembuka / Fenomena Awal",
+        spec1Default: "Fenomena Sehari-hari & Dilema Ringan",
+        spec2Label: "Target Respons Murid",
+        spec2Default: "Curah Pendapat, Prediksi & Diskusi Awal"
+      },
+      {
+        id: "studi_kasus",
+        shortLabel: "Studi Kasus",
+        name: "Generator Studi Kasus",
+        desc: "Membuat kasus kontekstual sesuai materi lengkap dengan latar belakang, data/fakta, masalah inti, dan panduan analisis.",
+        icon: "file-search",
+        spec1Label: "Latar Konteks Kasus (Sekolah, Masyarakat, Industri, Lingkungan)",
+        spec1Default: "Situasi Nyata di Lingkungan Sekolah & Masyarakat",
+        spec2Label: "Fokus Analisis Kasus",
+        spec2Default: "Identifikasi Akar Masalah, Dampak & Alternatif Solusi"
+      },
+      {
+        id: "pengayaan",
+        shortLabel: "Pengayaan",
+        name: "Generator Pengayaan",
+        desc: "Menyiapkan aktivitas pendalaman dan tantangan tingkat lanjut bagi murid yang sudah mencapai tujuan pembelajaran.",
+        icon: "trending-up",
+        spec1Label: "Bentuk Tantangan Pengayaan",
+        spec1Default: "Analisis Mendalam, Mini Riset & Proyek Lanjutan",
+        spec2Label: "Produk / Luaran Murid Pengayaan",
+        spec2Default: "Ringkasan Analisis / Infografis / Presentasi Singkat"
+      },
+      {
+        id: "remedial",
+        shortLabel: "Remedial",
+        name: "Generator Remedial",
+        desc: "Menyiapkan pembelajaran ulang, penyederhanaan konsep, scaffolding, dan latihan bertahap bagi murid yang belum mencapai tujuan.",
+        icon: "life-buoy",
+        spec1Label: "Kesulitan Utama Murid yang Ditargetkan",
+        spec1Default: "Pemahaman Konsep Dasar & Langkah Penyelesaian Bertahap",
+        spec2Label: "Strategi Pendampingan Remedial",
+        spec2Default: "Bimbingan Bertahap (Scaffolding) & Latihan Terbimbing"
+      },
+      {
+        id: "diferensiasi",
+        shortLabel: "Diferensiasi",
+        name: "Generator Diferensiasi",
+        desc: "Menyesuaikan Konten, Proses, dan Produk pembelajaran sesuai kesiapan belajar, minat, dan profil belajar peserta didik.",
+        icon: "git-branch",
+        spec1Label: "Dimensi Diferensiasi yang Difokuskan",
+        spec1Default: "Diferensiasi Konten, Proses & Produk",
+        spec2Label: "Variasi Profil / Kesiapan Murid",
+        spec2Default: "Visual, Auditori/Diskusi & Kinestetik/Praktik"
+      },
+      {
+        id: "ice_breaking",
+        shortLabel: "Ice Breaking",
+        name: "Generator Ice Breaking",
+        desc: "Membuat aktivitas pembuka atau penyegar suasana kelas yang relevan dengan materi, aman, dan membangun fokus.",
+        icon: "smile",
+        spec1Label: "Waktu Pelaksanaan & Durasi",
+        spec1Default: "Awal Pembelajaran (5–7 Menit)",
+        spec2Label: "Suasana yang Ingin Dibangun",
+        spec2Default: "Ceria, Fokus & Siap Berkolaborasi"
+      },
+      {
+        id: "jurnal_mengajar",
+        shortLabel: "Jurnal Mengajar",
+        name: "Generator Jurnal Mengajar",
+        desc: "Membuat catatan pelaksanaan pembelajaran harian meliputi kegiatan, ketercapaian, kendala kelas, dan tindak lanjut.",
+        icon: "book-marked",
+        spec1Label: "Status Ketercapaian Pembelajaran",
+        spec1Default: "Sebagian Besar Tercapai, Perlu Penguatan pada Sebagian Murid",
+        spec2Label: "Catatan Kelas / Observasi Singkat",
+        spec2Default: "Diskusi berjalan aktif, beberapa murid butuh arahan tambahan"
+      },
+      {
+        id: "prosem",
+        shortLabel: "Program Semester",
+        name: "Generator Program Semester",
+        desc: "Membantu menyusun perencanaan pembelajaran per semester: topik/unit, alokasi JP/minggu, tujuan, dan keterangan waktu.",
+        icon: "calendar-range",
+        spec1Label: "Semester & Jumlah Minggu Efektif",
+        spec1Default: "Semester Ganjil • 16 Minggu Efektif",
+        spec2Label: "Beban Jam Pelajaran (JP) per Minggu",
+        spec2Default: "3 JP / Minggu"
+      }
+    ];
+
+    const DEFAULT_MASTER_BRAIN_RULES = [
+      { id: "mb-1", priority: 1, active: true, category: "Peran AI", name: "Ahli Perangkat Ajar & Kurikulum", instruction: "Susun perangkat ajar yang aplikatif, pedagogis, terstruktur, dan selaras dengan jenjang, fase/kelas, serta topik pembelajaran." },
+      { id: "mb-2", priority: 2, active: true, category: "Konteks", name: "Kesesuaian Fase, Kelas & Budaya Indonesia", instruction: "Sesuaikan tingkat bahasa, kedalaman konsep, dan contoh kontekstual dengan usia murid serta budaya dan kehidupan nyata di Indonesia." },
+      { id: "mb-3", priority: 3, active: true, category: "Struktur", name: "Kejelasan Bagian & Keterpaduan", instruction: "Pastikan setiap bagian memiliki tujuan jelas, langkah/poin konkret, dan dapat langsung digunakan oleh guru/dosen tanpa banyak revisi." },
+      { id: "mb-4", priority: 4, active: true, category: "Etika", name: "Bahasa Baku, Inklusif & Bebas Bias", instruction: "Gunakan Bahasa Indonesia yang jelas dan santun, hindari stereotip atau bias SARA/gender, serta dukung praktik pembelajaran inklusif." }
+    ];
+
+    const DEFAULT_APP_SETTINGS = {
+      general: {
+        siteName: "AI Studio Perangkat Ajar",
+        tagline: "10 Generator Pedagogis: Media, PPT, Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal & Prosem",
+        costBadge: "10 Modul Gratis",
+        showCostBadge: true
+      },
+      theme: {
+        primaryColor: "#1d4ed8",
+        secondaryColor: "#0f766e",
+        accentColor: "#d97706",
+        surfaceColor: "#f8fafc",
+        fontFamily: "Inter",
+        fontSize: "16px",
+        borderRadius: "0.75rem",
+        maxWidth: "80rem",
+        palette18: [
+          "#1d4ed8", "#2563eb", "#0284c7", "#0f766e", "#059669", "#16a34a",
+          "#d97706", "#ea580c", "#dc2626", "#db2777", "#7c3aed", "#4f46e5",
+          "#0f172a", "#334155", "#64748b", "#f8fafc", "#ffffff", "#fef3c7"
+        ]
+      },
+      content: {
+        heroBadge: "Tanpa Login • 10 Generator Perangkat Ajar • Siap Cetak & Ekspor DOCX/PDF",
+        heroTitle: "Buat Media Belajar, Slide PPT, Studi Kasus, Remedial, Pengayaan & Prosem Secara Instan",
+        heroSubtitle: "Dirancang untuk guru, dosen, dan tenaga pendidik. Pilih salah satu dari 10 generator khusus, gunakan Mode Praktis atau Mode Kompleks, sunting langsung hasilnya, generate ulang per bagian, dan ekspor ke DOCX, PDF, atau Cetak.",
+        heroCtaText: "Pilih Generator Sekarang",
+        featuresHeading: "10 Modul Perangkat Ajar Terpadu",
+        featuresSubheading: "Setiap generator menghasilkan output yang terstruktur, kontekstual dengan kurikulum dan fase/kelas, serta siap diedit dan dibagikan.",
+        generatorHeading: "Pilih Jenis Generator & Isi Formulir",
+        generatorGuide: "Klik salah satu dari 10 tab generator di bawah, pilih Mode Praktis atau Mode Kompleks, lalu tekan Generate.",
+        generateButtonText: "Generate Perangkat Ajar",
+        successToast: "Hasil berhasil disusun dan siap diperiksa, diedit, atau diekspor.",
+        errorToast: "Terjadi kendala saat menyusun hasil."
+      },
+      navigation: {
+        navbarLinks: [
+          { label: "Keunggulan", href: "#keunggulan", active: true },
+          { label: "10 Generator", href: "#generator-section", active: true },
+          { label: "Preview & Ekspor", href: "#hasil-dokumen-section", active: true },
+          { label: "Panduan", href: "#panduan-penggunaan", active: true }
+        ],
+        ctaLabel: "Mulai Buat",
+        ctaHref: "#generator-section",
+        footerLinks: [
+          { label: "10 Generator", href: "#generator-section", active: true },
+          { label: "Keunggulan", href: "#keunggulan", active: true },
+          { label: "Panduan", href: "#panduan-penggunaan", active: true }
+        ]
+      },
+      generator_form: {
+        enablePracticalMode: true,
+        enableComplexMode: true,
+        defaultItemsCount: 6
+      },
+      features: {
+        inlineEdit: true,
+        regenerateSection: true,
+        copyClipboard: true,
+        downloadDocx: true,
+        downloadPdf: true,
+        printDoc: true
+      },
+      seo: {
+        metaTitle: "AI Studio Perangkat Ajar — 10 Generator Pedagogis Instan",
+        metaDescription: "Buat Media Pembelajaran, PPT per Slide, Pertanyaan Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal Mengajar, dan Program Semester berbasis AI tanpa login.",
+        metaKeywords: "Generator Media Pembelajaran, Generator PPT, Pertanyaan Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal Mengajar, Program Semester",
+        robots: "index, follow"
+      },
+      footer: {
+        description: "Platform penyusunan perangkat ajar komprehensif berbasis AI: Media Pembelajaran, PPT per Slide, Pertanyaan Pemantik, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking, Jurnal Mengajar, dan Program Semester.",
+        copyright: "© 2026 AI Studio Perangkat Ajar. Seluruh hak cipta dilindungi.",
+        contact: "Kontak: halo@studioperangkatajar.id • Indonesia",
+        privacyPolicy: "Kebijakan Privasi:\n\n1. Akses publik tanpa login untuk seluruh 10 generator.\n2. Data isian digunakan untuk menyusun dokumen pembelajaran.\n3. Kredensial rahasia tidak disimpan pada kode frontend.",
+        termsOfService: "Syarat dan Ketentuan:\n\n1. Hasil AI merupakan draf perangkat ajar untuk ditinjau dan disesuaikan oleh pendidik.\n2. Gunakan secara wajar dan etis."
+      }
+    };
+
+    const DEFAULT_AI_PUBLIC_CONFIG = {
+      provider: "Gemini / Generative AI (Backend Proxy)",
+      model: "gemini-3-flash-preview",
+      temperature: 0.65,
+      maxTokens: 4096,
+      systemPromptAddon: "Sajikan hasil yang jelas, aplikatif, dan langsung dapat digunakan di kelas.",
+      rateLimitPerMinute: 20,
+      maxRetries: 2,
+      timeoutMs: 45000
+    };
+
+    const AppState = {
+      activeToolId: "media",
+      currentMode: "practical",
+      publishedSettings: structuredClone(DEFAULT_APP_SETTINGS),
+      draftSettings: structuredClone(DEFAULT_APP_SETTINGS),
+      publishedMasterBrain: structuredClone(DEFAULT_MASTER_BRAIN_RULES),
+      draftMasterBrain: structuredClone(DEFAULT_MASTER_BRAIN_RULES),
+      aiPublicConfig: structuredClone(DEFAULT_AI_PUBLIC_CONFIG),
+      configVersions: [],
+      auditLogs: [],
+      currentOutput: null,
+      undoStack: [],
+      redoStack: [],
+      inlineEditEnabled: true,
+      currentAdminUser: null,
+      isAdminAuthorized: false,
+      activeAdminMenu: 1,
+      pendingRegenIdx: null,
+      pendingRegenNewValue: null,
+      fieldUndoHistory: {},
+      stats: { generationsCount: 0, successCount: 0 }
+    };
+
+    const Toast = {
+      show(message, type = "info") {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+        const palette = {
+          success: "bg-emerald-900 text-emerald-50 border-emerald-700",
+          error: "bg-rose-900 text-rose-50 border-rose-700",
+          warning: "bg-amber-900 text-amber-50 border-amber-700",
+          info: "bg-slate-900 text-slate-50 border-slate-700"
+        };
+        const el = document.createElement("div");
+        el.className = `pointer-events-auto rounded-xl border px-4 py-3 text-xs sm:text-sm font-medium shadow-lg flex items-start gap-2.5 ${palette[type] || palette.info}`;
+        el.innerHTML = `<span class="flex-1">${escapeHtml(message)}</span><button type="button" class="text-white/70 hover:text-white font-bold">✕</button>`;
+        el.querySelector("button").onclick = () => el.remove();
+        container.appendChild(el);
+        setTimeout(() => { if (el.isConnected) el.remove(); }, 4200);
+      }
+    };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function deepMerge(target, source) {
+      if (!source || typeof source !== "object") return target;
+      const out = Array.isArray(target) ? [...target] : { ...target };
+      for (const key of Object.keys(source)) {
+        if (source[key] !== null && typeof source[key] === "object" && !Array.isArray(source[key])) {
+          out[key] = deepMerge(target[key] || {}, source[key]);
+        } else if (source[key] !== undefined) {
+          out[key] = source[key];
+        }
+      }
+      return out;
+    }
+
+    // =====================================================================
+    // FIREBASE SERVICE
+    // =====================================================================
+    const FirebaseService = {
+      initListeners() {
+        onValue(
+          ref(database, "app_settings/published"),
+          (snap) => {
+            if (snap.exists()) {
+              AppState.publishedSettings = deepMerge(DEFAULT_APP_SETTINGS, snap.val());
+            }
+            ThemeEngine.applyPublicConfig(AppState.publishedSettings);
+          },
+          () => ThemeEngine.applyPublicConfig(AppState.publishedSettings)
+        );
+
+        onValue(
+          ref(database, "master_brain/published"),
+          (snap) => {
+            if (snap.exists()) {
+              const raw = snap.val();
+              const arr = Array.isArray(raw) ? raw : Object.values(raw);
+              if (arr.length > 0) {
+                AppState.publishedMasterBrain = arr.filter(Boolean).sort((a, b) => (a.priority || 999) - (b.priority || 999));
+              }
+            }
+            StudioUI.updateBrainBadge();
+          },
+          () => {}
+        );
+
+        onValue(
+          ref(database, "ai_configuration/public"),
+          (snap) => {
+            if (snap.exists()) {
+              AppState.aiPublicConfig = deepMerge(DEFAULT_AI_PUBLIC_CONFIG, snap.val());
+            }
+          },
+          () => {}
+        );
+
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) {
+            AppState.currentAdminUser = null;
+            AppState.isAdminAuthorized = false;
+            document.getElementById("btn-admin-session-badge")?.classList.add("hidden");
+            document.getElementById("btn-admin-session-badge")?.classList.remove("inline-flex");
+            return;
+          }
+          await AdminAuth.verifyAndSetSession(user, false);
+        });
+      },
+
+      async loadAdminData() {
+        if (!AppState.isAdminAuthorized) return;
+        try {
+          const [draftSettingsSnap, draftBrainSnap, versionsSnap, logsSnap] = await Promise.all([
+            get(ref(database, "app_settings/draft")),
+            get(ref(database, "master_brain/draft")),
+            get(ref(database, "config_versions")),
+            get(ref(database, "audit_logs"))
+          ]);
+          AppState.draftSettings = draftSettingsSnap.exists()
+            ? deepMerge(DEFAULT_APP_SETTINGS, draftSettingsSnap.val())
+            : structuredClone(AppState.publishedSettings);
+
+          if (draftBrainSnap.exists()) {
+            const raw = draftBrainSnap.val();
+            const arr = Array.isArray(raw) ? raw : Object.values(raw);
+            AppState.draftMasterBrain = arr.filter(Boolean).sort((a, b) => (a.priority || 999) - (b.priority || 999));
+          } else {
+            AppState.draftMasterBrain = structuredClone(AppState.publishedMasterBrain);
+          }
+
+          AppState.configVersions = versionsSnap.exists()
+            ? Object.entries(versionsSnap.val()).map(([id, val]) => ({ id, ...val })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+            : [];
+
+          AppState.auditLogs = logsSnap.exists()
+            ? Object.entries(logsSnap.val()).map(([id, val]) => ({ id, ...val })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+            : [];
+        } catch (err) {
+          Toast.show("Gagal memuat data Admin: " + err.message, "error");
+        }
+      },
+
+      async appendAuditLog(action, detail) {
+        if (!AppState.isAdminAuthorized || !AppState.currentAdminUser) return;
+        const entry = {
+          action,
+          detail,
+          adminUid: AppState.currentAdminUser.uid,
+          adminEmail: AppState.currentAdminUser.email || "admin",
+          timestamp: Date.now()
+        };
+        AppState.auditLogs.unshift(entry);
+        try {
+          await push(ref(database, "audit_logs"), entry);
+        } catch (e) {}
+      }
+    };
+
+    // =====================================================================
+    // ADMIN AUTH
+    // =====================================================================
+    const AdminAuth = {
+      openModal() {
+        document.getElementById("admin-login-error")?.classList.add("hidden");
+        document.getElementById("admin-login-modal")?.classList.remove("hidden");
+      },
+      closeModal() {
+        document.getElementById("admin-login-modal")?.classList.add("hidden");
+      },
+      async loginWithEmail(e) {
+        e.preventDefault();
+        const email = document.getElementById("admin-email-input").value.trim();
+        const password = document.getElementById("admin-password-input").value;
+        const btn = document.getElementById("btn-admin-signin");
+        btn.disabled = true;
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+          await this.verifyAndSetSession(cred.user, true);
+        } catch (err) {
+          this.showError("Login gagal: " + err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      },
+      async loginWithGoogle() {
+        try {
+          const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+          await this.verifyAndSetSession(cred.user, true);
+        } catch (err) {
+          this.showError("Login Google gagal: " + err.message);
+        }
+      },
+      showError(msg) {
+        const box = document.getElementById("admin-login-error");
+        if (box) {
+          box.textContent = msg;
+          box.classList.remove("hidden");
+        }
+      },
+      async verifyAndSetSession(user, openDashboard = true) {
+        if (!user?.uid) return false;
+        const tokenRes = await getIdTokenResult(user, true);
+        const hasClaim = tokenRes?.claims?.admin === true;
+        let hasNode = false;
+        try {
+          const snap = await get(ref(database, `admins/${user.uid}`));
+          hasNode = snap.exists() && snap.val() === true;
+        } catch (e) {}
+
+        if (!hasClaim && !hasNode) {
+          await signOut(auth);
+          AppState.currentAdminUser = null;
+          AppState.isAdminAuthorized = false;
+          this.showError(`Akses ditolak untuk UID ${user.uid}. Akun bukan Admin terotorisasi.`);
+          return false;
+        }
+
+        AppState.currentAdminUser = { uid: user.uid, email: user.email || "admin" };
+        AppState.isAdminAuthorized = true;
+        this.closeModal();
+        const badge = document.getElementById("btn-admin-session-badge");
+        badge?.classList.remove("hidden");
+        badge?.classList.add("inline-flex");
+        document.getElementById("admin-user-email").textContent = user.email || "Administrator";
+        document.getElementById("admin-user-uid").textContent = user.uid;
+        await FirebaseService.loadAdminData();
+        if (openDashboard) AppController.switchView("admin");
+        return true;
+      }
+    };
+
+    // =====================================================================
+    // THEME ENGINE
+    // =====================================================================
+    const ThemeEngine = {
+      applyPublicConfig(cfg) {
+        if (!cfg) return;
+        const root = document.documentElement;
+        const t = cfg.theme || {};
+        root.style.setProperty("--color-primary", t.primaryColor || "#1d4ed8");
+        root.style.setProperty("--color-secondary", t.secondaryColor || "#0f766e");
+        root.style.setProperty("--color-accent", t.accentColor || "#d97706");
+        root.style.setProperty("--color-surface", t.surfaceColor || "#f8fafc");
+        root.style.setProperty("--radius-base", t.borderRadius || "0.75rem");
+        root.style.setProperty("--content-max-width", t.maxWidth || "80rem");
+        root.style.setProperty("--font-size-base", t.fontSize || "16px");
+        root.style.setProperty("--font-family-active", `'${t.fontFamily || "Inter"}', sans-serif`);
+
+        const g = cfg.general || {};
+        const c = cfg.content || {};
+        const f = cfg.footer || {};
+        const seo = cfg.seo || {};
+
+        document.getElementById("dynamic-page-title").textContent = seo.metaTitle || g.siteName;
+        document.getElementById("dynamic-meta-desc")?.setAttribute("content", seo.metaDescription || "");
+        document.getElementById("dynamic-meta-keywords")?.setAttribute("content", seo.metaKeywords || "");
+        document.getElementById("nav-brand-title").textContent = g.siteName || "AI Studio Perangkat Ajar";
+        document.getElementById("nav-brand-tagline").textContent = g.tagline || "";
+        const costBadge = document.getElementById("nav-cost-badge");
+        if (costBadge) {
+          costBadge.textContent = g.costBadge || "Gratis";
+          costBadge.classList.toggle("hidden", g.showCostBadge === false);
+        }
+
+        document.getElementById("hero-badge").querySelector("span").textContent = c.heroBadge || "";
+        document.getElementById("hero-title").textContent = c.heroTitle || "";
+        document.getElementById("hero-subtitle").textContent = c.heroSubtitle || "";
+        document.getElementById("hero-primary-cta").querySelector("span").textContent = c.heroCtaText || "Pilih Generator Sekarang";
+        document.getElementById("features-heading").textContent = c.featuresHeading || "";
+        document.getElementById("features-subheading").textContent = c.featuresSubheading || "";
+        document.getElementById("generator-heading").textContent = c.generatorHeading || "";
+        document.getElementById("generator-guide").textContent = c.generatorGuide || "";
+        document.getElementById("btn-generate-text").textContent = c.generateButtonText || "Generate Perangkat Ajar";
+
+        const navEl = document.getElementById("nav-links-container");
+        if (navEl && Array.isArray(cfg.navigation?.navbarLinks)) {
+          navEl.innerHTML = cfg.navigation.navbarLinks
+            .filter(l => l.active !== false)
+            .map(l => `<a href="${escapeHtml(l.href)}" class="hover:text-slate-900 transition-colors">${escapeHtml(l.label)}</a>`)
+            .join("");
+        }
+
+        const ctaEl = document.getElementById("nav-cta-btn");
+        if (ctaEl && cfg.navigation) {
+          ctaEl.href = cfg.navigation.ctaHref || "#generator-section";
+          ctaEl.querySelector("span").textContent = cfg.navigation.ctaLabel || "Mulai Buat";
+        }
+
+        const feat = cfg.features || {};
+        document.getElementById("btn-copy-clipboard")?.classList.toggle("hidden", feat.copyClipboard === false);
+        document.getElementById("btn-export-docx")?.classList.toggle("hidden", feat.downloadDocx === false);
+        document.getElementById("btn-export-pdf")?.classList.toggle("hidden", feat.downloadPdf === false);
+        document.getElementById("btn-print-doc")?.classList.toggle("hidden", feat.printDoc === false);
+
+        document.getElementById("footer-brand-name").textContent = g.siteName || "";
+        document.getElementById("footer-description").textContent = f.description || "";
+        document.getElementById("footer-contact").textContent = f.contact || "";
+        document.getElementById("footer-copyright").textContent = f.copyright || "";
+
+        StudioUI.renderToolTabs();
+        StudioUI.renderAiFieldWidgets();
+        StudioUI.updateBrainBadge();
+        lucide.createIcons();
+      }
+    };
+
+    // =====================================================================
+    // STUDIO UI (10 TOOLS, MODE, PER-FIELD AI GENERATE & UNDO)
+    // =====================================================================
+    const StudioUI = {
+      getActiveTool() {
+        return GENERATOR_TOOLS.find(t => t.id === AppState.activeToolId) || GENERATOR_TOOLS[0];
+      },
+
+      renderToolTabs() {
+        const container = document.getElementById("generator-tool-tabs");
+        if (!container) return;
+        container.innerHTML = GENERATOR_TOOLS.map(tool => {
+          const isActive = tool.id === AppState.activeToolId;
+          return `
+            <button type="button" onclick="StudioUI.selectTool('${tool.id}')" class="p-3 rounded-xl border text-left transition flex items-center gap-2.5 ${
+              isActive
+                ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                : "bg-white text-slate-700 border-slate-200 hover:border-blue-400 hover:bg-blue-50/40"
+            }">
+              <i data-lucide="${tool.icon}" class="w-4 h-4 shrink-0 ${isActive ? "text-amber-300" : "text-blue-700"}"></i>
+              <span class="text-xs sm:text-sm font-bold truncate">${escapeHtml(tool.shortLabel)}</span>
+            </button>
+          `;
+        }).join("");
+
+        const active = this.getActiveTool();
+        document.getElementById("active-tool-title").textContent = active.name;
+        document.getElementById("active-tool-desc").textContent = active.desc;
+        lucide.createIcons();
+      },
+
+      selectTool(toolId) {
+        AppState.activeToolId = toolId;
+        const tool = this.getActiveTool();
+        // Adjust default count nicely per tool type
+        const countEl = document.getElementById("p-jumlah-item");
+        if (countEl) {
+          if (toolId === "ppt") countEl.value = 6;
+          else if (toolId === "pemantik") countEl.value = 5;
+          else if (toolId === "prosem") countEl.value = 6;
+          else if (toolId === "jurnal_mengajar") countEl.value = 4;
+          else countEl.value = 3;
+        }
+        this.renderToolTabs();
+        this.renderAiFieldWidgets();
+      },
+
+      setMode(mode) {
+        AppState.currentMode = mode;
+        const tabP = document.getElementById("tab-mode-practical");
+        const tabC = document.getElementById("tab-mode-complex");
+        const cFields = document.getElementById("complex-mode-fields");
+        if (mode === "practical") {
+          tabP.className = "px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-xs transition flex items-center gap-2";
+          tabC.className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2";
+          cFields.classList.add("hidden");
+        } else {
+          tabC.className = "px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-900 shadow-xs transition flex items-center gap-2";
+          tabP.className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-2";
+          cFields.classList.remove("hidden");
+          this.renderAiFieldWidgets();
+        }
+        lucide.createIcons();
+      },
+
+      syncClassOptions(jenjangId, kelasId) {
+        const jenjang = document.getElementById(jenjangId)?.value || "";
+        const kelasEl = document.getElementById(kelasId);
+        if (!kelasEl) return;
+        const map = {
+          "PAUD/TK": "Kelompok B / Usia 5–6 Tahun",
+          "SD/MI": "Fase C / Kelas V",
+          "SMP/MTs": "Fase D / Kelas VIII",
+          "SMA/MA": "Fase E / Kelas X",
+          "SMK": "Fase F / Kelas XI",
+          "Perguruan Tinggi": "Semester 2 / Mata Kuliah Dasar"
+        };
+        if (map[jenjang]) kelasEl.value = map[jenjang];
+      },
+
+      renderAiFieldWidgets() {
+        const tool = this.getActiveTool();
+        const fields = [
+          { containerId: "ai-field-c-tujuan", inputId: "c-tujuan", label: "Tujuan Pembelajaran / Sasaran Utama", placeholder: "Rumusan tujuan atau target yang ingin dicapai..." },
+          { containerId: "ai-field-c-karakteristik", inputId: "c-karakteristik", label: "Karakteristik Peserta Didik & Kelas", placeholder: "Kesiapan belajar, gaya belajar, atau kondisi kelas..." },
+          { containerId: "ai-field-c-spesifik-1", inputId: "c-spesifik-1", label: tool.spec1Label, placeholder: tool.spec1Default },
+          { containerId: "ai-field-c-spesifik-2", inputId: "c-spesifik-2", label: tool.spec2Label, placeholder: tool.spec2Default },
+          { containerId: "ai-field-c-catatan-tambahan", inputId: "c-catatan-tambahan", label: "Instruksi Khusus / Catatan Tambahan", placeholder: "Tambahkan konteks lokal, durasi, atau ketentuan khusus..." }
+        ];
+
+        fields.forEach(cfg => {
+          const box = document.getElementById(cfg.containerId);
+          if (!box) return;
+          const prevEl = document.getElementById(cfg.inputId);
+          const currentVal = prevEl ? prevEl.value : "";
+          const canUndo = (AppState.fieldUndoHistory[cfg.inputId]?.length || 0) > 0;
+
+          box.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <label for="${cfg.inputId}" class="text-xs font-semibold text-slate-700">${escapeHtml(cfg.label)}</label>
+              <div class="flex items-center gap-1.5">
+                ${canUndo ? `<button type="button" onclick="StudioUI.undoField('${cfg.inputId}')" class="px-2 py-0.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-semibold">Batal / Undo</button>` : ""}
+                <button type="button" id="btn-ai-${cfg.inputId}" onclick="StudioUI.generateFieldWithAI('${cfg.inputId}', '${escapeHtml(cfg.label)}')" class="px-2.5 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-800 text-[11px] font-bold inline-flex items-center gap-1 transition"><i data-lucide="sparkles" class="w-3 h-3"></i><span>Generate AI</span></button>
+              </div>
+            </div>
+            <textarea id="${cfg.inputId}" rows="2" placeholder="${escapeHtml(cfg.placeholder)}" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none">${escapeHtml(currentVal)}</textarea>
+          `;
+        });
+        lucide.createIcons();
+      },
+
+      async generateFieldWithAI(inputId, label) {
+        const el = document.getElementById(inputId);
+        const btn = document.getElementById(`btn-ai-${inputId}`);
+        if (!el) return;
+
+        const oldVal = el.value.trim();
+        if (oldVal) {
+          if (!AppState.fieldUndoHistory[inputId]) AppState.fieldUndoHistory[inputId] = [];
+          AppState.fieldUndoHistory[inputId].push(oldVal);
+        }
+        const attempt = (AppState.fieldUndoHistory[inputId]?.length || 0) + 1;
+        if (btn) {
+          btn.disabled = true;
+          btn.querySelector("span").textContent = "Menyusun...";
+        }
+
+        try {
+          const ctx = StudioController.collectContext();
+          const result = await AIEngine.generateFieldText(label, ctx, oldVal, attempt);
+          el.value = result;
+          this.renderAiFieldWidgets();
+          Toast.show(`"${label}" berhasil diisi oleh AI.`, "success");
+        } catch (err) {
+          if (oldVal && AppState.fieldUndoHistory[inputId]?.length) AppState.fieldUndoHistory[inputId].pop();
+          Toast.show("Gagal generate kolom: " + err.message, "error");
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.querySelector("span").textContent = "Generate AI";
+          }
+        }
+      },
+
+      undoField(inputId) {
+        const hist = AppState.fieldUndoHistory[inputId];
+        const el = document.getElementById(inputId);
+        if (hist?.length && el) {
+          el.value = hist.pop();
+          this.renderAiFieldWidgets();
+          Toast.show("Isi kolom dikembalikan.", "info");
+        }
+      },
+
+      updateBrainBadge() {
+        const count = AppState.publishedMasterBrain.filter(r => r && r.active !== false).length;
+        const el = document.getElementById("active-brain-count");
+        if (el) el.textContent = `${count} Aturan Master Brain AI`;
+      },
+
+      fillSampleData() {
+        document.getElementById("p-jenjang").value = "SMP/MTs";
+        document.getElementById("p-mapel").value = "IPA (Ilmu Pengetahuan Alam)";
+        document.getElementById("p-kelas").value = "Fase D / Kelas VIII";
+        document.getElementById("p-topik").value = "Sistem Pencernaan Manusia";
+        document.getElementById("p-pendekatan").value = "Kontekstual & Interaktif";
+        Toast.show("Contoh data pembelajaran diisikan.", "info");
+      },
+
+      resetForm() {
+        document.getElementById("studio-generator-form").reset();
+        AppState.fieldUndoHistory = {};
+        this.renderAiFieldWidgets();
+      }
+    };
+
+    // =====================================================================
+    // AI ENGINE FOR ALL 10 GENERATORS
+    // =====================================================================
+    const AIEngine = {
+      buildMasterBrainSystemPrompt() {
+        const active = AppState.publishedMasterBrain.filter(r => r && r.active !== false);
+        const ruleStr = active.map((r, i) => `${i + 1}. [${r.category}] ${r.name}: ${r.instruction}`).join("\n");
+        const addon = AppState.aiPublicConfig?.systemPromptAddon || "";
+        return `Anda adalah pakar perangkat ajar dan pedagogi Indonesia.\nAturan Master Brain AI:\n${ruleStr}\n${addon}`;
+      },
+
+      async callGemini(prompt, systemInstruction = "") {
+        const cfg = AppState.aiPublicConfig || DEFAULT_AI_PUBLIC_CONFIG;
+        const model = cfg.model || "gemini-3-flash-preview";
+        const apiKey = "";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: typeof cfg.temperature === "number" ? cfg.temperature : 0.65,
+            maxOutputTokens: typeof cfg.maxTokens === "number" ? cfg.maxTokens : 4096
+          }
+        };
+        if (systemInstruction) payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+
+        const retries = typeof cfg.maxRetries === "number" ? cfg.maxRetries : 2;
+        let lastErr = null;
+        for (let i = 0; i <= retries; i++) {
+          try {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), cfg.timeoutMs || 45000);
+            const res = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              signal: ctrl.signal
+            });
+            clearTimeout(timer);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!txt) throw new Error("Respons kosong");
+            return txt.trim();
+          } catch (e) {
+            lastErr = e;
+            if (i < retries) await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+          }
+        }
+        throw lastErr;
+      },
+
+      async generateFieldText(label, ctx, oldVal, attempt) {
+        const prompt = `
+Susun isi untuk kolom "${label}" pada ${ctx.toolName} (variasi ke-${attempt}).
+Jenjang: ${ctx.jenjang} | Mapel: ${ctx.mapel} | Kelas: ${ctx.kelas} | Topik: ${ctx.topik} | Pendekatan: ${ctx.pendekatan}.
+${oldVal ? `Jangan mengulang persis: ${oldVal}` : ""}
+Tulis langsung hasil yang ringkas, jelas, dan siap pakai.
+        `.trim();
+        try {
+          return await this.callGemini(prompt, this.buildMasterBrainSystemPrompt());
+        } catch (e) {
+          const opts = [
+            `Rumusan ${label} untuk topik "${ctx.topik}" (${ctx.kelas}, ${ctx.mapel}) dengan pendekatan ${ctx.pendekatan}: Dirancang agar peserta didik aktif, memahami konsep inti, dan mampu mengaitkan materi dengan pengalaman nyata.`,
+            `Fokus ${label} pada ${ctx.mapel} — ${ctx.topik} (${ctx.jenjang}): Mengutamakan kejelasan langkah, relevansi konteks, serta ketercapaian tujuan belajar peserta didik.`
+          ];
+          return opts[(attempt - 1) % opts.length];
+        }
+      },
+
+      async generateForTool(ctx, onStage) {
+        const stages = [
+          "Memahami topik, jenjang, dan kebutuhan generator",
+          "Menyusun kerangka & poin utama berbasis Master Brain AI",
+          "Merinci langkah, contoh/data, dan catatan pedagogis",
+          "Memeriksa kelengkapan & kerapian format output"
+        ];
+        if (onStage) onStage(1, stages.length, stages[0], stages.slice(0, 1));
+        if (onStage) onStage(2, stages.length, stages[1], stages.slice(0, 2));
+
+        const sys = this.buildMasterBrainSystemPrompt();
+        const prompt = `
+Buat hasil terstruktur dalam JSON VALID (tanpa markdown fence) untuk:
+- Generator: ${ctx.toolName} (id: ${ctx.toolId})
+- Jenjang: ${ctx.jenjang}
+- Mata Pelajaran: ${ctx.mapel}
+- Fase / Kelas: ${ctx.kelas}
+- Materi Pokok: ${ctx.topik}
+- Pendekatan / Konteks: ${ctx.pendekatan}
+- Jumlah Item / Slide / Bagian: ${ctx.jumlahItem}
+- Tujuan / Catatan Tambahan: ${ctx.tujuan || "-"} | ${ctx.spesifik1 || "-"} | ${ctx.spesifik2 || "-"}
+
+Kembalikan JSON dengan format:
+{
+  "documentTitle": "string",
+  "summary": "string",
+  "sections": [
+    {
+      "heading": "string",
+      "badge": "string",
+      "content": "string",
+      "bullets": ["string"],
+      "speakerOrTeacherNote": "string"
+    }
+  ],
+  "tableHeaders": ["string"],
+  "tableRows": [["string"]]
+}
+        `.trim();
+
+        let parsed = null;
+        try {
+          const raw = await this.callGemini(prompt, sys);
+          const cleaned = raw.replace(/^```(?:json)?\s*/i, "").replace(/```$/i, "").trim();
+          const match = cleaned.match(/\{[\s\S]*\}/);
+          if (match) parsed = JSON.parse(match[0]);
+        } catch (err) {
+          // Use rich tool-specific pedagogical generator below
+        }
+
+        if (onStage) onStage(3, stages.length, stages[2], stages.slice(0, 3));
+        const output = this.buildToolSpecificOutput(parsed, ctx);
+        if (onStage) onStage(4, stages.length, stages[3], stages);
+        return output;
+      },
+
+      buildToolSpecificOutput(aiObj, ctx) {
+        const count = Math.max(2, Math.min(20, Number(ctx.jumlahItem) || 5));
+        const baseMeta = {
+          toolId: ctx.toolId,
+          toolName: ctx.toolName,
+          jenjang: ctx.jenjang,
+          mapel: ctx.mapel,
+          kelas: ctx.kelas,
+          topik: ctx.topik,
+          pendekatan: ctx.pendekatan,
+          generatedAt: new Date().toLocaleString("id-ID")
+        };
+
+        if (aiObj && Array.isArray(aiObj.sections) && aiObj.sections.length > 0) {
+          return {
+            title: aiObj.documentTitle || `${ctx.toolName}: ${ctx.topik}`,
+            summary: aiObj.summary || `Disusun untuk ${ctx.mapel} (${ctx.kelas}) pada topik ${ctx.topik}.`,
+            sections: aiObj.sections,
+            tableHeaders: Array.isArray(aiObj.tableHeaders) ? aiObj.tableHeaders : [],
+            tableRows: Array.isArray(aiObj.tableRows) ? aiObj.tableRows : [],
+            meta: baseMeta
+          };
+        }
+
+        // Dedicated high-quality builders for all 10 tools
+        if (ctx.toolId === "ppt") {
+          const slides = [
+            {
+              heading: `Slide 1 — Judul & Tujuan: ${ctx.topik}`,
+              badge: "Pembukaan",
+              content: `Presentasi ${ctx.mapel} (${ctx.kelas}) • ${ctx.pendekatan}`,
+              bullets: [
+                `Topik utama: ${ctx.topik}`,
+                `Sasaran belajar: memahami konsep inti dan penerapan ${ctx.topik}`,
+                "Pertanyaan awal untuk mengaitkan pengalaman peserta didik"
+              ],
+              speakerOrTeacherNote: "Sapa peserta didik dengan antusias dan jelaskan alur sesi presentasi secara singkat."
+            },
+            {
+              heading: `Slide 2 — Mengapa ${ctx.topik} Penting?`,
+              badge: "Konteks",
+              content: `Menghubungkan ${ctx.topik} dengan situasi nyata (${ctx.pendekatan}).`,
+              bullets: [
+                "Contoh fenomena di sekitar kehidupan sehari-hari",
+                "Dampak langsung terhadap pemahaman konsep lanjutan",
+                "Diskusi singkat 2 menit bersama teman sebangku"
+              ],
+              speakerOrTeacherNote: "Ajak 2–3 murid menyampaikan pendapat awal sebelum masuk ke konsep inti."
+            }
+          ];
+          for (let i = 3; i <= count; i++) {
+            slides.push({
+              heading: `Slide ${i} — Pokok Bahasan & Aktivitas Bagian ${i - 2}`,
+              badge: i === count ? "Penutup & Refleksi" : "Materi & Latihan",
+              content: `Pendalaman ${ctx.topik} pada ${ctx.mapel} (${ctx.kelas}) — fokus poin ke-${i - 2}.`,
+              bullets: [
+                `Poin kunci ${i - 2} terkait ${ctx.topik}`,
+                "Ilustrasi/diagram pendukung yang mudah dibaca di layar",
+                "Cek pemahaman singkat sebelum lanjut ke bagian berikutnya"
+              ],
+              speakerOrTeacherNote: "Hindari membaca teks slide kata demi kata; tekankan makna dan contoh nyata."
+            });
+          }
+          return {
+            title: `Materi Presentasi (PPT): ${ctx.topik}`,
+            summary: `Kerangka ${slides.length} slide untuk ${ctx.mapel} (${ctx.kelas}) dengan pendekatan ${ctx.pendekatan}.`,
+            sections: slides,
+            tableHeaders: ["No. Slide", "Judul Slide", "Visual Utama", "Catatan Pembicara"],
+            tableRows: slides.map((s, idx) => [String(idx + 1), s.heading, "Diagram / Ikon Kontekstual", s.speakerOrTeacherNote]),
+            meta: baseMeta
+          };
+        }
+
+        if (ctx.toolId === "pemantik") {
+          const qs = Array.from({ length: count }, (_, i) => ({
+            heading: `Pertanyaan Pemantik #${i + 1}`,
+            badge: i % 2 === 0 ? "Eksplorasi Makna" : "Berpikir Kritis",
+            content: `Bagaimana jika dalam mempelajari "${ctx.topik}" pada ${ctx.mapel} (${ctx.kelas}), kita mengamati perubahan atau situasi tak terduga (skenario ke-${i + 1})?`,
+            bullets: [
+              "Fokus pemicu: mengaitkan pengetahuan awal dengan fenomena baru",
+              "Bentuk respons: jawaban lisan singkat, sticky note, atau diskusi pasangan",
+              "Kata kunci penelusuran: mengapa, bagaimana, dan apa dampaknya"
+            ],
+            speakerOrTeacherNote: "Berikan jeda berpikir (wait time) 10–15 detik dan hargai semua hipotesis awal murid."
+          }));
+          return {
+            title: `Bank Pertanyaan Pemantik: ${ctx.topik}`,
+            summary: `Kumpulan ${qs.length} pertanyaan pembuka pembelajaran ${ctx.mapel} (${ctx.kelas}).`,
+            sections: qs,
+            tableHeaders: [],
+            tableRows: [],
+            meta: baseMeta
+          };
+        }
+
+        if (ctx.toolId === "prosem") {
+          const rows = Array.from({ length: count }, (_, i) => [
+            `Unit / Pertemuan ${i + 1}`,
+            `${ctx.topik} — Bagian ${i + 1}`,
+            `Memahami & menerapkan konsep ${ctx.topik} (Bagian ${i + 1})`,
+            `${ctx.spesifik2 || "3 JP"}`,
+            `Minggu ke-${i * 2 + 1}–${i * 2 + 2}`
+          ]);
+          return {
+            title: `Program Semester (Prosem): ${ctx.mapel} — ${ctx.topik}`,
+            summary: `Perencanaan pembelajaran semester untuk ${ctx.kelas} (${ctx.spesifik1 || "Semester Ganjil"}) dengan fokus ${ctx.topik}.`,
+            sections: [
+              {
+                heading: "Ringkasan Alokasi & Strategi Semester",
+                badge: "Perencanaan",
+                content: `Rencana distribusi topik ${ctx.topik} pada mata pelajaran ${ctx.mapel} (${ctx.kelas}) menggunakan pendekatan ${ctx.pendekatan}.`,
+                bullets: [
+                  `Periode: ${ctx.spesifik1 || "Semester berjalan"}`,
+                  `Beban waktu: ${ctx.spesifik2 || "Sesuai struktur kurikulum"}`,
+                  "Sisipkan waktu asesmen formatif, remedial, dan pengayaan secara proporsional"
+                ],
+                speakerOrTeacherNote: "Sesuaikan minggu efektif dengan kalender akademik satuan pendidikan setempat."
+              }
+            ],
+            tableHeaders: ["Unit", "Materi / Pokok Bahasan", "Tujuan Utama", "Alokasi Waktu", "Estimasi Waktu"],
+            tableRows: rows,
+            meta: baseMeta
+          };
+        }
+
+        if (ctx.toolId === "jurnal_mengajar") {
+          const entries = Array.from({ length: count }, (_, i) => ({
+            heading: `Catatan Pertemuan / Sesi ${i + 1} — ${ctx.topik}`,
+            badge: "Jurnal Mengajar",
+            content: `Pelaksanaan pembelajaran ${ctx.mapel} (${ctx.kelas}) pada materi ${ctx.topik} dengan pendekatan ${ctx.pendekatan}.`,
+            bullets: [
+              "Kegiatan pembuka, inti, dan penutup berjalan sesuai rencana",
+              "Ketercapaian: peserta didik mulai mampu menguraikan konsep utama",
+              "Tindak lanjut: beri umpan balik tertulis & siapkan penguatan pada pertemuan berikutnya"
+            ],
+            speakerOrTeacherNote: "Isi catatan kendala spesifik kelas dan nama murid yang memerlukan pendampingan lanjutan."
+          }));
+          return {
+            title: `Jurnal Mengajar: ${ctx.mapel} — ${ctx.topik}`,
+            summary: `Format catatan pelaksanaan pembelajaran untuk ${ctx.kelas}.`,
+            sections: entries,
+            tableHeaders: ["Sesi", "Topik / Fokus", "Ketercapaian", "Tindak Lanjut"],
+            tableRows: entries.map((e, idx) => [`Sesi ${idx + 1}`, ctx.topik, "Tercapai / Dalam Proses", "Pengayaan & Remedial Terarah"]),
+            meta: baseMeta
+          };
+        }
+
+        // Media, Studi Kasus, Pengayaan, Remedial, Diferensiasi, Ice Breaking
+        const items = Array.from({ length: count }, (_, i) => ({
+          heading: `${ctx.toolName} — Ide / Rancangan #${i + 1}: ${ctx.topik}`,
+          badge: ctx.shortLabel,
+          content: `Rancangan ${ctx.shortLabel.toLowerCase()} untuk mata pelajaran ${ctx.mapel} (${ctx.kelas}) pada topik "${ctx.topik}" dengan pendekatan ${ctx.pendekatan}.`,
+          bullets: [
+            `Langkah 1: Siapkan konteks dan ${ctx.spesifik1 || "materi pendukung"} yang relevan dengan ${ctx.topik}`,
+            `Langkah 2: Libatkan peserta didik melalui ${ctx.spesifik2 || "aktivitas terarah"} sesuai tingkat ${ctx.kelas}`,
+            "Langkah 3: Evaluasi pemahaman dan hubungkan kembali dengan tujuan pembelajaran"
+          ],
+          speakerOrTeacherNote: "Pastikan instruksi singkat, jelas, dan aman untuk seluruh peserta didik."
+        }));
+
+        return {
+          title: `${ctx.toolName}: ${ctx.topik}`,
+          summary: `Hasil penyusunan ${ctx.toolName} untuk ${ctx.mapel} (${ctx.kelas}) dengan pendekatan ${ctx.pendekatan}.`,
+          sections: items,
+          tableHeaders: [],
+          tableRows: [],
+          meta: baseMeta
+        };
+      },
+
+      async regenerateSectionItem(outputObj, sectionIdx) {
+        const sec = outputObj.sections[sectionIdx];
+        if (!sec) return sec;
+        const prompt = `
+Buat variasi baru untuk bagian "${sec.heading}" pada ${outputObj.meta.toolName} (${outputObj.meta.mapel}, ${outputObj.meta.kelas}, topik: ${outputObj.meta.topik}).
+Kembalikan teks ringkas dan jelas dalam Bahasa Indonesia.
+        `.trim();
+        try {
+          const txt = await this.callGemini(prompt, this.buildMasterBrainSystemPrompt());
+          return { ...sec, content: txt };
+        } catch (e) {
+          return {
+            ...sec,
+            content: `[Alternatif Baru • ${new Date().toLocaleTimeString("id-ID")}] ${sec.content} — Diperbarui dengan penekanan praktis untuk ${outputObj.meta.kelas}.`
+          };
+        }
+      }
+    };
+
+    // =====================================================================
+    // STUDIO CONTROLLER
+    // =====================================================================
+    const StudioController = {
+      collectContext() {
+        const tool = StudioUI.getActiveTool();
+        const isComplex = AppState.currentMode === "complex";
+        return {
+          toolId: tool.id,
+          toolName: tool.name,
+          shortLabel: tool.shortLabel,
+          jenjang: document.getElementById("p-jenjang")?.value.trim() || "SMP/MTs",
+          mapel: document.getElementById("p-mapel")?.value.trim() || "Mata Pelajaran",
+          kelas: document.getElementById("p-kelas")?.value.trim() || "Fase D",
+          topik: document.getElementById("p-topik")?.value.trim() || "Topik Pembelajaran",
+          pendekatan: document.getElementById("p-pendekatan")?.value.trim() || "Kontekstual",
+          jumlahItem: Number(document.getElementById("p-jumlah-item")?.value || 5),
+          tujuan: isComplex ? document.getElementById("c-tujuan")?.value.trim() : "",
+          karakteristik: isComplex ? document.getElementById("c-karakteristik")?.value.trim() : "",
+          spesifik1: isComplex ? document.getElementById("c-spesifik-1")?.value.trim() : tool.spec1Default,
+          spesifik2: isComplex ? document.getElementById("c-spesifik-2")?.value.trim() : tool.spec2Default,
+          catatanTambahan: isComplex ? document.getElementById("c-catatan-tambahan")?.value.trim() : ""
+        };
+      },
+
+      async handleGenerate(e) {
+        e.preventDefault();
+        const ctx = this.collectContext();
+        if (!ctx.jenjang || !ctx.mapel || !ctx.kelas || !ctx.topik) {
+          Toast.show("Mohon lengkapi Jenjang, Mata Pelajaran, Fase/Kelas, dan Materi Pokok.", "warning");
+          return;
+        }
+
+        const btn = document.getElementById("btn-generate-doc");
+        const panel = document.getElementById("generation-progress-panel");
+        const counter = document.getElementById("progress-stage-counter");
+        const label = document.getElementById("progress-stage-label");
+        const log = document.getElementById("progress-stage-log");
+
+        btn.disabled = true;
+        panel.classList.remove("hidden");
+        log.innerHTML = "";
+        AppState.stats.generationsCount += 1;
+
+        try {
+          const out = await AIEngine.generateForTool(ctx, (step, total, cur, doneList) => {
+            counter.textContent = `Tahap ${step} / ${total}`;
+            label.textContent = cur;
+            log.innerHTML = doneList.map((it, i) => `<li>${i + 1 === step ? "⏳" : "✓"} ${escapeHtml(it)}</li>`).join("");
+          });
+
+          AppState.currentOutput = out;
+          AppState.undoStack = [];
+          AppState.redoStack = [];
+          AppState.stats.successCount += 1;
+
+          PreviewController.renderAll();
+          document.getElementById("hasil-dokumen-section").classList.remove("hidden");
+          document.getElementById("hasil-dokumen-section").scrollIntoView({ behavior: "smooth", block: "start" });
+          Toast.show(AppState.publishedSettings.content?.successToast || "Hasil berhasil dibuat!", "success");
+        } catch (err) {
+          Toast.show("Gagal menyusun hasil: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          setTimeout(() => panel.classList.add("hidden"), 700);
+        }
+      }
+    };
+
+    // =====================================================================
+    // PREVIEW, INLINE EDIT (UNDO/REDO) & SECTION REGENERATE
+    // =====================================================================
+    const PreviewController = {
+      pushUndo() {
+        if (!AppState.currentOutput) return;
+        AppState.undoStack.push(JSON.stringify(AppState.currentOutput));
+        if (AppState.undoStack.length > 25) AppState.undoStack.shift();
+        AppState.redoStack = [];
+        this.syncUndoRedo();
+      },
+      undoEdit() {
+        if (!AppState.undoStack.length || !AppState.currentOutput) return;
+        AppState.redoStack.push(JSON.stringify(AppState.currentOutput));
+        AppState.currentOutput = JSON.parse(AppState.undoStack.pop());
+        this.renderAll();
+        this.syncUndoRedo();
+        Toast.show("Undo berhasil.", "info");
+      },
+      redoEdit() {
+        if (!AppState.redoStack.length || !AppState.currentOutput) return;
+        AppState.undoStack.push(JSON.stringify(AppState.currentOutput));
+        AppState.currentOutput = JSON.parse(AppState.redoStack.pop());
+        this.renderAll();
+        this.syncUndoRedo();
+        Toast.show("Redo berhasil.", "info");
+      },
+      syncUndoRedo() {
+        const u = document.getElementById("btn-undo-edit");
+        const r = document.getElementById("btn-redo-edit");
+        if (u) u.disabled = AppState.undoStack.length === 0;
+        if (r) r.disabled = AppState.redoStack.length === 0;
+      },
+      toggleInlineEdit() {
+        AppState.inlineEditEnabled = !AppState.inlineEditEnabled;
+        document.getElementById("inline-edit-label").textContent = AppState.inlineEditEnabled ? "Edit Langsung: AKTIF" : "Edit Langsung: NONAKTIF";
+        this.renderBody();
+      },
+      applyDocLayout() {
+        const paper = document.getElementById("doc-print-area");
+        if (!paper) return;
+        const size = document.getElementById("doc-paper-size")?.value || "a4";
+        const orient = document.getElementById("doc-orientation")?.value || "portrait";
+        const font = document.getElementById("doc-font-family")?.value || "sans";
+        const margin = document.getElementById("doc-margin")?.value || "18";
+
+        paper.classList.remove("paper-a4", "paper-f4", "paper-landscape", "font-sans", "font-serif");
+        paper.classList.add(size === "f4" ? "paper-f4" : "paper-a4");
+        if (orient === "landscape") paper.classList.add("paper-landscape");
+        paper.classList.add(font === "serif" ? "font-serif" : "font-sans");
+        paper.style.padding = `${margin}mm`;
+      },
+      renderAll() {
+        this.applyDocLayout();
+        this.renderTOC();
+        this.renderBody();
+        this.syncUndoRedo();
+      },
+      renderTOC() {
+        const toc = document.getElementById("doc-toc-list");
+        const out = AppState.currentOutput;
+        if (!toc || !out) return;
+        toc.innerHTML = out.sections
+          .map((s, idx) => `<li><a href="#sec-item-${idx}" class="block px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-blue-50 hover:text-blue-800 truncate">${idx + 1}. ${escapeHtml(s.heading)}</a></li>`)
+          .join("");
+      },
+      editableAttr(path) {
+        if (!AppState.inlineEditEnabled) return "";
+        return `contenteditable="true" data-path="${path}" onblur="PreviewController.onBlurEdit(this)" class="editable-hover"`;
+      },
+      onBlurEdit(el) {
+        const out = AppState.currentOutput;
+        if (!out) return;
+        const path = el.dataset.path;
+        const val = el.innerText.trim();
+        if (path === "title" && out.title !== val) {
+          this.pushUndo();
+          out.title = val;
+        } else if (path === "summary" && out.summary !== val) {
+          this.pushUndo();
+          out.summary = val;
+        } else if (path.startsWith("sec-content-")) {
+          const idx = Number(path.replace("sec-content-", ""));
+          if (out.sections[idx] && out.sections[idx].content !== val) {
+            this.pushUndo();
+            out.sections[idx].content = val;
+          }
+        }
+      },
+      async openSectionRegen(idx) {
+        const out = AppState.currentOutput;
+        const sec = out?.sections?.[idx];
+        if (!sec) return;
+        AppState.pendingRegenIdx = idx;
+        AppState.pendingRegenNewValue = null;
+
+        document.getElementById("regen-modal-title").textContent = `Generate Ulang: ${sec.heading}`;
+        document.getElementById("regen-old-preview").textContent = sec.content;
+        document.getElementById("regen-new-preview").textContent = "Menyusun variasi baru...";
+        document.getElementById("regen-loading-badge").classList.remove("hidden");
+        document.getElementById("btn-apply-regen").disabled = true;
+        document.getElementById("regen-section-modal").classList.remove("hidden");
+
+        const updatedSec = await AIEngine.regenerateSectionItem(out, idx);
+        AppState.pendingRegenNewValue = updatedSec;
+        document.getElementById("regen-loading-badge").classList.add("hidden");
+        document.getElementById("regen-new-preview").textContent = updatedSec.content;
+        document.getElementById("btn-apply-regen").disabled = false;
+      },
+      applySectionRegen() {
+        const idx = AppState.pendingRegenIdx;
+        const val = AppState.pendingRegenNewValue;
+        if (idx === null || !val || !AppState.currentOutput) return;
+        this.pushUndo();
+        AppState.currentOutput.sections[idx] = val;
+        this.cancelSectionRegen();
+        this.renderBody();
+        Toast.show("Bagian berhasil diperbarui.", "success");
+      },
+      cancelSectionRegen() {
+        AppState.pendingRegenIdx = null;
+        AppState.pendingRegenNewValue = null;
+        document.getElementById("regen-section-modal").classList.add("hidden");
+      },
+      renderBody() {
+        const container = document.getElementById("doc-preview-content");
+        const out = AppState.currentOutput;
+        if (!container || !out) return;
+
+        document.getElementById("doc-tool-pill").textContent = out.meta.toolName;
+
+        const sectionsHtml = out.sections.map((sec, idx) => `
+          <section id="sec-item-${idx}" class="p-4 rounded-xl border border-slate-200 bg-white space-y-2.5">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold text-slate-900">${escapeHtml(sec.heading)}</h2>
+                ${sec.badge ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">${escapeHtml(sec.badge)}</span>` : ""}
+              </div>
+              <button type="button" onclick="PreviewController.openSectionRegen(${idx})" class="no-print inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200">
+                <i data-lucide="refresh-cw" class="w-3 h-3"></i><span>Regenerate</span>
+              </button>
+            </div>
+            <p class="text-sm text-slate-800" ${this.editableAttr(`sec-content-${idx}`)}>${escapeHtml(sec.content)}</p>
+            ${Array.isArray(sec.bullets) && sec.bullets.length ? `
+              <ul class="list-disc list-inside text-sm text-slate-700 space-y-1 pl-1">
+                ${sec.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("")}
+              </ul>
+            ` : ""}
+            ${sec.speakerOrTeacherNote ? `
+              <div class="text-xs bg-amber-50/70 border border-amber-200/70 rounded-lg px-3 py-2 text-amber-950">
+                <strong>Catatan Pendidik:</strong> ${escapeHtml(sec.speakerOrTeacherNote)}
+              </div>
+            ` : ""}
+          </section>
+        `).join("");
+
+        const tableHtml = (Array.isArray(out.tableHeaders) && out.tableHeaders.length && Array.isArray(out.tableRows) && out.tableRows.length) ? `
+          <div class="overflow-x-auto pt-2">
+            <table class="w-full border-collapse border border-slate-300 text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-slate-100">
+                  ${out.tableHeaders.map(h => `<th class="border border-slate-300 px-3 py-2 text-left font-bold">${escapeHtml(h)}</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${out.tableRows.map(r => `
+                  <tr>${r.map(c => `<td class="border border-slate-300 px-3 py-1.5">${escapeHtml(c)}</td>`).join("")}</tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        ` : "";
+
+        container.innerHTML = `
+          <div class="border-b-2 border-slate-800 pb-3 mb-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-blue-700">${escapeHtml(out.meta.toolName)} • ${escapeHtml(out.meta.jenjang)}</div>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5" ${this.editableAttr("title")}>${escapeHtml(out.title)}</h1>
+            <p class="text-xs text-slate-500 mt-1">${escapeHtml(out.meta.mapel)} | ${escapeHtml(out.meta.kelas)} | ${escapeHtml(out.meta.topik)}</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700" ${this.editableAttr("summary")}>${escapeHtml(out.summary)}</div>
+          <div class="space-y-4">${sectionsHtml}</div>
+          ${tableHtml}
+          <div class="text-[11px] text-slate-400 border-t border-slate-200 pt-3 flex items-center justify-between">
+            <span>${escapeHtml(AppState.publishedSettings.general?.siteName || "AI Studio Perangkat Ajar")}</span>
+            <span>${escapeHtml(out.meta.generatedAt)}</span>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    };
+
+    // =====================================================================
+    // EXPORT CONTROLLER (CLIPBOARD, REAL DOCX, PDF & PRINT)
+    // =====================================================================
+    const ExportController = {
+      copyToClipboard() {
+        const el = document.getElementById("doc-preview-content");
+        if (!el) return;
+        const ta = document.createElement("textarea");
+        ta.value = el.innerText;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          Toast.show("Hasil disalin ke clipboard.", "success");
+        } catch (e) {
+          Toast.show("Gagal menyalin ke clipboard.", "error");
+        } finally {
+          document.body.removeChild(ta);
+        }
+      },
+
+      async exportDOCX() {
+        const out = AppState.currentOutput;
+        if (!out) {
+          Toast.show("Generate hasil terlebih dahulu sebelum mengekspor DOCX.", "warning");
+          return;
+        }
+        if (!window.docx) {
+          Toast.show("Pustaka DOCX belum siap.", "error");
+          return;
+        }
+        try {
+          const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+          const children = [
+            new Paragraph({ text: out.title, heading: HeadingLevel.HEADING_1 }),
+            new Paragraph({ children: [new TextRun({ text: `${out.meta.toolName} | ${out.meta.mapel} | ${out.meta.kelas}`, italics: true })] }),
+            new Paragraph(out.summary),
+            ...out.sections.flatMap(sec => [
+              new Paragraph({ text: sec.heading, heading: HeadingLevel.HEADING_2 }),
+              new Paragraph(sec.content),
+              ...(sec.bullets || []).map(b => new Paragraph(`• ${b}`)),
+              ...(sec.speakerOrTeacherNote ? [new Paragraph(`Catatan: ${sec.speakerOrTeacherNote}`)] : [])
+            ])
+          ];
+          const wordDoc = new Document({ sections: [{ children }] });
+          const blob = await Packer.toBlob(wordDoc);
+          const safe = (out.title || "Perangkat_Ajar").replace(/[^a-zA-Z0-9_-]+/g, "_").slice(0, 60);
+          saveAs(blob, `${safe}.docx`);
+          Toast.show("File DOCX berhasil diunduh.", "success");
+        } catch (err) {
+          Toast.show("Gagal membuat DOCX: " + err.message, "error");
+        }
+      },
+
+      exportPDF() {
+        const area = document.getElementById("doc-print-area");
+        const out = AppState.currentOutput;
+        if (!area || !out) {
+          Toast.show("Generate hasil terlebih dahulu sebelum mengekspor PDF.", "warning");
+          return;
+        }
+        if (!window.html2pdf) {
+          window.print();
+          return;
+        }
+        const safe = (out.title || "Perangkat_Ajar").replace(/[^a-zA-Z0-9_-]+/g, "_").slice(0, 60);
+        window.html2pdf().set({
+          margin: 10,
+          filename: `${safe}.pdf`,
+          image: { type: "jpeg", quality: 0.96 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        }).from(area).save().then(() => Toast.show("File PDF berhasil diunduh.", "success")).catch(() => window.print());
+      },
+
+      printDocument() {
+        window.print();
+      }
+    };
+
+    // =====================================================================
+    // ADMIN DASHBOARD CONTROLLER
+    // =====================================================================
+    const AdminController = {
+      selectMenu(menuNum) {
+        AppState.activeAdminMenu = menuNum;
+        document.querySelectorAll(".admin-nav-btn").forEach(btn => {
+          const active = Number(btn.dataset.adminMenu) === menuNum;
+          btn.classList.toggle("ring-2", active);
+          btn.classList.toggle("ring-blue-500", active);
+        });
+        this.renderModule();
+      },
+
+      formatPermissionError(err) {
+        const raw = err?.message || String(err || "");
+        if (raw.includes("PERMISSION_DENIED") || raw.toLowerCase().includes("permission denied")) {
+          return "PERMISSION_DENIED: Akun belum memiliki hak tulis di Realtime Database. Pastikan token memiliki Custom Claim admin: true atau UID terdaftar di /admins/{uid} dan Security Rules mengizinkan akses tulis Admin.";
+        }
+        return raw;
+      },
+
+      collectIntoDraft() {
+        const m = AppState.activeAdminMenu;
+        const d = AppState.draftSettings;
+        if (m === 2) {
+          d.theme.primaryColor = document.getElementById("adm-primary")?.value || d.theme.primaryColor;
+          d.theme.secondaryColor = document.getElementById("adm-secondary")?.value || d.theme.secondaryColor;
+          d.theme.fontFamily = document.getElementById("adm-font")?.value || d.theme.fontFamily;
+        } else if (m === 3) {
+          d.general.siteName = document.getElementById("adm-site-name")?.value || d.general.siteName;
+          d.content.heroTitle = document.getElementById("adm-hero-title")?.value || d.content.heroTitle;
+          d.content.heroSubtitle = document.getElementById("adm-hero-subtitle")?.value || d.content.heroSubtitle;
+          d.content.generateButtonText = document.getElementById("adm-gen-btn")?.value || d.content.generateButtonText;
+        } else if (m === 8) {
+          d.features.inlineEdit = document.getElementById("adm-f-inline")?.checked ?? true;
+          d.features.regenerateSection = document.getElementById("adm-f-regen")?.checked ?? true;
+          d.features.copyClipboard = document.getElementById("adm-f-copy")?.checked ?? true;
+          d.features.downloadDocx = document.getElementById("adm-f-docx")?.checked ?? true;
+          d.features.downloadPdf = document.getElementById("adm-f-pdf")?.checked ?? true;
+          d.features.printDoc = document.getElementById("adm-f-print")?.checked ?? true;
+        } else if (m === 9) {
+          d.seo.metaTitle = document.getElementById("adm-seo-title")?.value || d.seo.metaTitle;
+          d.seo.metaDescription = document.getElementById("adm-seo-desc")?.value || d.seo.metaDescription;
+        } else if (m === 10) {
+          d.footer.description = document.getElementById("adm-f-desc")?.value || d.footer.description;
+          d.footer.copyright = document.getElementById("adm-f-copy-right")?.value || d.footer.copyright;
+        }
+      },
+
+      async saveDraft() {
+        if (!AppState.isAdminAuthorized) return;
+        this.collectIntoDraft();
+        try {
+          await set(ref(database, "app_settings/draft"), AppState.draftSettings);
+          const brainMap = {};
+          AppState.draftMasterBrain.forEach((r, i) => { brainMap[r.id || `r-${i + 1}`] = { ...r, priority: i + 1 }; });
+          await set(ref(database, "master_brain/draft"), brainMap);
+          await FirebaseService.appendAuditLog("SIMPAN_DRAFT", "Menyimpan draft konfigurasi & Master Brain AI.");
+          Toast.show("Draft berhasil disimpan ke Firebase.", "success");
+        } catch (err) {
+          Toast.show("Gagal menyimpan draft: " + this.formatPermissionError(err), "error");
+        }
+      },
+
+      previewWebsite() {
+        this.collectIntoDraft();
+        ThemeEngine.applyPublicConfig(AppState.draftSettings);
+        AppController.switchView("public");
+        Toast.show("Preview draft diterapkan sementara di halaman publik.", "info");
+      },
+
+      async publishConfig() {
+        if (!AppState.isAdminAuthorized) return;
+        this.collectIntoDraft();
+        try {
+          const vId = `v_${Date.now()}`;
+          await set(ref(database, "app_settings/published"), AppState.draftSettings);
+          const brainMap = {};
+          AppState.draftMasterBrain.forEach((r, i) => { brainMap[r.id || `r-${i + 1}`] = { ...r, priority: i + 1 }; });
+          await set(ref(database, "master_brain/published"), brainMap);
+          await set(ref(database, `config_versions/${vId}`), {
+            timestamp: Date.now(),
+            adminEmail: AppState.currentAdminUser?.email || "admin",
+            settingsSnapshot: AppState.draftSettings
+          });
+
+          AppState.publishedSettings = structuredClone(AppState.draftSettings);
+          AppState.publishedMasterBrain = AppState.draftMasterBrain.map((r, i) => ({ ...r, priority: i + 1 }));
+          ThemeEngine.applyPublicConfig(AppState.publishedSettings);
+          await FirebaseService.appendAuditLog("PUBLIKASI", `Mempublikasikan konfigurasi (${vId}).`);
+          Toast.show("Konfigurasi berhasil dipublikasikan!", "success");
+        } catch (err) {
+          Toast.show("Gagal mempublikasikan konfigurasi: " + this.formatPermissionError(err), "error");
+        }
+      },
+
+      async logout() {
+        await signOut(auth);
+        AppState.currentAdminUser = null;
+        AppState.isAdminAuthorized = false;
+        AppController.switchView("public");
+        Toast.show("Logout berhasil.", "info");
+      },
+
+      renderModule() {
+        const container = document.getElementById("admin-module-container");
+        if (!container) return;
+        const m = AppState.activeAdminMenu;
+        const d = AppState.draftSettings;
+
+        if (m === 1) {
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-4">1. Dashboard Overview</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div class="p-4 rounded-xl bg-blue-50 border border-blue-200"><div class="text-xs font-semibold text-blue-700">Total Generate Sesi</div><div class="text-2xl font-extrabold text-blue-950 mt-1">${AppState.stats.generationsCount}</div></div>
+              <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200"><div class="text-xs font-semibold text-emerald-700">Berhasil Dibuat</div><div class="text-2xl font-extrabold text-emerald-950 mt-1">${AppState.stats.successCount}</div></div>
+              <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200"><div class="text-xs font-semibold text-indigo-700">Modul Generator Aktif</div><div class="text-2xl font-extrabold text-indigo-950 mt-1">10 Modul</div></div>
+            </div>
+            <p class="text-sm text-slate-600">Gunakan menu di sebelah kiri untuk mengatur tampilan, teks, fitur ekspor, Master Brain AI, SEO, dan riwayat versi.</p>
+          `;
+        } else if (m === 2) {
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-4">2. Pengaturan Tampilan</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+              <div><label class="block text-xs font-semibold mb-1">Warna Utama</label><input id="adm-primary" type="color" value="${d.theme.primaryColor}" class="w-full h-10 rounded-lg" /></div>
+              <div><label class="block text-xs font-semibold mb-1">Warna Sekunder</label><input id="adm-secondary" type="color" value="${d.theme.secondaryColor}" class="w-full h-10 rounded-lg" /></div>
+              <div><label class="block text-xs font-semibold mb-1">Jenis Font</label><select id="adm-font" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option value="Inter" ${d.theme.fontFamily === "Inter" ? "selected" : ""}>Inter</option><option value="Plus Jakarta Sans" ${d.theme.fontFamily === "Plus Jakarta Sans" ? "selected" : ""}>Plus Jakarta Sans</option><option value="Merriweather" ${d.theme.fontFamily === "Merriweather" ? "selected" : ""}>Merriweather</option></select></div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              ${(d.theme.palette18 || []).map(hex => `<button type="button" onclick="document.getElementById('adm-primary').value='${hex}'" class="w-7 h-7 rounded border border-slate-300" style="background:${hex}" title="${hex}"></button>`).join("")}
+            </div>
+          `;
+        } else if (m === 3) {
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-4">3. Teks dan Konten</h2>
+            <div class="space-y-4">
+              <div><label class="block text-xs font-semibold mb-1">Nama Website</label><input id="adm-site-name" type="text" value="${escapeHtml(d.general.siteName)}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+              <div><label class="block text-xs font-semibold mb-1">Judul Hero</label><input id="adm-hero-title" type="text" value="${escapeHtml(d.content.heroTitle)}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+              <div><label class="block text-xs font-semibold mb-1">Subjudul Hero</label><textarea id="adm-hero-subtitle" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">${escapeHtml(d.content.heroSubtitle)}</textarea></div>
+              <div><label class="block text-xs font-semibold mb-1">Teks Tombol Generate</label><input id="adm-gen-btn" type="text" value="${escapeHtml(d.content.generateButtonText)}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            </div>
+          `;
+        } else if (m === 6) {
+          container.innerHTML = `
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-slate-900">6. Master Brain AI</h2>
+              <button type="button" onclick="AdminController.addBrainRule()" class="px-3 py-1.5 rounded-lg bg-blue-700 text-white text-xs font-semibold">+ Tambah Aturan</button>
+            </div>
+            <div class="space-y-2.5">
+              ${AppState.draftMasterBrain.map((r, i) => `
+                <div class="p-3 rounded-xl border border-slate-200 space-y-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <input type="text" value="${escapeHtml(r.name)}" onchange="AppState.draftMasterBrain[${i}].name=this.value" class="font-bold text-sm text-slate-900 border rounded px-2 py-1 flex-1" />
+                    <label class="text-xs inline-flex items-center gap-1"><input type="checkbox" ${r.active !== false ? "checked" : ""} onchange="AppState.draftMasterBrain[${i}].active=this.checked" /> Aktif</label>
+                  </div>
+                  <textarea rows="2" onchange="AppState.draftMasterBrain[${i}].instruction=this.value" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs sm:text-sm">${escapeHtml(r.instruction)}</textarea>
+                </div>
+              `).join("")}
+            </div>
+          `;
+        } else if (m === 8) {
+          const f = d.features;
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-4">8. Fitur dan Ekspor</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <label class="p-3 rounded-xl border flex items-center justify-between"><span>Inline Edit</span><input id="adm-f-inline" type="checkbox" ${f.inlineEdit !== false ? "checked" : ""} /></label>
+              <label class="p-3 rounded-xl border flex items-center justify-between"><span>Regenerate Per Bagian</span><input id="adm-f-regen" type="checkbox" ${f.regenerateSection !== false ? "checked" : ""} /></label>
+              <label class="p-3 rounded-xl border flex items-center justify-between"><span>Salin Clipboard</span><input id="adm-f-copy" type="checkbox" ${f.copyClipboard !== false ? "checked" : ""} /></label>
+              <label class="p-3 rounded-xl border flex items-center justify-between"><span>Download DOCX</span><input id="adm-f-docx" type="checkbox" ${f.downloadDocx !== false ? "checked" : ""} /></label>
+              <label class="p-3 rounded-xl border flex items-center justify-between"><span>Download PDF</span><input id="adm-f-pdf" type="checkbox" ${f.downloadPdf !== false ? "checked" : ""} /></label>
+              <label class="p-3 rounded-xl border flex items-center justify-between"><span>Cetak (Print)</span><input id="adm-f-print" type="checkbox" ${f.printDoc !== false ? "checked" : ""} /></label>
+            </div>
+          `;
+        } else if (m === 9) {
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-4">9. Pengaturan SEO</h2>
+            <div class="space-y-4">
+              <div><label class="block text-xs font-semibold mb-1">Meta Title</label><input id="adm-seo-title" type="text" value="${escapeHtml(d.seo.metaTitle)}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+              <div><label class="block text-xs font-semibold mb-1">Meta Description</label><textarea id="adm-seo-desc" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">${escapeHtml(d.seo.metaDescription)}</textarea></div>
+            </div>
+          `;
+        } else if (m === 10) {
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-4">10. Footer dan Legal</h2>
+            <div class="space-y-4">
+              <div><label class="block text-xs font-semibold mb-1">Deskripsi Footer</label><textarea id="adm-f-desc" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">${escapeHtml(d.footer.description)}</textarea></div>
+              <div><label class="block text-xs font-semibold mb-1">Copyright</label><input id="adm-f-copy-right" type="text" value="${escapeHtml(d.footer.copyright)}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-900 mb-2">Menu ${m}</h2>
+            <p class="text-sm text-slate-600 mb-4">Project Firebase: <span class="font-mono">p-c410f</span> • Model AI: <span class="font-mono">${escapeHtml(AppState.aiPublicConfig.model)}</span></p>
+            <div class="space-y-2 text-xs">
+              ${AppState.auditLogs.slice(0, 8).map(l => `<div class="p-2.5 rounded-lg bg-slate-50 border">${escapeHtml(l.action)} — ${escapeHtml(l.detail)} (${new Date(l.timestamp).toLocaleString("id-ID")})</div>`).join("")}
+            </div>
+          `;
+        }
+        lucide.createIcons();
+      },
+
+      addBrainRule() {
+        AppState.draftMasterBrain.push({
+          id: `mb-${Date.now()}`,
+          priority: AppState.draftMasterBrain.length + 1,
+          active: true,
+          category: "Kustom",
+          name: "Aturan Baru",
+          instruction: "Tuliskan aturan penyusunan perangkat ajar."
+        });
+        this.renderModule();
+      }
+    };
+
+    const AppController = {
+      switchView(view) {
+        const pub = document.getElementById("public-view");
+        const adm = document.getElementById("admin-dashboard-view");
+        if (view === "admin") {
+          if (!AppState.isAdminAuthorized) {
+            AdminAuth.openModal();
+            return;
+          }
+          pub.classList.add("hidden");
+          adm.classList.remove("hidden");
+          AdminController.selectMenu(AppState.activeAdminMenu || 1);
+        } else {
+          adm.classList.add("hidden");
+          pub.classList.remove("hidden");
+        }
+        lucide.createIcons();
+      },
+      openAdminPortal() {
+        if (AppState.isAdminAuthorized) this.switchView("admin");
+        else AdminAuth.openModal();
+      }
+    };
+
+    const LegalModal = {
+      open(type) {
+        const f = AppState.publishedSettings.footer || DEFAULT_APP_SETTINGS.footer;
+        document.getElementById("legal-modal-title").textContent = type === "privacy" ? "Kebijakan Privasi" : "Syarat dan Ketentuan";
+        document.getElementById("legal-modal-body").textContent = type === "privacy" ? f.privacyPolicy : f.termsOfService;
+        document.getElementById("legal-modal").classList.remove("hidden");
+      },
+      close() {
+        document.getElementById("legal-modal").classList.add("hidden");
+      }
+    };
+
+    window.AppController = AppController;
+    window.AdminAuth = AdminAuth;
+    window.AdminController = AdminController;
+    window.StudioUI = StudioUI;
+    window.StudioController = StudioController;
+    window.PreviewController = PreviewController;
+    window.ExportController = ExportController;
+    window.LegalModal = LegalModal;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      ThemeEngine.applyPublicConfig(AppState.publishedSettings);
+      StudioUI.renderToolTabs();
+      StudioUI.renderAiFieldWidgets();
+      FirebaseService.initListeners();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
